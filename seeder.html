@@ -213,6 +213,11 @@
         const weekDays = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"];
         const today = new Date();
         
+        // Yozilishi kerak bo'lganlarni yig'ish (tezroq ishlashi uchun)
+        const newAssignmentsToSave = [];
+        const changedAttendances = new Set();
+        const changedGrades = new Set();
+        
         // Kunlarni shakllantirish (Bugun va undan oldingi 4 kun)
         const daysToSeed = [];
         for(let i = 0; i < 5; i++) {
@@ -262,7 +267,7 @@
                     };
                     
                     assignments.push(newAssignment);
-                    await db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment);
+                    newAssignmentsToSave.push(newAssignment);
                     newAssignmentsCount++;
                     currentCourses.push(newAssignment);
                 }
@@ -300,8 +305,8 @@
                             studentId: student.id,
                             status: Math.random() > 0.15 ? "kelgan" : "kelmagan"
                         });
-                        // Bazani yangilaymiz
-                        await db.collection("attendance").doc(attRecord.id).set(attRecord);
+                        // Batch orqali yozish uchun yig'amiz
+                        changedAttendances.add(attRecord);
                     }
 
                     // --- BAHO ---
@@ -337,7 +342,7 @@
                                 studentId: student.id,
                                 grade: b
                             });
-                            await db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
+                            changedGrades.add(gradeRecord);
                         }
                     }
                 }
@@ -348,6 +353,46 @@
         localStorage.setItem("courseAssignments", JSON.stringify(assignments));
         localStorage.setItem("attendance", JSON.stringify(attendances));
         localStorage.setItem("grades", JSON.stringify(grades));
+
+        // Firebase ga batch orqali tez yozish
+        logMessage("Firebase bazasiga yozilmoqda... Bu biroz vaqt olishi mumkin.", "info");
+        
+        let batch = db.batch();
+        let opsCount = 0;
+        let totalOps = 0;
+
+        async function commitBatchIfNeeded() {
+            if (opsCount >= 400) {
+                await batch.commit();
+                batch = db.batch();
+                opsCount = 0;
+            }
+        }
+
+        for (const a of newAssignmentsToSave) {
+            batch.set(db.collection("courseAssignments").doc(a.id), a);
+            opsCount++;
+            totalOps++;
+            await commitBatchIfNeeded();
+        }
+
+        for (const a of changedAttendances) {
+            batch.set(db.collection("attendance").doc(a.id), a);
+            opsCount++;
+            totalOps++;
+            await commitBatchIfNeeded();
+        }
+
+        for (const g of changedGrades) {
+            batch.set(db.collection("grades").doc(g.id), g);
+            opsCount++;
+            totalOps++;
+            await commitBatchIfNeeded();
+        }
+
+        if (opsCount > 0) {
+            await batch.commit();
+        }
 
         logMessage("===========================", "info");
         logMessage(`Yangi yozilgan kurslar: ${newAssignmentsCount} ta`, "success");
