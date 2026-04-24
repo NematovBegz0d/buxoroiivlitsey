@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avtomatik Ma'lumot Kiritish (Seeder)</title>
+  <link rel="icon" type="image/png" href="./imgs/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #448aff;
+      --primary-dark: #2962ff;
+      --success: #00e676;
+      --danger: #ff5252;
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --border: #30363d;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0;
+      color: #fff;
+      font-size: 24px;
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .info-box {
+      background-color: rgba(68, 138, 255, 0.1);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    .btn:disabled {
+      background-color: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-danger {
+      background-color: var(--danger);
+      margin-top: 15px;
+    }
+    .btn-danger:hover {
+      background-color: #d32f2f;
+    }
+    .progress-box {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: none;
+    }
+    .progress-box.show {
+      display: block;
+    }
+    .log-item {
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: var(--success);
+    }
+    .log-item.error {
+      color: var(--danger);
+    }
+    .log-item.info {
+      color: var(--primary);
+    }
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <!-- Firebase ulanishi -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="./js/firebase-config.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-database text-primary"></i> Avtomatik Ma'lumot Kiritish</h1>
+      <p>Barcha o'quvchilarni kamida 3 ta kursga yozib, ularga davomat va baholarni avtomatik shakllantirish</p>
+    </div>
+
+    <div class="info-box">
+      <strong><i class="fas fa-info-circle"></i> Eslatma:</strong> Bu script bazadagi (yoki LocalStorage'dagi) mavjud guruhlar va o'quvchilarni oladi, har biriga tasodifiy 3 ta fanni tanlab kursga yozadi va o'tgan kunlar uchun tasodifiy davomat va baho yozib beradi.
+    </div>
+
+    <button id="startBtn" class="btn" onclick="startSeeding()">
+      <i class="fas fa-play"></i> Jarayonni boshlash
+    </button>
+    
+    <button id="clearBtn" class="btn btn-danger" onclick="clearData()">
+      <i class="fas fa-trash"></i> Kiritilgan ma'lumotlarni tozalash
+    </button>
+
+    <div id="progressBox" class="progress-box">
+      <!-- Log xabarlari shu yerda chiqadi -->
+    </div>
+  </div>
+
+  <script>
+    const progressBox = document.getElementById("progressBox");
+    const startBtn = document.getElementById("startBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    function logMessage(msg, type = "info") {
+      progressBox.classList.add("show");
+      const div = document.createElement("div");
+      div.className = `log-item ${type}`;
+      div.textContent = `> ${msg}`;
+      progressBox.appendChild(div);
+      progressBox.scrollTop = progressBox.scrollHeight;
+    }
+
+    // Yordamchi funksiya tasodifiy element tanlash uchun
+    function getRandomElements(arr, count) {
+      const shuffled = [...arr].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+    
+    // Yordamchi funksiya tasodifiy raqam olish uchun (min dan max gacha)
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    async function startSeeding() {
+      startBtn.disabled = true;
+      clearBtn.disabled = true;
+      startBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Jarayon ketmoqda...';
+      progressBox.innerHTML = '';
+      
+      try {
+        logMessage("Boshlandi...", "info");
+
+        // 1. Bazaviy ma'lumotlarni o'qish (LocalStorage dan kutamiz)
+        const students = JSON.parse(localStorage.getItem("students") || "[]");
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+        
+        if (students.length === 0 || subjects.length === 0 || teachers.length === 0) {
+            logMessage("Xatolik! Bazaviy ma'lumotlar (o'quvchilar, fanlar yoki o'qituvchilar) topilmadi. Avval ma'lumotlarni yuklang.", "error");
+            resetButtons();
+            return;
+        }
+
+        logMessage(`${students.length} ta o'quvchi, ${subjects.length} ta fan va ${teachers.length} ta o'qituvchi topildi.`, "info");
+
+        let assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+        let attendances = JSON.parse(localStorage.getItem("attendance") || "[]");
+        let grades = JSON.parse(localStorage.getItem("grades") || "[]");
+
+        let newAssignmentsCount = 0;
+        let newAttendancesCount = 0;
+        let newGradesCount = 0;
+
+        const weekDays = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"];
+        const today = new Date();
+        
+        // Kunlarni shakllantirish (Bugun va undan oldingi 4 kun)
+        const daysToSeed = [];
+        for(let i = 0; i < 5; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            if(d.getDay() !== 0) { // Yakshanba bo'lmasa
+                const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                const weekDayUz = weekDays[d.getDay() - 1]; // getDay() 1 = Dushanba
+                daysToSeed.push({ date: dateStr, weekDay: weekDayUz || "Dushanba" });
+            }
+        }
+
+        // Har bir o'quvchini aylanib chiqish
+        for (const student of students) {
+            // Shu o'quvchining hozirgi kurslarini tekshiramiz
+            const currentCourses = assignments.filter(a => a.studentId === student.id);
+            
+            // Kamida 3 ta bo'lishi uchun yana nechta kerak
+            const needed = Math.max(0, 3 - currentCourses.length);
+            
+            if (needed > 0) {
+                // O'quvchi yozilmagan fanlarni topamiz
+                const currentSubjectIds = currentCourses.map(c => c.subjectId);
+                const availableSubjects = subjects.filter(s => !currentSubjectIds.includes(s.id));
+                
+                // Keraklicha tasodifiy fanlarni tanlaymiz
+                const selectedSubjects = getRandomElements(availableSubjects, needed);
+                
+                for (const subject of selectedSubjects) {
+                    // Shu fandan dars beradigan o'qituvchini topamiz
+                    const availableTeachers = teachers.filter(t => t.subject === subject.name);
+                    const teacher = availableTeachers.length > 0 ? availableTeachers[0] : teachers[getRandomInt(0, teachers.length - 1)];
+                    
+                    const newAssignment = {
+                        id: "ca_" + Date.now() + "_" + student.id + "_" + subject.id,
+                        studentId: student.id,
+                        studentName: student.fullName,
+                        groupCode: student.groupCode,
+                        subjectId: subject.id,
+                        subjectName: subject.name,
+                        teacherId: teacher.id,
+                        teacherName: teacher.fullName,
+                        classTime: "14:00 - 15:30", // Tasodifiy vaqt qilsa ham bo'ladi
+                        weekDays: getRandomElements(weekDays, 3), // haftada 3 kun
+                        createdBy: "seeder",
+                        createdAt: new Date().toISOString().split("T")[0]
+                    };
+                    
+                    assignments.push(newAssignment);
+                    await db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment);
+                    newAssignmentsCount++;
+                    currentCourses.push(newAssignment);
+                }
+            }
+
+            // Endi shu o'quvchining barcha kurslari bo'yicha davomat va baho yaratamiz
+            for (const course of currentCourses) {
+                // Har bir kun uchun tekshiramiz
+                for (const day of daysToSeed) {
+                    // Agar bu kurs shu kunda o'tiladigan bo'lsa (yoki majburan o'tilgan qilib qo'ysak)
+                    // Keling, seeder uchun har kunga yozaylik
+                    
+                    // --- DAVOMAT ---
+                    // Shu kurs, shu kun uchun davomat yozuvi bormi?
+                    let attRecord = attendances.find(a => a.date === day.date && a.subjectId === course.subjectId && a.teacherId === course.teacherId);
+                    
+                    if (!attRecord) {
+                        attRecord = {
+                            id: "att_" + course.subjectId + "_" + course.teacherId + "_" + day.date,
+                            date: day.date,
+                            subjectId: course.subjectId,
+                            subjectName: course.subjectName,
+                            teacherId: course.teacherId,
+                            classTime: course.classTime,
+                            records: [],
+                            createdAt: new Date().toISOString()
+                        };
+                        attendances.push(attRecord);
+                        newAttendancesCount++;
+                    }
+                    
+                    // Agar bu o'quvchi bu davomatda bo'lmasa, qo'shamiz (85% ehtimollik bilan kelgan)
+                    if (!attRecord.records.find(r => r.studentId === student.id)) {
+                        attRecord.records.push({
+                            studentId: student.id,
+                            status: Math.random() > 0.15 ? "kelgan" : "kelmagan"
+                        });
+                        // Bazani yangilaymiz
+                        await db.collection("attendance").doc(attRecord.id).set(attRecord);
+                    }
+
+                    // --- BAHO ---
+                    // Faqat kelgan bo'lsa baho qo'yamiz (3, 4 yoki 5)
+                    const studentAtt = attRecord.records.find(r => r.studentId === student.id);
+                    if (studentAtt && studentAtt.status === "kelgan") {
+                        let gradeRecord = grades.find(g => g.date === day.date && g.subjectId === course.subjectId && g.teacherId === course.teacherId);
+                        
+                        if (!gradeRecord) {
+                            gradeRecord = {
+                                id: "gr_" + course.subjectId + "_" + course.teacherId + "_" + day.date,
+                                date: day.date,
+                                subjectId: course.subjectId,
+                                subjectName: course.subjectName,
+                                teacherId: course.teacherId,
+                                teacherName: course.teacherName,
+                                classTime: course.classTime,
+                                grades: [],
+                                createdAt: new Date().toISOString()
+                            };
+                            grades.push(gradeRecord);
+                            newGradesCount++;
+                        }
+                        
+                        if (!gradeRecord.grades.find(g => g.studentId === student.id)) {
+                            // 70% 5 baho, 20% 4 baho, 10% 3 baho
+                            const rand = Math.random();
+                            let b = 5;
+                            if(rand > 0.9) b = 3;
+                            else if (rand > 0.7) b = 4;
+
+                            gradeRecord.grades.push({
+                                studentId: student.id,
+                                grade: b
+                            });
+                            await db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Barchasini LocalStorage ga qaytarib saqlaymiz
+        localStorage.setItem("courseAssignments", JSON.stringify(assignments));
+        localStorage.setItem("attendance", JSON.stringify(attendances));
+        localStorage.setItem("grades", JSON.stringify(grades));
+
+        logMessage("===========================", "info");
+        logMessage(`Yangi yozilgan kurslar: ${newAssignmentsCount} ta`, "success");
+        logMessage(`Yaratilgan/yangilangan davomatlar: ${newAttendancesCount} ta kun kesimida`, "success");
+        logMessage(`Yaratilgan/yangilangan baholar: ${newGradesCount} ta kun kesimida`, "success");
+        logMessage("Barcha amallar muvaffaqiyatli yakunlandi!", "success");
+
+      } catch (error) {
+        console.error("Xatolik:", error);
+        logMessage("Jarayonda xatolik yuz berdi: " + error.message, "error");
+      } finally {
+        resetButtons();
+      }
+    }
+
+    async function clearData() {
+        if(!confirm("DIQQAT! Barcha kurslar, davomat va baholar bazadan o'chib ketadi. Rozimisiz?")) return;
+        
+        startBtn.disabled = true;
+        clearBtn.disabled = true;
+        clearBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Tozalanmoqda...';
+        progressBox.innerHTML = '';
+        progressBox.classList.add("show");
+
+        try {
+            logMessage("Ma'lumotlar o'chirilmoqda...", "info");
+            
+            const collections = ["courseAssignments", "attendance", "grades"];
+            for (const collName of collections) {
+                const snapshot = await db.collection(collName).get();
+                if (snapshot.empty) {
+                    logMessage(`"${collName}" kolleksiyasi bo'sh.`, "info");
+                    continue;
+                }
+
+                let deleted = 0;
+                // Batch yordamida o'chirish (maksimum 500)
+                let batch = db.batch();
+                let i = 0;
+                
+                for (const doc of snapshot.docs) {
+                    batch.delete(doc.ref);
+                    i++;
+                    deleted++;
+                    
+                    if (i === 400) {
+                        await batch.commit();
+                        batch = db.batch();
+                        i = 0;
+                    }
+                }
+                if (i > 0) {
+                    await batch.commit();
+                }
+                
+                logMessage(`"${collName}" dan ${deleted} ta hujjat o'chirildi.`, "success");
+            }
+            
+            // LocalStorage ni tozalash
+            localStorage.setItem("courseAssignments", "[]");
+            localStorage.setItem("attendance", "[]");
+            localStorage.setItem("grades", "[]");
+            
+            logMessage("Barcha tasodifiy kiritilgan ma'lumotlar o'chirildi!", "success");
+
+        } catch (error) {
+            console.error("Tozalashda xatolik:", error);
+            logMessage("Xatolik: " + error.message, "error");
+        } finally {
+            resetButtons();
+            clearBtn.innerHTML = '<i class="fas fa-trash"></i> Kiritilgan ma\'lumotlarni tozalash';
+        }
+    }
+
+    function resetButtons() {
+      startBtn.disabled = false;
+      clearBtn.disabled = false;
+      startBtn.innerHTML = '<i class="fas fa-play"></i> Jarayonni boshlash';
+    }
+  </script>
+</body>
+</html>
