@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kurs Nazorat — Dashboard</title>
+  <meta name="description" content="Kurs nazorati va davomat boshqaruvi asosiy paneli" />
+  <link rel="icon" type="image/png" href="../imgs/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== TOAST XABARLARI UCHUN KONTEYNER ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="dashboard-header" id="dashboardHeader">
+    <div class="header-content">
+      <!-- Chap tomon: Logo va sarlavha -->
+      <div class="header-left">
+        <div class="header-icon">📋</div>
+        <div class="header-title">
+          <h1>Kurs Nazorat Tizimi</h1>
+          <p>Kunlik kurs nazorati</p>
+        </div>
+      </div>
+
+      <!-- O'ng tomon: Sana, tugmalar, foydalanuvchi -->
+      <div class="header-right">
+        <span class="date-badge" id="currentDate"></span>
+
+        <!-- Kursga yozish tugmasi — faqat Sinf rahbari ko'radi -->
+        <button class="btn-primary-action role-sinf-rahbari" id="btnOpenEnroll" onclick="openEnrollModal()">
+          + Kursga yozish
+        </button>
+
+        <!-- Kurslarga yozilganlar sahifasiga o'tish — hamma ko'radi -->
+        <a href="kursgaYozilganlar.html" class="btn-secondary-action" id="btnGoToEnrolled">
+          📑 Yozilganlar
+        </a>
+
+        <!-- Foydalanuvchi badge -->
+        <div class="user-badge" id="userBadge">
+          <span class="role-dot"></span>
+          <span id="userNameDisplay"></span>
+        </div>
+
+        <!-- Chiqish tugmasi -->
+        <button class="btn-logout" id="btnLogout" onclick="logout()">Chiqish</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== KURS KARTALARI ===== -->
+  <main class="courses-container" id="coursesContainer">
+    <!-- JS orqali to'ldiriladi -->
+  </main>
+
+  <!-- ===== KURSGA YOZISH MODALI ===== -->
+  <div class="modal-overlay" id="enrollModal">
+    <div class="modal-container" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon">📝</div>
+          <div>
+            <h2>Kursga yozish</h2>
+            <p id="enrollGroupName">Guruh: —</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('enrollModal')">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Guruh (avtomatik) -->
+        <div class="modal-form-group">
+          <label>Guruh</label>
+          <input type="text" class="form-input" id="enrollGroup" readonly />
+        </div>
+
+        <!-- Fan tanlash -->
+        <div class="modal-form-group">
+          <label>Fan tanlash *</label>
+          <select id="enrollSubject" class="form-input" onchange="onSubjectChange()">
+            <option value="">— Fan tanlang —</option>
+          </select>
+          <!-- Yangi fan qo'shish -->
+          <div class="add-subject-row" id="addSubjectRow" style="display:none;">
+            <input type="text" class="form-input" id="newSubjectName" placeholder="Yangi fan nomi" />
+            <input type="text" class="form-input" id="newSubjectShort" placeholder="Qisqa" style="width:80px;flex:none;" />
+            <button class="btn-add-small" onclick="addNewSubject()">Qo'shish</button>
+          </div>
+          <button class="btn-add-small mt-2" onclick="toggleAddSubject()" style="font-size:0.75rem;padding:4px 10px;">+ Yangi fan</button>
+        </div>
+
+        <!-- O'qituvchi tanlash -->
+        <div class="modal-form-group">
+          <label>O'qituvchi tanlash *</label>
+          <select id="enrollTeacher" class="form-input">
+            <option value="">— Avval fan tanlang —</option>
+          </select>
+          <!-- Yangi o'qituvchi qo'shish -->
+          <div class="add-subject-row" id="addTeacherRow" style="display:none;">
+            <input type="text" class="form-input" id="newTeacherName" placeholder="O'qituvchi F.I.Sh" />
+            <select class="form-input" id="newTeacherType" style="width:120px;flex:none;">
+              <option value="ichki">Ichki</option>
+              <option value="tashqi">Tashqi</option>
+            </select>
+            <button class="btn-add-small" onclick="addNewTeacher()">Qo'shish</button>
+          </div>
+          <button class="btn-add-small mt-2" onclick="toggleAddTeacher()" style="font-size:0.75rem;padding:4px 10px;">+ Yangi o'qituvchi</button>
+        </div>
+
+        <!-- Dars vaqti va hafta kunlari -->
+        <div class="modal-form-row">
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>Dars vaqti *</label>
+            <select id="enrollTime" class="form-input" onchange="onTimeSelectChange()">
+              <option value="">— Vaqt tanlang —</option>
+              <option value="14:00 - 15:30">14:00 - 15:30 (1-para)</option>
+              <option value="15:40 - 17:10">15:40 - 17:10 (2-para)</option>
+              <option value="16:00 - 17:30">16:00 - 17:30</option>
+              <option value="17:20 - 18:50">17:20 - 18:50 (3-para)</option>
+              <option value="__custom__">✏️ Boshqa vaqt (qo'lda kiritish)</option>
+            </select>
+            <input type="text" class="form-input" id="enrollTimeCustom" placeholder="Masalan: 09:00 - 10:30" style="display:none; margin-top:6px;" />
+          </div>
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>Hafta kunlari *</label>
+            <div class="weekday-selector" id="weekdaySelector">
+              <button type="button" class="weekday-btn" data-day="Dushanba">Du</button>
+              <button type="button" class="weekday-btn" data-day="Seshanba">Se</button>
+              <button type="button" class="weekday-btn" data-day="Chorshanba">Cho</button>
+              <button type="button" class="weekday-btn" data-day="Payshanba">Pay</button>
+              <button type="button" class="weekday-btn" data-day="Juma">Ju</button>
+              <button type="button" class="weekday-btn" data-day="Shanba">Sha</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- O'quvchilar ro'yxati -->
+        <div class="modal-form-group">
+          <label>O'quvchilar tanlash *</label>
+          <div class="student-select-list" id="enrollStudentList">
+            <!-- JS orqali to'ldiriladi -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeModal('enrollModal')">Bekor qilish</button>
+        <button class="btn-modal-save" onclick="saveEnrollment()">💾 Saqlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DAVOMAT OLISH MODALI ===== -->
+  <div class="modal-overlay" id="attendanceModal">
+    <div class="modal-container" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon" style="background: var(--accent-blue-glow);">📊</div>
+          <div>
+            <h2>Davomat qo'shish</h2>
+            <p id="attendanceSubTitle">— uchun davomat</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('attendanceModal')">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Sana va Para -->
+        <div class="modal-form-row">
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>Sana *</label>
+            <input type="date" id="attendanceDate" class="form-input" />
+          </div>
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>Para *</label>
+            <select id="attendancePara" class="form-input">
+              <option value="">— Tanlang —</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- O'qituvchi paroli va mashg'ulot sababi -->
+        <div class="modal-form-row">
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>O'qituvchi paroli * (4 xonali)</label>
+            <input type="password" id="attendancePassword" class="form-input" maxlength="4" placeholder="••••" />
+            <div class="confirm-message" id="confirmMessage">✓ Tasdiqlandi</div>
+          </div>
+          <div class="modal-form-group" style="margin-bottom:0;">
+            <label>Mashg'ulot sababi</label>
+            <input type="text" id="attendanceReason" class="form-input" readonly />
+          </div>
+        </div>
+
+        <!-- O'quvchilar davomat ro'yxati -->
+        <div class="attendance-list" id="attendanceList">
+          <div class="attendance-list-header">O'quvchilar ro'yxati</div>
+          <!-- JS orqali to'ldiriladi -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="attendance-summary" id="attendanceSummary">
+          <span>✓ Kelgan: <span class="kelgan" id="kelganCount">0</span></span>
+          <span>✕ Kelmagan: <span class="kelmagan" id="kelmaganCount">0</span></span>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-modal-cancel" onclick="closeModal('attendanceModal')">Bekor qilish</button>
+          <button class="btn-modal-save" onclick="saveAttendance()">💾 Saqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BAHOLASH MODALI ===== -->
+  <div class="modal-overlay" id="gradingModal">
+    <div class="modal-container" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);">⭐</div>
+          <div>
+            <h2>Baholash</h2>
+            <p id="gradingSubTitle">— uchun baholar</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('gradingModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="attendance-list" id="gradingList">
+          <div class="attendance-list-header">O'quvchilarni baholash</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div style="display:flex;gap:10px;">
+          <button class="btn-modal-cancel" onclick="closeModal('gradingModal')">Bekor qilish</button>
+          <button class="btn-modal-save" onclick="saveGrades()">💾 Baholarni saqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== O'QUVCHI KURSLARI MODALI (Search natijasi) ===== -->
+  <div class="modal-overlay" id="studentCoursesModal">
+    <div class="modal-container" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon" style="background: var(--accent-purple); background: rgba(124,77,255,0.15);">👤</div>
+          <div>
+            <h2 id="scmStudentName">O'quvchi</h2>
+            <p id="scmStudentGroup">Guruh: —</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('studentCoursesModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="student-courses-list" id="studentCoursesList">
+          <!-- JS orqali to'ldiriladi -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KURS O'QUVCHILARI MODALI ===== -->
+  <div class="modal-overlay" id="courseStudentsModal">
+    <div class="modal-container" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon" id="csmIcon">📋</div>
+          <div>
+            <h2 id="csmTitle">Kurs o'quvchilari</h2>
+            <p id="csmSubTitle">—</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('courseStudentsModal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 24px 24px;">
+        <!-- O'quvchi qo'shish satri (faqat sinf rahbariga) -->
+        <div id="csmAddSection" style="display:none; margin-bottom: 16px;">
+          <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px;">O'quvchi qo'shish</label>
+              <select id="csmAddStudentSelect" class="form-input" style="width:100%;">
+                <option value="">— O'quvchi tanlang —</option>
+              </select>
+            </div>
+            <button class="btn-primary-action" onclick="addStudentToCourse()" style="padding:10px 16px;">+ Qo'shish</button>
+          </div>
+        </div>
+        <!-- O'quvchilar ro'yxati -->
+        <div id="csmStudentsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FIREBASE ===== -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+
+  <script>
+    /* ============================================================
+       KURS NAZORAT — ASOSIY LOGIKA
+       ============================================================ */
+
+    // ===== GLOBAL O'ZGARUVCHILAR =====
+    let currentUser = null;           // Joriy foydalanuvchi ma'lumoti
+    let selectedWeekdays = [];        // Tanlangan hafta kunlari (kursga yozish)
+    let currentAttendanceCourse = null; // Davomat olinayotgan kurs ma'lumoti
+
+    // ===== Fan ranglar xaritasi =====
+    const subjectColors = {
+      "Tarix": "#00e676",
+      "Ona-tili va adabiyot": "#ff9800",
+      "Rus tili": "#e91e63",
+      "Ingliz tili": "#448aff",
+      "Fransuz tili": "#7c4dff",
+      "Nemis tili": "#ff5722",
+      "Informatika fani": "#00bcd4",
+      "Matematika fani": "#ffc107",
+      "Fizika fani": "#9c27b0",
+      "Jismoniy tarbiya": "#4caf50",
+      "Huquqshunoslik": "#795548",
+      "Geografiya": "#009688",
+      "Kimyo fani": "#f44336",
+      "Biologiya fani": "#8bc34a",
+      "Kasbiy fan": "#607d8b",
+      "Maxsus fan": "#ff5252"
+    };
+
+    // ===== SAHIFA YUKLANGANDA =====
+    document.addEventListener("DOMContentLoaded", async () => {
+      checkAuth();
+      setCurrentDate();
+      setupWeekdayButtons();
+      
+      const container = document.getElementById("coursesContainer");
+      if(container) container.innerHTML = '<div style="text-align:center; padding: 40px; color:#666;">⏳ Ma\'lumotlar Bazadan yuklanmoqda...</div>';
+
+      try {
+        const collections = [
+          { name: "course_students", ls: "students" },
+          { name: "courseAssignments", ls: "courseAssignments" },
+          { name: "attendance", ls: "attendance" },
+          { name: "grades", ls: "grades" },
+          { name: "subjects", ls: "subjects" },
+          { name: "teachers", ls: "teachers" },
+          { name: "classMentors", ls: "classMentors" },
+          { name: "groups", ls: "groups" }
+        ];
+        await Promise.all(collections.map(async c => {
+          const snap = await db.collection(c.name).get();
+          localStorage.setItem(c.ls, JSON.stringify(snap.docs.map(d => d.data())));
+        }));
+      } catch (err) {
+        console.error("Baza sync xatosi:", err);
+      }
+
+      loadCourseCards();
+    });
+
+    /* ============================================================
+       AUTENTIFIKATSIYA
+       ============================================================ */
+
+    /** Foydalanuvchi login qilganmi tekshirish */
+    function checkAuth() {
+      const userData = sessionStorage.getItem("currentUser");
+      if (!userData) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = JSON.parse(userData);
+      updateUIForRole();
+    }
+
+    /** UI'ni rolga qarab sozlash */
+    function updateUIForRole() {
+      const userNameEl = document.getElementById("userNameDisplay");
+      const roleDot = document.querySelector(".role-dot");
+
+      // Foydalanuvchi nomini ko'rsatish
+      if (currentUser.role === "sinf_rahbari") {
+        userNameEl.textContent = `${currentUser.fullName} (${currentUser.groupCode})`;
+        roleDot.style.background = "var(--accent-green)";
+      } else if (currentUser.role === "oqituvchi") {
+        userNameEl.textContent = `${currentUser.fullName} (${currentUser.subject})`;
+        roleDot.style.background = "var(--accent-blue)";
+      } else {
+        userNameEl.textContent = "Kuzatuvchi";
+        roleDot.style.background = "var(--accent-orange)";
+      }
+
+      // "Kursga yozish" tugmasini faqat sinf rahbariga ko'rsatish
+      const enrollBtns = document.querySelectorAll(".role-sinf-rahbari");
+      enrollBtns.forEach(btn => {
+        btn.style.display = currentUser.role === "sinf_rahbari" ? "" : "none";
+      });
+    }
+
+    /** Tizimdan chiqish */
+    function logout() {
+      sessionStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+    }
+
+    /* ============================================================
+       SANA
+       ============================================================ */
+
+    /** Joriy sanani header'ga yozish */
+    function setCurrentDate() {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      document.getElementById("currentDate").textContent = `${day}.${month}.${year}`;
+      // Davomat modali uchun default sana
+      const dateInput = document.getElementById("attendanceDate");
+      if (dateInput) {
+        dateInput.value = `${year}-${month}-${day}`;
+      }
+    }
+
+    /* ============================================================
+       QIDIRUV (SEARCH)
+       ============================================================ */
+
+    /** Search inputini sozlash */
+    function setupSearch() {
+      const searchInput = document.getElementById("searchInput");
+      const searchResults = document.getElementById("searchResults");
+
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (query.length < 2) {
+          searchResults.classList.remove("show");
+          return;
+        }
+
+        const students = JSON.parse(localStorage.getItem("students") || "[]");
+        const filtered = students.filter(s =>
+          s.fullName.toLowerCase().includes(query) ||
+          s.groupCode.toLowerCase().includes(query)
+        ).slice(0, 15); // Maksimum 15 ta natija
+
+        if (filtered.length === 0) {
+          searchResults.innerHTML = '<div class="search-no-results">Hech narsa topilmadi</div>';
+        } else {
+          searchResults.innerHTML = filtered.map(s => `
+            <div class="search-result-item" onclick="showStudentCourses(${s.id})">
+              <span class="student-name">${s.fullName}</span>
+              <span class="student-group">${s.groupCode}-guruh</span>
+            </div>
+          `).join("");
+        }
+        searchResults.classList.add("show");
+      });
+
+      // Tashqariga bosganda yopish
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-wrapper")) {
+          searchResults.classList.remove("show");
+        }
+      });
+    }
+
+    /** O'quvchining kurslarini ko'rsatish (modal) */
+    function showStudentCourses(studentId) {
+      const students = JSON.parse(localStorage.getItem("students") || "[]");
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const student = students.find(s => s.id === studentId);
+      if (!student) return;
+
+      document.getElementById("scmStudentName").textContent = student.fullName;
+      document.getElementById("scmStudentGroup").textContent = `${student.groupCode}-guruh`;
+
+      // Bu o'quvchining kurslari
+      const studentCourses = assignments.filter(a => a.studentId === studentId);
+
+      const listEl = document.getElementById("studentCoursesList");
+      if (studentCourses.length === 0) {
+        listEl.innerHTML = '<div class="table-empty">Bu o\'quvchi hali hech qaysi kursga yozilmagan.</div>';
+      } else {
+        listEl.innerHTML = studentCourses.map(c => `
+          <div class="student-course-item" style="border-left-color: ${subjectColors[c.subjectName] || '#448aff'}">
+            <div class="course-name">${c.subjectName}</div>
+            <div class="course-detail">O'qituvchi: ${c.teacherName}</div>
+            <div class="course-detail">Vaqt: ${c.classTime} | ${(c.weekDays || []).join(", ")}</div>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("searchResults").classList.remove("show");
+      document.getElementById("searchInput").value = "";
+      openModal("studentCoursesModal");
+    }
+
+    /* ============================================================
+       KURS KARTALARI
+       ============================================================ */
+
+    /** Kurs kartalarini yuklash va chizish */
+    function loadCourseCards() {
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const container = document.getElementById("coursesContainer");
+
+      if (assignments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>Hozircha kurslar mavjud emas</h3>
+            <p>Sinf rahbari o'quvchilarni kurslarga yozgandan keyin, bu yerda kurs kartalari paydo bo'ladi.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Kurslarni fan+o'qituvchi bo'yicha guruhlash
+      const courseMap = {};
+      assignments.forEach(a => {
+        const key = `${a.subjectId}_${a.teacherId}_${a.classTime}`;
+        if (!courseMap[key]) {
+          courseMap[key] = {
+            subjectId: a.subjectId,
+            subjectName: a.subjectName,
+            teacherId: a.teacherId,
+            teacherName: a.teacherName,
+            classTime: a.classTime,
+            weekDays: a.weekDays || [],
+            students: [],
+            groups: new Set()
+          };
+        }
+        courseMap[key].students.push({
+          studentId: a.studentId,
+          studentName: a.studentName,
+          groupCode: a.groupCode
+        });
+        courseMap[key].groups.add(a.groupCode);
+      });
+
+      let courses = Object.values(courseMap);
+
+      // Agar o'qituvchi kirgan bo'lsa — faqat o'z kurslarini ko'rsatish
+      if (currentUser.role === "oqituvchi") {
+        courses = courses.filter(c => c.teacherId === currentUser.id);
+      }
+
+      // Fan nomi bo'yicha tartiblash (bir xil fanlar ketma-ket chiqsin)
+      courses.sort((a, b) => a.subjectName.localeCompare(b.subjectName));
+
+      // Davomat ma'lumotlari
+      const allAttendance = JSON.parse(localStorage.getItem("attendance") || "[]");
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+      const weekDaysUz = ["Yakshanba", "Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"];
+      const todayWeekDay = weekDaysUz[now.getDay()];
+
+      // Bitta ro'yxatda chiqarish
+      let html = '<div class="course-cards-list" style="max-width: 900px; margin: 0 auto;">';
+      courses.forEach((c, i) => {
+        c.filteredStudents = c.students;
+        html += renderCourseCard(c, i, allAttendance, todayStr, todayWeekDay);
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    /** Bitta kurs kartasini chizish */
+    function renderCourseCard(course, index, allAttendance, todayStr, todayWeekDay) {
+      const color = subjectColors[course.subjectName] || "#448aff";
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const subj = subjects.find(s => s.id === course.subjectId);
+      const shortName = subj ? subj.shortName : course.subjectName.substring(0, 3).toUpperCase();
+      const totalStudents = course.filteredStudents ? course.filteredStudents.length : course.students.length;
+      const groupsArr = [...course.groups];
+
+      // Bugun uchun davomat olinganmi tekshirish
+      const safeClassTime = (course.classTime || '').replace(/'/g, "\\'");
+      const courseTime = (course.classTime || '').trim();
+      const todayAttendance = (allAttendance && allAttendance.length > 0) ? allAttendance.find(att => {
+        const attTime = (att.classTime || '').trim();
+        // Davomat olganda unga berilgan vaqt va kurs yozilgan vaqt haqiqatdan bir xilmi?
+        return att.date === todayStr &&
+          String(att.subjectId) === String(course.subjectId) &&
+          String(att.teacherId) === String(course.teacherId) &&
+          (courseTime ? attTime === courseTime : true);
+      }) : null;
+
+      // Davomat / Baholash tugmasi
+      const isTodayClass = (course.weekDays || []).includes(todayWeekDay);
+      let attendanceBtnHtml = '';
+      if (currentUser.role === "oqituvchi" && currentUser.id === course.teacherId) {
+        if (!isTodayClass) {
+          attendanceBtnHtml = `<button class="btn-attendance" disabled title="Bugun bu fandan dars yo'q" style="opacity:0.7;cursor:not-allowed;">📅 Bugun dars yo'q</button>`;
+        } else if (todayAttendance) {
+          attendanceBtnHtml = `<button class="btn-attendance btn-grade" onclick="event.stopPropagation(); openGradingModal(${course.subjectId}, ${course.teacherId}, '${safeClassTime}')">⭐ Baholash</button>`;
+        } else {
+          attendanceBtnHtml = `<button class="btn-attendance" onclick="event.stopPropagation(); openAttendanceModal(${course.subjectId}, ${course.teacherId}, '${safeClassTime}')">Davomat olish</button>`;
+        }
+      } else if (currentUser.role === "oqituvchi") {
+        attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
+      } else if (currentUser.role === "kuzatuvchi") {
+        attendanceBtnHtml = `<button class="btn-attendance" disabled title="Kuzatuvchi davomat ola olmaydi">Davomat olish</button>`;
+      } else {
+        // Sinf rahbari — faqat ko'rish
+        attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
+      }
+
+      return `
+        <div class="course-card" style="animation-delay: ${index * 0.08}s; cursor:pointer;" onclick="openCourseStudents(${course.subjectId}, ${course.teacherId}, '${safeClassTime}')">
+          <div class="course-card-header">
+            <div class="course-card-info">
+              <div class="subject-badge" style="background: ${color};">${shortName}</div>
+              <div>
+                <div class="course-card-name">${course.subjectName} (${course.teacherName})</div>
+                <div class="course-card-teacher">${course.classTime || ""}</div>
+              </div>
+            </div>
+            <div class="course-card-count">jami: ${totalStudents}</div>
+          </div>
+          <div class="course-card-details">
+            ${course.classTime ? `<span class="detail-chip"><span class="chip-icon">🕐</span> ${course.classTime}</span>` : ''}
+            ${(course.weekDays || []).map(d => `<span class="detail-chip">${d}</span>`).join("")}
+            <span class="detail-chip">${groupsArr.length} ta guruh</span>
+          </div>
+          <div class="course-card-footer">
+            <div class="groups-enrolled">
+              ${groupsArr.map(g => `<span class="group-mini-badge">${g}</span>`).join("")}
+            </div>
+            ${attendanceBtnHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ============================================================
+       KURS O'QUVCHILARI MODALI
+       ============================================================ */
+
+    // Joriy ochiq kurs (modal uchun)
+    let currentCourseView = null;
+
+    /** Kurs kartasiga bosganda o'quvchilar modalini ochish */
+    function openCourseStudents(subjectId, teacherId, classTime) {
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+
+      const subject = subjects.find(s => s.id === subjectId);
+      const teacher = teachers.find(t => t.id === teacherId);
+      if (!subject || !teacher) return;
+
+      currentCourseView = { subjectId, teacherId, classTime, subjectName: subject.name, teacherName: teacher.fullName };
+
+      const color = subjectColors[subject.name] || "#448aff";
+      document.getElementById("csmIcon").style.background = color;
+      document.getElementById("csmTitle").textContent = subject.name;
+      document.getElementById("csmSubTitle").textContent = `O'qituvchi: ${teacher.fullName} | ${classTime || ''}`;
+
+      // O'quvchilar ro'yxatini chizish
+      renderCourseStudentsList(subjectId, teacherId, classTime);
+
+      // Sinf rahbari uchun o'quvchi qo'shish bo'limini ko'rsatish
+      const addSection = document.getElementById("csmAddSection");
+      if (currentUser.role === "sinf_rahbari") {
+        addSection.style.display = "block";
+        loadAddStudentOptions(subjectId, teacherId, classTime);
+      } else {
+        addSection.style.display = "none";
+      }
+
+      openModal("courseStudentsModal");
+    }
+
+    /** Kurs o'quvchilarini chizish */
+    function renderCourseStudentsList(subjectId, teacherId, classTime) {
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const courseStudents = assignments.filter(a => a.subjectId === subjectId && a.teacherId === teacherId && a.classTime === classTime);
+
+      const listEl = document.getElementById("csmStudentsList");
+
+      if (courseStudents.length === 0) {
+        listEl.innerHTML = '<div class="table-empty">Bu kursda hali o\'quvchilar yo\'q.</div>';
+        return;
+      }
+
+      let html = '';
+      courseStudents.forEach((s, i) => {
+        // O'chirish tugmasi faqat sinf rahbariga
+        const deleteBtn = currentUser.role === "sinf_rahbari"
+          ? `<button class="btn-remove-student" onclick="event.stopPropagation(); removeStudentFromCourse(${s.studentId}, ${subjectId}, ${teacherId}, '${(classTime||'').replace(/'/g, "\\'")}')"
+ title="O'chirish">✕</button>`
+          : '';
+
+        html += `
+          <div class="csm-student-item">
+            <div class="csm-student-num">${String(i + 1).padStart(2, '0')}</div>
+            <div class="csm-student-info">
+              <div class="csm-student-name">${s.studentName}</div>
+              <div class="csm-student-group">${s.groupCode}-guruh</div>
+            </div>
+            ${deleteBtn}
+          </div>
+        `;
+      });
+
+      listEl.innerHTML = `
+        <div class="csm-header-row">
+          <span>Jami: ${courseStudents.length} ta o'quvchi</span>
+        </div>
+        ${html}
+      `;
+    }
+
+    /** O'quvchini kursdan o'chirish */
+    async function removeStudentFromCourse(studentId, subjectId, teacherId, classTime) {
+      if (!confirm("Bu o'quvchini kursdan o'chirishni tasdiqlaysizmi?")) return;
+
+      let assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const target = assignments.find(a => (a.studentId === studentId && a.subjectId === subjectId && a.teacherId === teacherId && a.classTime === classTime));
+      
+      if(target) {
+        await db.collection("courseAssignments").doc(target.id).delete();
+        assignments = assignments.filter(a => a.id !== target.id);
+        localStorage.setItem("courseAssignments", JSON.stringify(assignments));
+      }
+
+      // Qayta chizish
+      renderCourseStudentsList(subjectId, teacherId, classTime);
+      loadAddStudentOptions(subjectId, teacherId, classTime);
+      loadCourseCards();
+      showToast("O'quvchi kursdan o'chirildi", "success");
+    }
+
+    /** Qo'shish uchun o'quvchilar dropdown'ini to'ldirish (faqat shu guruhdan, hali yozilmaganlar) */
+    function loadAddStudentOptions(subjectId, teacherId, classTime) {
+      if (currentUser.role !== "sinf_rahbari") return;
+
+      const allStudents = JSON.parse(localStorage.getItem("students") || "[]");
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+
+      // Faqat sinf rahbarining guruhi o'quvchilari
+      const groupStudents = allStudents
+        .filter(s => s.groupCode === currentUser.groupCode)
+        .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+      // Allaqachon bu kursga yozilganlar
+      const enrolledIds = assignments
+        .filter(a => a.subjectId === subjectId && a.teacherId === teacherId && a.classTime === classTime)
+        .map(a => a.studentId);
+
+      // Shu fanga boshqa o'qituvchiga yozilganlar (faqat bitta o'qituvchiga ruxsat)
+      const enrolledInOtherTeacher = assignments
+        .filter(a => a.subjectId === subjectId && a.teacherId !== teacherId)
+        .map(a => a.studentId);
+
+      const available = groupStudents.filter(s =>
+        !enrolledIds.includes(s.id) && !enrolledInOtherTeacher.includes(s.id)
+      );
+
+      const select = document.getElementById("csmAddStudentSelect");
+      select.innerHTML = '<option value="">— O\'quvchi tanlang —</option>';
+      available.forEach(s => {
+        select.innerHTML += `<option value="${s.id}" data-name="${s.fullName}">${s.fullName}</option>`;
+      });
+    }
+
+    /** O'quvchini kursga qo'shish (modal ichidan) */
+    function addStudentToCourse() {
+      if (!currentCourseView || currentUser.role !== "sinf_rahbari") return;
+
+      const select = document.getElementById("csmAddStudentSelect");
+      const studentId = parseInt(select.value);
+      if (!studentId) { showToast("O'quvchi tanlang!", "error"); return; }
+
+      const studentName = select.options[select.selectedIndex].dataset.name;
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+
+      // Shu fanga boshqa o'qituvchiga yozilganmi tekshirish
+      const inOtherTeacher = assignments.find(a =>
+        a.studentId === studentId &&
+        a.subjectId === currentCourseView.subjectId &&
+        a.teacherId !== currentCourseView.teacherId
+      );
+      if (inOtherTeacher) {
+        showToast(`Bu o'quvchi ${currentCourseView.subjectName} faniga ${inOtherTeacher.teacherName} ga yozilgan!`, "error");
+        return;
+      }
+
+      // Mavjud kursning ma'lumotlarini olish
+      const existingCourse = assignments.find(a =>
+        a.subjectId === currentCourseView.subjectId &&
+        a.teacherId === currentCourseView.teacherId &&
+        a.classTime === currentCourseView.classTime
+      );
+
+      const newAssignment = {
+        id: "ca_" + Date.now() + "_" + studentId,
+        studentId: studentId,
+        studentName: studentName,
+        groupCode: currentUser.groupCode,
+        subjectId: currentCourseView.subjectId,
+        subjectName: currentCourseView.subjectName,
+        teacherId: currentCourseView.teacherId,
+        teacherName: currentCourseView.teacherName,
+        classTime: currentCourseView.classTime || (existingCourse ? existingCourse.classTime : ""),
+        weekDays: existingCourse ? existingCourse.weekDays : [],
+        createdBy: currentUser.login,
+        createdAt: new Date().toISOString().split("T")[0]
+      };
+
+      assignments.push(newAssignment);
+      localStorage.setItem("courseAssignments", JSON.stringify(assignments));
+      db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment);
+
+      // Qayta chizish
+      renderCourseStudentsList(currentCourseView.subjectId, currentCourseView.teacherId, currentCourseView.classTime);
+      loadAddStudentOptions(currentCourseView.subjectId, currentCourseView.teacherId, currentCourseView.classTime);
+      loadCourseCards();
+      showToast(`${studentName} kursga qo'shildi!`, "success");
+    }
+
+    /* ============================================================
+       KURSGA YOZISH MODAL
+       ============================================================ */
+
+    /** Kursga yozish modalini ochish */
+    function openEnrollModal() {
+      if (currentUser.role !== "sinf_rahbari") return;
+
+      // Guruhni avtomatik to'ldirish
+      document.getElementById("enrollGroup").value = currentUser.groupCode + "-guruh";
+      document.getElementById("enrollGroupName").textContent = `Guruh: ${currentUser.groupCode}`;
+
+      // Fanlar ro'yxatini yuklash
+      loadSubjectOptions();
+
+      // O'quvchilar ro'yxatini to'ldirish (faqat shu guruh)
+      loadStudentsList();
+
+      // Hafta kunlarini tozalash
+      selectedWeekdays = [];
+      document.querySelectorAll(".weekday-btn").forEach(b => b.classList.remove("selected"));
+
+      // O'qituvchi va vaqtni tozalash
+      document.getElementById("enrollTeacher").innerHTML = '<option value="">— Avval fan tanlang —</option>';
+      document.getElementById("enrollTime").value = "";
+      document.getElementById("enrollSubject").value = "";
+
+      openModal("enrollModal");
+    }
+
+    /** Fanlar dropdown'ini to'ldirish */
+    function loadSubjectOptions() {
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const select = document.getElementById("enrollSubject");
+      select.innerHTML = '<option value="">— Fan tanlang —</option>';
+      subjects.forEach(s => {
+        select.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+      });
+    }
+
+    /** Fan tanlanganda o'qituvchilarni filterlash */
+    function onSubjectChange() {
+      const subjectId = parseInt(document.getElementById("enrollSubject").value);
+      const teacherSelect = document.getElementById("enrollTeacher");
+      teacherSelect.innerHTML = '<option value="">— O\'qituvchi tanlang —</option>';
+
+      if (!subjectId) return;
+
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const selectedSubject = subjects.find(s => s.id === subjectId);
+      if (!selectedSubject) return;
+
+      // Shu fandagi o'qituvchilarni topish
+      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+      const filtered = teachers.filter(t => t.subject === selectedSubject.name);
+
+      filtered.forEach(t => {
+        teacherSelect.innerHTML += `<option value="${t.id}">${t.fullName} (${t.badgeLabel})</option>`;
+      });
+    }
+
+    /** O'quvchilar ro'yxatini yuklash (faqat shu guruh) */
+    function loadStudentsList() {
+      const students = JSON.parse(localStorage.getItem("students") || "[]");
+      const groupStudents = students
+        .filter(s => s.groupCode === currentUser.groupCode)
+        .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+      const listEl = document.getElementById("enrollStudentList");
+
+      // Hammasini tanlash satri
+      let html = `
+        <div class="select-all-row">
+          <label>
+            <input type="checkbox" id="selectAllStudents" onchange="toggleSelectAll(this)" />
+            Hammasini tanlash
+          </label>
+          <span class="count" id="selectedCount">0 / ${groupStudents.length}</span>
+        </div>
+      `;
+
+      groupStudents.forEach(s => {
+        html += `
+          <div class="student-select-item">
+            <input type="checkbox" class="student-checkbox" value="${s.id}" data-name="${s.fullName}" onchange="updateSelectedCount()" />
+            <div class="student-info">
+              <div class="s-name">${s.fullName}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      listEl.innerHTML = html;
+    }
+
+    /** Hammasini tanlash/bekor qilish */
+    function toggleSelectAll(checkbox) {
+      const checkboxes = document.querySelectorAll(".student-checkbox");
+      checkboxes.forEach(cb => cb.checked = checkbox.checked);
+      updateSelectedCount();
+    }
+
+    /** Tanlangan o'quvchilar sonini yangilash */
+    function updateSelectedCount() {
+      const checkboxes = document.querySelectorAll(".student-checkbox");
+      const checked = document.querySelectorAll(".student-checkbox:checked");
+      document.getElementById("selectedCount").textContent = `${checked.length} / ${checkboxes.length}`;
+    }
+
+    /** Yangi fan qo'shish bo'limini ko'rsatish/yashirish */
+    function toggleAddSubject() {
+      const row = document.getElementById("addSubjectRow");
+      row.style.display = row.style.display === "none" ? "flex" : "none";
+    }
+
+    /** Yangi fan qo'shish */
+    function addNewSubject() {
+      const name = document.getElementById("newSubjectName").value.trim();
+      const shortName = document.getElementById("newSubjectShort").value.trim().toUpperCase();
+      if (!name) { showToast("Fan nomini kiriting!", "error"); return; }
+
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const newId = subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1;
+
+      subjects.push({
+        id: newId,
+        name: name,
+        shortName: shortName || name.substring(0, 3).toUpperCase()
+      });
+
+      localStorage.setItem("subjects", JSON.stringify(subjects));
+      loadSubjectOptions();
+
+      // Yangi qo'shilgan fanni tanlab qo'yish
+      document.getElementById("enrollSubject").value = newId;
+      onSubjectChange();
+
+      // Inputlarni tozalash
+      document.getElementById("newSubjectName").value = "";
+      document.getElementById("newSubjectShort").value = "";
+      document.getElementById("addSubjectRow").style.display = "none";
+
+      showToast(`"${name}" fani qo'shildi!`, "success");
+    }
+
+    /** Yangi o'qituvchi qo'shish bo'limini ko'rsatish/yashirish */
+    function toggleAddTeacher() {
+      const row = document.getElementById("addTeacherRow");
+      row.style.display = row.style.display === "none" ? "flex" : "none";
+    }
+
+    /** Yangi o'qituvchi qo'shish */
+    function addNewTeacher() {
+      const name = document.getElementById("newTeacherName").value.trim();
+      const type = document.getElementById("newTeacherType").value;
+      if (!name) { showToast("O'qituvchi nomini kiriting!", "error"); return; }
+
+      const subjectId = parseInt(document.getElementById("enrollSubject").value);
+      if (!subjectId) { showToast("Avval fan tanlang!", "error"); return; }
+
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const selectedSubject = subjects.find(s => s.id === subjectId);
+      if (!selectedSubject) return;
+
+      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+      const newId = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1;
+      const badgeLabel = type === "ichki" ? "Ichki o'qituvchi" : "Tashqi o'qituvchi";
+      const loginNum = String(newId).padStart(3, '0');
+
+      teachers.push({
+        id: newId,
+        fullName: name,
+        subject: selectedSubject.name,
+        type: type,
+        role: "oqituvchi",
+        badgeLabel: badgeLabel,
+        login: "teacher" + loginNum,
+        password: String(newId * 10).padStart(4, '0')
+      });
+
+      localStorage.setItem("teachers", JSON.stringify(teachers));
+      onSubjectChange();
+      document.getElementById("enrollTeacher").value = newId;
+
+      document.getElementById("newTeacherName").value = "";
+      document.getElementById("addTeacherRow").style.display = "none";
+      showToast(`"${name}" o'qituvchi qo'shildi! (${badgeLabel})`, "success");
+    }
+
+    /** Dars vaqti tanlovi o'zgarganda */
+    function onTimeSelectChange() {
+      const select = document.getElementById("enrollTime");
+      const customInput = document.getElementById("enrollTimeCustom");
+      if (select.value === "__custom__") {
+        customInput.style.display = "block";
+        customInput.focus();
+      } else {
+        customInput.style.display = "none";
+        customInput.value = "";
+      }
+    }
+
+    /** Tanlangan/kiritilgan vaqtni olish */
+    function getSelectedTime() {
+      const select = document.getElementById("enrollTime");
+      if (select.value === "__custom__") {
+        return document.getElementById("enrollTimeCustom").value.trim();
+      }
+      return select.value;
+    }
+
+    /** Kursga yozishni saqlash */
+    function saveEnrollment() {
+      const subjectId = parseInt(document.getElementById("enrollSubject").value);
+      const teacherId = parseInt(document.getElementById("enrollTeacher").value);
+      const classTime = getSelectedTime();
+
+      // Validatsiya
+      if (!subjectId) { showToast("Iltimos, fan tanlang!", "error"); return; }
+      if (!teacherId) { showToast("Iltimos, o'qituvchi tanlang!", "error"); return; }
+      if (!classTime) { showToast("Iltimos, dars vaqtini tanlang!", "error"); return; }
+      if (selectedWeekdays.length === 0) { showToast("Kamida bitta hafta kunini tanlang!", "error"); return; }
+
+      // Tanlangan o'quvchilar
+      const checkedBoxes = document.querySelectorAll(".student-checkbox:checked");
+      if (checkedBoxes.length === 0) { showToast("Kamida bitta o'quvchi tanlang!", "error"); return; }
+
+      // Ma'lumotlarni tayyorlash
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+      const subject = subjects.find(s => s.id === subjectId);
+      const teacher = teachers.find(t => t.id === teacherId);
+
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+
+      let newCount = 0;
+      let skipCount = 0;
+
+      checkedBoxes.forEach(cb => {
+        const studentId = parseInt(cb.value);
+        const studentName = cb.dataset.name;
+
+        // Takroriy yozilishni tekshirish (bir o'quvchi bir xil kursga ikki marta yozilmasin)
+        const alreadyExists = assignments.some(a =>
+          a.studentId === studentId &&
+          a.subjectId === subjectId &&
+          a.teacherId === teacherId
+        );
+
+        // Bir fan uchun faqat bitta o'qituvchiga ruxsat
+        const inOtherTeacher = assignments.find(a =>
+          a.studentId === studentId &&
+          a.subjectId === subjectId &&
+          a.teacherId !== teacherId
+        );
+
+        if (inOtherTeacher) {
+          skipCount++; // Bu o'quvchi shu fanga boshqa o'qituvchiga yozilgan
+        } else if (!alreadyExists) {
+          const newAssignment = {
+            id: "ca_" + Date.now() + "_" + studentId,
+            studentId: studentId,
+            studentName: studentName,
+            groupCode: currentUser.groupCode,
+            subjectId: subjectId,
+            subjectName: subject.name,
+            teacherId: teacherId,
+            teacherName: teacher.fullName,
+            classTime: classTime,
+            weekDays: [...selectedWeekdays],
+            createdBy: currentUser.login,
+            createdAt: new Date().toISOString().split("T")[0]
+          };
+          assignments.push(newAssignment);
+          db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment);
+          newCount++;
+        } else {
+          skipCount++;
+        }
+      });
+
+      // LocalStorage'ga saqlash
+      localStorage.setItem("courseAssignments", JSON.stringify(assignments));
+
+      // Modalni yopish va kartalarni yangilash
+      closeModal("enrollModal");
+      loadCourseCards();
+
+      // Natija xabari
+      let msg = `${newCount} ta o'quvchi "${subject.name}" kursiga yozildi!`;
+      if (skipCount > 0) msg += ` (${skipCount} ta allaqachon yozilgan edi)`;
+      showToast(msg, "success");
+    }
+
+    /** Hafta kuni tugmalarini sozlash */
+    function setupWeekdayButtons() {
+      document.querySelectorAll(".weekday-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const day = btn.dataset.day;
+          if (btn.classList.contains("selected")) {
+            btn.classList.remove("selected");
+            selectedWeekdays = selectedWeekdays.filter(d => d !== day);
+          } else {
+            btn.classList.add("selected");
+            selectedWeekdays.push(day);
+          }
+        });
+      });
+    }
+
+    /* ============================================================
+       DAVOMAT OLISH MODAL
+       ============================================================ */
+
+    /** Davomat modalini ochish */
+    function openAttendanceModal(subjectId, teacherId, classTime) {
+      // Faqat o'qituvchi va o'z kursi uchun
+      if (currentUser.role !== "oqituvchi" || currentUser.id !== teacherId) {
+        showToast("Sizda bu kursga davomat olish huquqi yo'q!", "error");
+        return;
+      }
+
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const subject = subjects.find(s => s.id === subjectId);
+
+      // Kurs ma'lumotlarini topish
+      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
+      const courseStudents = assignments.filter(a =>
+        a.subjectId === subjectId && a.teacherId === teacherId && a.classTime === classTime
+      );
+
+      if (courseStudents.length === 0) {
+        showToast("Bu kursda hali o'quvchilar yo'q!", "error");
+        return;
+      }
+
+      // Joriy davomat kursini saqlash
+      currentAttendanceCourse = {
+        subjectId,
+        teacherId,
+        classTime,
+        subjectName: subject ? subject.name : "",
+        students: courseStudents
+      };
+
+      // Modal sarlavhasini yangilash
+      document.getElementById("attendanceSubTitle").textContent =
+        `${currentAttendanceCourse.subjectName} (${currentUser.fullName}) uchun davomat`;
+
+      // Mashg'ulot sababi
+      document.getElementById("attendanceReason").value = currentAttendanceCourse.subjectName;
+
+      // Para (vaqt) tanlovini to'ldirish
+      const paraSelect = document.getElementById("attendancePara");
+      paraSelect.innerHTML = '<option value="">— Tanlang —</option>';
+      if (classTime) {
+        paraSelect.innerHTML += `<option value="${classTime}">${classTime}</option>`;
+        paraSelect.value = classTime;
+      }
+
+      // Parolni tozalash
+      document.getElementById("attendancePassword").value = "";
+      document.getElementById("confirmMessage").classList.remove("show");
+
+      // Parol kiritilganda tekshirish
+      const pwdInput = document.getElementById("attendancePassword");
+      pwdInput.oninput = function() {
+        if (this.value.length === 4) {
+          if (this.value === currentUser.password) {
+            document.getElementById("confirmMessage").textContent =
+              `✓ Tasdiqlandi: ${currentUser.fullName} (${currentUser.subject})`;
+            document.getElementById("confirmMessage").classList.add("show");
+          } else {
+            document.getElementById("confirmMessage").textContent = "✕ Parol noto'g'ri!";
+            document.getElementById("confirmMessage").classList.add("show");
+            document.getElementById("confirmMessage").style.color = "var(--accent-red)";
+          }
+        } else {
+          document.getElementById("confirmMessage").classList.remove("show");
+          document.getElementById("confirmMessage").style.color = "";
+        }
+      };
+
+      // O'quvchilar ro'yxatini to'ldirish
+      renderAttendanceStudents(courseStudents);
+
+      openModal("attendanceModal");
+    }
+
+    /** Davomat o'quvchilar ro'yxatini chizish */
+    function renderAttendanceStudents(students) {
+      const listEl = document.getElementById("attendanceList");
+
+      // Dublikat o'quvchilarni olib tashlash (bir o'quvchi bir nechta kursga yozilgan bo'lishi mumkin)
+      const uniqueStudents = [];
+      const seenIds = new Set();
+      students.forEach(s => {
+        if (!seenIds.has(s.studentId)) {
+          seenIds.add(s.studentId);
+          uniqueStudents.push(s);
+        }
+      });
+
+      let html = '<div class="attendance-list-header">O\'quvchilar ro\'yxati</div>';
+
+      uniqueStudents.forEach((s, i) => {
+        html += `
+          <div class="attendance-item">
+            <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
+            <div class="attendance-item-info">
+              <div class="attendance-item-name">${s.studentName}</div>
+              <div class="attendance-item-group">${s.groupCode}-guruh</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" data-student-id="${s.studentId}" data-student-name="${s.studentName}" data-group="${s.groupCode}" onchange="updateAttendanceSummary()" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        `;
+      });
+
+      listEl.innerHTML = html;
+
+      // Hisobni yangilash
+      updateAttendanceSummary();
+    }
+
+    /** Kelgan/kelmagan hisobini yangilash */
+    function updateAttendanceSummary() {
+      const toggles = document.querySelectorAll('#attendanceList input[type="checkbox"]');
+      let kelgan = 0;
+      let kelmagan = 0;
+      toggles.forEach(t => {
+        if (t.checked) kelgan++;
+        else kelmagan++;
+      });
+      document.getElementById("kelganCount").textContent = kelgan;
+      document.getElementById("kelmaganCount").textContent = kelmagan;
+    }
+
+    /** Davomatni saqlash */
+    function saveAttendance() {
+      if (!currentAttendanceCourse) return;
+
+      const date = document.getElementById("attendanceDate").value;
+      const para = document.getElementById("attendancePara").value;
+      const password = document.getElementById("attendancePassword").value;
+      const reason = document.getElementById("attendanceReason").value;
+
+      // Validatsiya
+      if (!date) { showToast("Sanani tanlang!", "error"); return; }
+      if (!para) { showToast("Para vaqtini tanlang!", "error"); return; }
+      if (!password || password.length !== 4) { showToast("4 xonali parolni kiriting!", "error"); return; }
+      if (password !== currentUser.password) { showToast("Parol noto'g'ri!", "error"); return; }
+
+      // Davomat yozuvlarini yig'ish
+      const toggles = document.querySelectorAll('#attendanceList input[type="checkbox"]');
+      const records = [];
+      toggles.forEach(t => {
+        records.push({
+          studentId: parseInt(t.dataset.studentId),
+          studentName: t.dataset.studentName,
+          groupCode: t.dataset.group,
+          status: t.checked ? "kelgan" : "kelmagan"
+        });
+      });
+
+      // Attendance obyektini yaratish
+      const attendanceRecord = {
+        id: "att_" + Date.now(),
+        teacherId: currentUser.id,
+        teacherLogin: currentUser.login,
+        teacherName: currentUser.fullName,
+        subjectId: currentAttendanceCourse.subjectId,
+        subjectName: currentAttendanceCourse.subjectName,
+        date: date,
+        classTime: para,
+        reason: reason,
+        records: records,
+        confirmedBy: currentUser.login,
+        createdAt: new Date().toISOString()
+      };
+
+      // localStorage'ga saqlash
+      const attendance = JSON.parse(localStorage.getItem("attendance") || "[]");
+
+      // Oldingi shu kungi va ushbu vaqtdagi davomat bor-yo'qligini tekshiramiz
+      const existIndex = attendance.findIndex(a => 
+        a.date === date && 
+        String(a.subjectId) === String(currentAttendanceCourse.subjectId) && 
+        String(a.teacherId) === String(currentUser.id) && 
+        (a.classTime || '').trim() === (para || '').trim()
+      );
+
+      // Agar oldin saqlangan bo'lsa uni ustidan yangilaymiz, aks holda yangi qo'shamiz
+      if (existIndex >= 0) {
+        // Eski idni saqlab qolamiz ammo ichidagi kelgan/kelmaganlarini yangisiga almashtiramiz
+        attendanceRecord.id = attendance[existIndex].id;
+        attendance[existIndex] = attendanceRecord;
+      } else {
+        attendance.push(attendanceRecord);
+      }
+      
+      localStorage.setItem("attendance", JSON.stringify(attendance));
+      db.collection("attendance").doc(attendanceRecord.id).set(attendanceRecord);
+
+      // Modalni yopish
+      closeModal("attendanceModal");
+      currentAttendanceCourse = null;
+
+      const kelgan = records.filter(r => r.status === "kelgan").length;
+      const kelmagan = records.filter(r => r.status === "kelmagan").length;
+      showToast(`Davomat saqlandi! Kelgan: ${kelgan}, Kelmagan: ${kelmagan}`, "success");
+
+      // Kartalarni yangilash (baholash tugmasi chiqishi uchun)
+      loadCourseCards();
+    }
+
+    /* ============================================================
+       BAHOLASH (GRADING)
+       ============================================================ */
+
+    let currentGradingCourse = null;
+
+    /** Baholash modalini ochish */
+    function openGradingModal(subjectId, teacherId, classTime) {
+      if (currentUser.role !== "oqituvchi" || currentUser.id !== teacherId) {
+        showToast("Sizda bu kursni baholash huquqi yo'q!", "error");
+        return;
+      }
+
+      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+      const subject = subjects.find(s => s.id === subjectId);
+      const allAttendance = JSON.parse(localStorage.getItem("attendance") || "[]");
+
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+      const todayAttendance = allAttendance.find(att =>
+        att.date === todayStr &&
+        att.subjectId === subjectId &&
+        att.teacherId === teacherId &&
+        att.classTime === classTime
+      );
+
+      if (!todayAttendance) {
+        showToast("Bugun uchun davomat topilmadi!", "error");
+        return;
+      }
+
+      const kelganStudents = todayAttendance.records.filter(r => r.status === "kelgan");
+      if (kelganStudents.length === 0) {
+        showToast("Bugun kelgan o'quvchi yo'q!", "error");
+        return;
+      }
+
+      currentGradingCourse = {
+        subjectId,
+        teacherId,
+        classTime,
+        subjectName: subject ? subject.name : "",
+        date: todayStr,
+        attendanceId: todayAttendance.id
+      };
+
+      document.getElementById("gradingSubTitle").textContent =
+        `${currentGradingCourse.subjectName} (${currentUser.fullName}) — ${classTime}`;
+
+      const existingGrades = JSON.parse(localStorage.getItem("grades") || "[]");
+      const todayGrade = existingGrades.find(g =>
+        g.date === todayStr &&
+        g.subjectId === subjectId &&
+        g.teacherId === teacherId &&
+        g.classTime === classTime
+      );
+
+      const listEl = document.getElementById("gradingList");
+      let html = '<div class="attendance-list-header">O\'quvchilarni baholash (faqat kelganlar)</div>';
+
+      kelganStudents.forEach((s, i) => {
+        let existingGradeValue = "";
+        if (todayGrade) {
+          const sg = todayGrade.grades.find(g => g.studentId === s.studentId);
+          if (sg) existingGradeValue = sg.grade;
+        }
+
+        html += `
+          <div class="attendance-item">
+            <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
+            <div class="attendance-item-info">
+              <div class="attendance-item-name">${s.studentName}</div>
+              <div class="attendance-item-group">${s.groupCode}-guruh</div>
+            </div>
+            <select class="form-input grade-select" data-student-id="${s.studentId}" data-student-name="${s.studentName}" data-group="${s.groupCode}" style="width:80px;flex:none;">
+              <option value="">—</option>
+              <option value="5" ${existingGradeValue == 5 ? 'selected' : ''}>5</option>
+              <option value="4" ${existingGradeValue == 4 ? 'selected' : ''}>4</option>
+              <option value="3" ${existingGradeValue == 3 ? 'selected' : ''}>3</option>
+              <option value="2" ${existingGradeValue == 2 ? 'selected' : ''}>2</option>
+            </select>
+          </div>
+        `;
+      });
+
+      listEl.innerHTML = html;
+      openModal("gradingModal");
+    }
+
+    /** Baholarni saqlash */
+    function saveGrades() {
+      if (!currentGradingCourse) return;
+
+      const gradeSelects = document.querySelectorAll('#gradingList .grade-select');
+      const gradesArr = [];
+      gradeSelects.forEach(sel => {
+        if (sel.value) {
+          gradesArr.push({
+            studentId: parseInt(sel.dataset.studentId),
+            studentName: sel.dataset.studentName,
+            groupCode: sel.dataset.group,
+            grade: parseInt(sel.value)
+          });
+        }
+      });
+
+      if (gradesArr.length === 0) {
+        showToast("Kamida bitta o'quvchiga baho qo'ying!", "error");
+        return;
+      }
+
+      const gradeRecord = {
+        id: "gr_" + Date.now(),
+        subjectId: currentGradingCourse.subjectId,
+        teacherId: currentGradingCourse.teacherId,
+        teacherName: currentUser.fullName,
+        subjectName: currentGradingCourse.subjectName,
+        classTime: currentGradingCourse.classTime,
+        date: currentGradingCourse.date,
+        attendanceId: currentGradingCourse.attendanceId,
+        grades: gradesArr,
+        createdAt: new Date().toISOString()
+      };
+
+      const allGrades = JSON.parse(localStorage.getItem("grades") || "[]");
+      const existIndex = allGrades.findIndex(g =>
+        g.date === currentGradingCourse.date &&
+        g.subjectId === currentGradingCourse.subjectId &&
+        g.teacherId === currentGradingCourse.teacherId &&
+        g.classTime === currentGradingCourse.classTime
+      );
+
+      if (existIndex >= 0) {
+        allGrades[existIndex] = gradeRecord;
+      } else {
+        allGrades.push(gradeRecord);
+      }
+      localStorage.setItem("grades", JSON.stringify(allGrades));
+      db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
+
+      closeModal("gradingModal");
+      currentGradingCourse = null;
+      showToast(`${gradesArr.length} ta o'quvchiga baho qo'yildi!`, "success");
+    }
+
+    /* ============================================================
+       MODAL BOSHQARUVI
+       ============================================================ */
+
+    /** Modalni ochish */
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+
+    /** Modalni yopish */
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove("show");
+      document.body.style.overflow = "";
+    }
+
+    // Overlay'ga bosganda modalni yopish
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove("show");
+          document.body.style.overflow = "";
+        }
+      });
+    });
+
+    // Escape tugmasi bilan yopish
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal-overlay.show").forEach(m => {
+          m.classList.remove("show");
+        });
+        document.body.style.overflow = "";
+      }
+    });
+
+    /* ============================================================
+       TOAST XABARLARI
+       ============================================================ */
+
+    /** Xabar ko'rsatish */
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const icons = { success: "✅", error: "❌", info: "ℹ️" };
+
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      // 4 soniyadan keyin o'chirish
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(100px)";
+        toast.style.transition = "all 0.3s ease";
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

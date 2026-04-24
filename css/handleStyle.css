@@ -1,0 +1,442 @@
+.top-bar i {
+  font-size: 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin: 0 4px;
+}
+
+.top-bar a:hover,
+.location-text:hover {
+  color: #ff6347;
+}
+
+header .logo-icon {
+  width: 60px;
+  height: 60px;
+  margin-right: 0px;
+}
+
+header .logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.quick-links-section .card-icon {
+  text-align: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  margin: 0 auto;
+}
+
+.quick-links-section .card-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.quick-links-section .card-icon {
+  margin-bottom: 25px;
+}
+
+.card-icon img {
+  transition: transform 0.3s ease;
+}
+.quick-links-section .card:hover .card-icon img {
+  transform: scale(1.2);
+}
+
+/* Asosiy sozlamalar (boshqa CSS laringizga halal bermasligi uchun faqat shu bo'limga tegishli) */
+:root {
+  --color-bg: #f8fafc;
+  --color-dark: #1e293b;
+  --color-blue: #2563eb;
+  --color-blue-hover: #1d4ed8;
+  --color-blue-light: #eff6ff;
+  --color-gray: #64748b;
+  --color-gray-light: #f1f5f9;
+  --color-red: #ef4444;
+  --color-white: #ffffff;
+}
+
+.leadership-section {
+  background-color: var(--color-bg);
+  padding: 80px 20px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.leadership-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Sarlavha Qismi */
+.leadership-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 60px auto;
+  text-align: center;
+}
+
+.leadership-badge {
+  display: inline-block;
+  background-color: var(--color-blue-light);
+  color: var(--color-blue);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 16px;
+}
+
+.leadership-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--color-dark);
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+
+.leadership-subtitle {
+  color: var(--color-gray);
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Grid (Kartochkalar joylashuvi) */
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+}
+
+/* Kartochka */
+.leader-card {
+  background: var(--color-white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.leader-card:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.card-image-wrapper {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.7s ease;
+}
+
+.leader-card:hover .card-image-wrapper img {
+  transform: scale(1.05);
+}
+
+/* Hover qilinganda chiqadigan Aloqa tugmalari */
+.card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  background: linear-gradient(to top, rgba(30, 41, 59, 0.9), transparent);
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.leader-card:hover .card-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+.social-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+.social-btn:hover {
+  transform: scale(1.1);
+}
+
+.btn-blue {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+.btn-blue:hover {
+  background: var(--color-blue-hover);
+}
+
+.btn-white {
+  background: var(--color-white);
+  color: var(--color-blue);
+}
+.btn-white:hover {
+  background: var(--color-gray-light);
+}
+
+/* Matnli qism */
+.card-content {
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.leader-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0 0 8px 0;
+}
+
+.leader-position {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px 0;
+}
+
+.accent-line {
+  width: 48px;
+  height: 4px;
+  background-color: var(--color-red);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.leader-bio {
+  color: var(--color-gray);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  flex-grow: 1;
+}
+
+.time-btn {
+  background: none;
+  border: none;
+  color: var(--color-gray);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+  margin-top: auto;
+}
+
+.time-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.time-btn:hover {
+  color: var(--color-dark);
+}
+
+/* Modal CSS (Pop-up oynasi) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  /* Animatsiya yashirin holati */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  background: var(--color-white);
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Animatsiya yashirin holati */
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.modal-backdrop.show .modal-box {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--color-dark);
+}
+
+.close-modal-btn {
+  background: var(--color-gray-light);
+  border: none;
+  color: var(--color-gray);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.close-modal-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.close-modal-btn:hover {
+  background: #fee2e2;
+  color: var(--color-red);
+}
+
+.modal-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--color-blue-light);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 24px;
+}
+
+.modal-icon {
+  color: var(--color-blue);
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.modal-body p {
+  margin: 0;
+  color: #334155;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.modal-action-btn {
+  width: 100%;
+  background: var(--color-blue);
+  color: var(--color-white);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-action-btn:hover {
+  background: var(--color-blue-hover);
+}
+
+.topToScrollBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-blue);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.topToScrollBtn:hover {
+  transform: scale(1.1);
+  background-color: var(--color-blue-hover);
+}
+
+/* Mobil moslashuvchanlik */
+@media (max-width: 768px) {
+  .leadership-title {
+    font-size: 28px;
+  }
+  .leadership-section {
+    padding: 40px 16px;
+  }
+}

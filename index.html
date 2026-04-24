@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IIV Akademik Litseyi</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./imgs/logo.png" />
+
+    <!-- CSS -->
+     <link rel="stylesheet" href=".//css/news.css">
+    <link rel="stylesheet" href=".//css/style.css" />
+
+    <!-- css handle -->
+    <link rel="stylesheet" href="./css/handleStyle.css" />
+    <!-- font awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <!-- ================= TEST MODE BANNER ================= -->
+    <div class="test-mode-banner">
+      <i class="fas fa-tools"></i>
+      <span>Sayt test rejimida ishlamoqda. Ba'zi funksiyalar va ma'lumotlar yangilanish jarayonida.</span>
+      <span class="test-mode-badge">Test Rejimi</span>
+    </div>
+
+    <!-- ================= TOP BAR (Yuqori qism) ================= -->
+    <div class="top-bar" id="home">
+      <div class="top-bar-contact">
+        <a href="tel:+998991742220" class="contact-link">
+          <span class="icon"><i class="fas fa-phone"></i></span>+998991742220
+        </a>
+      </div>
+      <div class="top-bar-location">
+        <span class="location-text">
+          <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+          Buxoro sh. Navoiy shoh ko'chasi 1-uy
+        </span>
+      </div>
+    </div>
+
+    <!-- ================= HEADER & NAVIGATION (Menyu) ================= -->
+    <header class="main-header">
+      <div class="container">
+        <!-- Logo qismi -->
+        <div class="logo-wrapper">
+          <div class="logo-icon">
+            <img src="./imgs/logo.png" alt="IIV Akademik Litseyi logotipi" />
+          </div>
+          <div class="logo-text">
+            <h1>IIV Buxoro Akademik</h1>
+            <p>Litseyi</p>
+          </div>
+        </div>
+
+        <!-- Asosiy menyu -->
+        <nav class="desktop-nav">
+          <ul class="nav-links">
+            <li><a href="#">Bosh sahifa</a></li>
+            <li><a href="info.html">Litsey haqida</a></li>
+            <li><a href="#statistika">Statistika</a></li>
+            <li><a href="#news">Yangiliklar</a></li>
+          </ul>
+        </nav>
+
+        <!-- Harakat tugmalari -->
+        <div class="header-actions">
+          <button class="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <a href="#" class="btn-apply">Online ariza yuborish</a>
+        </div>
+
+        <!-- Mobil menyu tugmasi -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      </div>
+
+      <!-- Mobil menyu (Boshlang'ich holatda yashiringan bo'lishi kerak css orqali) -->
+      <nav class="mobile-nav" id="mobileMenu">
+        <ul class="mobile-nav-links">
+          <li><a href="#">Bosh sahifa</a></li>
+          <li><a href="#about">Litsey haqida</a></li>
+          <li><a href="#">Yo'nalishlar</a></li>
+          <li>
+            <a href="#" class="btn-apply-mobile">Online ariza yuborish</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- ================= ASOSIY QISM (Main Content) ================= -->
+    <main>
+      <!-- 1. HERO SLIDER (Karusel) -->
+      <section class="hero-section">
+        <div class="slider-container">
+          <!-- Slide 1 -->
+          <div class="slide active">
+            <img src="./imgs/header-bg.jpg" alt="Slide 1 rasm" />
+            <div class="slide-content">
+              <span class="slide-subtitle"
+                >IIV Buxoro Akademik Litseyiga xush kelibsiz</span
+              >
+              <h2 class="slide-title">
+                Kelajak posbonlari bu yerdan yetishib chiqadi
+              </h2>
+              <div class="slide-buttons">
+                <a href="./reyting/reytingTwo.html">
+                  <button class="btn-primary">O'quvchilar reytingi</button>
+                </a>
+               
+                <a href="./kurslar/login.html">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00e676, #00c853); color: #000; border: none;">📋 Kurs nazorat</button>
+                </a>
+                  <a href="https://droncourse.netlify.app/" target="_blank">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00065e, #0d0047); color: #ffffff; border: none;">🚁 DRON DARSLARI</button>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="slide">
+            <img src="./imgs/gallery-06.jpg" alt="Slide 2 rasm" />
+            <div class="slide-content">
+              <span class="slide-subtitle"
+                >Biz bilan buyuk maqsadlar sari qadam tashlang</span
+              >
+              <h2 class="slide-title">Zamonaviy ta'lim va yuksak intizom</h2>
+              <div class="slide-buttons">
+                <a href="./reyting/reytingTwo.html">
+                  <button class="btn-primary">O'quvchilar reytingi</button>
+                </a>
+              
+                <a href="./kurslar/login.html">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00e676, #00c853); color: #000; border: none;">📋 Kurs nazorat</button>
+                </a> 
+                    <a href="https://droncourse.netlify.app/" target="_blank">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00065e, #0d0047); color: #ffffff; border: none;">🚁 DRON DARSLARI</button>
+                </a> 
+              </div>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div class="slide">
+            <img src="./imgs/forma.jpg" alt="Slide 3 rasm" />
+            <div class="slide-content">
+              <span class="slide-subtitle"
+                >Biz bilan buyuk maqsadlar sari qadam tashlang</span
+              >
+              <h2 class="slide-title">Zamonaviy ta'lim va yuksak intizom</h2>
+              <div class="slide-buttons">
+                <a href="./reyting/reytingTwo.html">
+                  <button class="btn-primary">O'quvchilar reytingi</button>
+                </a>
+              
+                <a href="./kurslar/login.html">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00e676, #00c853); color: #000; border: none;">📋 Kurs nazorat</button>
+                </a>  
+                   <a href="https://droncourse.netlify.app/" target="_blank">
+                  <button class="btn-secondary" style="background: linear-gradient(135deg, #00065e, #0d0047); color: #ffffff; border: none;">🚁 DRON DARSLARI</button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slider boshqaruv tugmalari -->
+        <button class="slider-btn prev" id="prevSlide">❮</button>
+        <button class="slider-btn next" id="nextSlide">❯</button>
+      </section>
+
+      <!-- 2. TEZKOR HAVOLALAR (Qisqa menyu kartalari) -->
+      <section class="quick-links-section">
+        <div class="container cards-grid">
+          <div class="card">
+            <div class="card-icon">
+              <img src="./imgs/book new.png" alt="book" />
+            </div>
+            <h3 class="card-title">Litsey haqida</h3>
+            <p class="card-desc">
+              Litsey tarixi, nizomi va asosiy faoliyati haqida batafsil
+              ma'lumot.
+            </p>
+            <a
+              href="info.html"
+              class="card-link"
+              style="background-color: rgb(0, 192, 0)"
+              >Batafsil ko'rish <span>→</span></a
+            >
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <img src="./imgs/layers.png" alt="jarayon" />
+            </div>
+            <h3 class="card-title">Ta'lim jarayoni</h3>
+            <p class="card-desc">
+              Dars jadvallari, o'quv dasturlari va fan to'garaklari.
+            </p>
+            <a
+              href="info.html"
+              class="card-link"
+              style="background-color: rgb(255, 31, 31)"
+              >Batafsil ko'rish <span>→</span></a
+            >
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <img src="./imgs/graduation.png" alt="yo'nalishlar" />
+            </div>
+            <h3 class="card-title">Yo'nalishlar</h3>
+            <p class="card-desc">
+              Qaysi kasb egalari yetishib chiqishi va o'quv yo'nalishlari.
+            </p>
+            <a
+              href="info.html"
+              class="card-link"
+              style="background-color: rgb(0, 14, 209)"
+              >Batafsil ko'rish <span>→</span></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. BIZ HAQIMIZDA (About Section) -->
+      <section class="about-section" id="about">
+        <div class="container about-flex">
+          <div class="about-image">
+            <img src="./imgs/1.jpg" alt="Litsey binosi" />
+          </div>
+
+          <div class="about-content">
+            <span class="section-badge">Biz haqimizda</span>
+            <h2 class="section-title">
+              IIV Buxoro Akademik litseyi - kelajak posbonlarini tayyorlovchi
+              maskan
+            </h2>
+            <p class="section-text">
+              IIV Akademik litseyi nafaqat chuqurlashtirilgan bilim berish,
+              balki o'quvchilarda yuksak vatanparvarlik, tartib-intizom va
+              qonunlarga hurmat ruhini tarbiyalashga qaratilgan ilg'or ta'lim
+              muassasasidir.
+            </p>
+
+            <ul class="features-list">
+              <li>
+                <img src="./imgs/accept.png" alt="" /> Zamonaviy o'quv xonalari
+                va laboratoriyalar
+              </li>
+              <li>
+                <img src="./imgs/accept.png" alt="" /> Malakali va tajribali
+                o'qituvchilar jamoasi
+              </li>
+              <li>
+                <img src="./imgs/accept.png" alt="" /> Sport va jangovar
+                tayyorgarlik mashg'ulotlari
+              </li>
+            </ul>
+
+            <a href="info.html" class="btn-primary"
+              >Batafsil tanishish <span>→</span></a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOTOGALEREYA (Dars jarayonlari) ================= -->
+    <section class="gallery-section">
+      <div class="container">
+        <!-- Sarlavha qismi -->
+        <div class="gallery-header">
+          <span class="section-badge">Fotogalereya</span>
+          <h2 class="section-title">Dars jarayonlaridan lavhalar</h2>
+          <p class="section-text">
+            Litseymizdagi qiziqarli darslar, amaliy mashg'ulotlar va madaniy
+            tadbirlar bilan tanishing.
+          </p>
+        </div>
+
+        <!-- Rasmlar to'ri (Grid) -->
+        <div class="gallery-grid">
+          <!-- 1-rasm (Katta) -->
+          <div class="gallery-item span-2-col span-2-row">
+            <img src="./imgs/gallery-02.jpg" alt="Zamonaviy IT xonalari" />
+            <div class="gallery-overlay">
+              <h3 class="gallery-caption">Zamonaviy IT xonalari</h3>
+            </div>
+          </div>
+
+          <!-- 2-rasm -->
+          <div class="gallery-item">
+            <img src="./imgs/gallery-03.jpg" alt="Interaktiv darslar" />
+            <div class="gallery-overlay">
+              <h3 class="gallery-caption">Interaktiv darslar</h3>
+            </div>
+          </div>
+
+          <!-- 3-rasm -->
+          <div class="gallery-item">
+            <img src="./imgs/gallery-05.jpg" alt="Kutubxona va mutolaa" />
+            <div class="gallery-overlay">
+              <h3 class="gallery-caption">Kutubxona va mutolaa</h3>
+            </div>
+          </div>
+
+          <!-- 4-rasm (Uzun) -->
+          <div class="gallery-item span-2-col">
+            <img src="./imgs/gallery-06.jpg" alt="Tantanali tadbirlar" />
+            <div class="gallery-overlay">
+              <h3 class="gallery-caption">Tantanali tadbirlar</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barchasini ko'rish tugmasi -->
+        <div class="gallery-footer">
+          <a href="info.html#gallery" class="btn-text"
+            >Barcha suratlarni ko'rish <span>→</span></a
+          >
+        </div>
+      </div>
+
+      <!-- Modal (Rasmni kattalashtirib ko'rsatish oynasi) -->
+      <div class="lightbox-modal" id="lightboxModal">
+        <span class="lightbox-close" id="lightboxClose">&times;</span>
+        <img
+          class="lightbox-content"
+          id="lightboxImg"
+          src=""
+          alt="Kattalashtirilgan rasm"
+        />
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+      </div>
+    </section>
+
+    <!-- ================= STATISTIKA (Raqamlar) ================= -->
+    <section class="stats-section" id="statistika">
+      <!-- Orqa fon rasmi uchun qoplama (Overlay) -->
+      <div class="stats-overlay"></div>
+      <div class="container relative-z">
+        <div class="stats-grid">
+          <!-- 1-Statistika: O'quvchilar -->
+          <div class="stat-box">
+            <div class="stat-icon">
+              <span class="icon">
+                <img src="./imgs/group.png" alt="" />
+              </span>
+            </div>
+            <!-- data-target atributiga yakuniy raqamni yozamiz (JS o'qiydi) -->
+            <h3 class="stat-number" data-target="364">0</h3>
+            <p class="stat-label">O'quvchilar</p>
+          </div>
+
+          <!-- 2-Statistika: O'qituvchilar -->
+          <div class="stat-box">
+            <div class="stat-icon">
+              <span class="icon">
+                <img src="./imgs/teacher.png" alt="O'qituvchi" />
+              </span>
+            </div>
+            <h3 class="stat-number" data-target="50">0</h3>
+            <p class="stat-label">Malakali o'qituvchilar</p>
+          </div>
+
+          <!-- 3-Statistika: Oliy ta'lim ko'rsatkichi -->
+          <div class="stat-box">
+            <div class="stat-icon">
+              <span class="icon">
+                <img src="./imgs/graph.png" alt="Oliy ta'lim" />
+              </span>
+            </div>
+            <h3 class="stat-number" data-target="98">0</h3>
+            <p class="stat-label">Oliy ta'limga kirish ko'rsatkichi</p>
+          </div>
+
+          <!-- 4-Statistika: Laboratoriyalar -->
+          <div class="stat-box">
+            <div class="stat-icon">
+              <span class="icon">
+                <img src="./imgs/pilot.png" alt="Laboratoriya" />
+              </span>
+            </div>
+            <h3 class="stat-number" data-target="15">0</h3>
+            <span class="stat-plus"></span>
+            <p class="stat-label">Zamonaviy laboratoriyalar</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <!-- ================= YANGILIKLAR VA E'LONLAR ================= -->
+<section class="news-section" id="news">
+  <div class="container">
+    <!-- Sarlavha qismi -->
+    <div class="news-header-flex">
+      <div class="news-title-area">
+        <span class="section-badge badge-red">Yangiliklar va E'lonlar</span>
+        <h2 class="section-title">So'nggi yangiliklar  <span class="live-badge">Live 🔴</span></h2>
+      </div>
+
+      <!-- Kompyuter ekranida ko'rinadigan tugma -->
+      <a href="#" class="view-all-link desktop-only">
+        Barchasini ko'rish <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <!-- Live News Section -->
+    <section class="live-news-section" id="live-news">
+      <div class="container">
+        <!-- Sarlavha qismi -->
+       
+
+        <!-- JS shu div ichiga kartochkalarni joylashtiradi -->
+        <div id="news-grid" class="live-news-grid">
+          <!-- Yuklanish jarayonida ko'rinib turadigan yozuv (JS ma'lumot tortguncha) -->
+          <div class="news-loading">
+            <div class="spinner"></div>
+            <p>Ma'lumotlar yuklanmoqda...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobil ekranda ko'rinadigan tugma -->
+    <div class="news-footer mobile-only">
+      <a href="#" class="view-all-link">
+        Barchasini ko'rish <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  
+    <!-- Rahbariyat Bo'limi -->
+    <section class="leadership-section">
+      <div class="leadership-container">
+        <!-- Sarlavha qismi -->
+        <div class="leadership-header">
+          <h2 class="leadership-title">Litsey Rahbariyati</h2>
+          <p class="leadership-subtitle">
+            Ta'lim sifati va o'quvchilar kamoloti yo'lida xizmat qilayotgan
+            tajribali va jonkuyar mutaxassislarimiz.
+          </p>
+        </div>
+
+        <!-- Rahbariyat Kartochkalari -->
+        <div class="leadership-grid">
+          <!-- 1-Rahbar -->
+          <div class="leader-card">
+            <div class="card-image-wrapper">
+              <img src="./imgs/samandarov.jpg" alt="Direktor" />
+
+              <!-- Rasm ustidagi aloqa tugmalari -->
+              <div class="card-overlay">
+                <a
+                  href="tel:+998991742220"
+                  class="social-btn btn-blue"
+                  title="Qo'ng'iroq qilish"
+                >
+                  <i data-lucide="phone"></i>
+                </a>
+                <a
+                  href="mailto:direktor@litsey.uz"
+                  class="social-btn btn-white"
+                  title="Xat yozish"
+                >
+                  <i data-lucide="mail"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <h3 class="leader-name">Samandarov Ilhom Iskandarovich</h3>
+              <p class="leader-position">Litsey Direktori</p>
+              <div class="accent-line"></div>
+              <p class="leader-bio">
+                Podpolkovnik Samandarov I.I  - IIV Buxoro Akademik litseyida vaqtinchalik direktor vazifasini bajarmoqda. Podpolkovnik I.I.Samandarov IIV Buxoro akademik litseyida ish faolyatini 2021-yil mart oyidan boshlagan va o'z ishiga fidoyilik bilan yondashadi har doim o'quvchilarning
+                farovonligi va muvaffaqiyati uchun kurashadi.
+              </p>
+              <button
+                class="time-btn"
+                onclick="
+                  showModal(
+                    'Ilhom aka',
+                    'Qabul vaqtlari: Dushanba va Payshanba (14:00 - 17:00)',
+                  )
+                "
+              >
+                <i data-lucide="clock"></i> Qabul vaqtlari
+              </button>
+            </div>
+          </div>
+
+            <!-- 2-Rahbar -->
+          <div class="leader-card">
+            <div class="card-image-wrapper">
+              <img src="./imgs/yandashev.jpg" alt="Direktor" />
+
+              <!-- Rasm ustidagi aloqa tugmalari -->
+              <div class="card-overlay">
+                <a
+                  href="tel:+998711234567"
+                  class="social-btn btn-blue"
+                  title="Qo'ng'iroq qilish"
+                >
+                  <i data-lucide="phone"></i>
+                </a>
+                <a
+                  href="mailto:direktor@litsey.uz"
+                  class="social-btn btn-white"
+                  title="Xat yozish"
+                >
+                  <i data-lucide="mail"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <h3 class="leader-name">Yandashev Anvar Atoevich</h3>
+              <p class="leader-position">Ma'naviy-marifiy ishlar bo'yicha direktor o'rinbosari</p>
+              <div class="accent-line"></div>
+              <p class="leader-bio">
+                Mayor Yandashev A.A  - IIV Buxoro Akademik litseyining
+                direktori, o'zining 20 yillik pedagogik tajribasi bilan
+                tanilgan. U o'quvchilarga nafaqat bilim berish, balki ularni
+                hayotga tayyorlashga ham katta e'tibor qaratadi. Yandashev
+                A.A  o'z ishiga fidoyilik bilan yondashadi va har doim o'quvchilarning
+                farovonligi va muvaffaqiyati uchun kurashadi.
+              </p>
+              <button
+                class="time-btn"
+                onclick="
+                  showModal(
+                    'Yandashev Anvar Atoevich',
+                    'Qabul vaqtlari: Dushanba va Payshanba (14:00 - 17:00)',
+                  )
+                "
+              >
+                <i data-lucide="clock"></i> Qabul vaqtlari
+              </button>
+            </div>
+          </div>
+            <!-- 3-Rahbar -->
+          <div class="leader-card">
+            <div class="card-image-wrapper">
+              <img src="./imgs/barnoyev.jpg" alt="Direktor" />
+
+              <!-- Rasm ustidagi aloqa tugmalari -->
+              <div class="card-overlay">
+                <a
+                  href="tel:+998711234567"
+                  class="social-btn btn-blue"
+                  title="Qo'ng'iroq qilish"
+                >
+                  <i data-lucide="phone"></i>
+                </a>
+                <a
+                  href="mailto:direktor@litsey.uz"
+                  class="social-btn btn-white"
+                  title="Xat yozish"
+                >
+                  <i data-lucide="mail"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <h3 class="leader-name">Barnoev Sanjar Qurbonovich</h3>
+              <p class="leader-position">O'quv bo'lim rahbari</p>
+              <div class="accent-line"></div>
+              <p class="leader-bio">
+                Barnoev Sanjar Qurbonovich - IIV Buxoro Akademik litseyining
+                direktori, o'zining 20 yillik pedagogik tajribasi bilan
+                tanilgan. U o'quvchilarga nafaqat bilim berish, balki ularni
+                hayotga tayyorlashga ham katta e'tibor qaratadi. Barnoev
+                S.Q. o'z ishiga fidoyilik bilan yondashadi va har doim o'quvchilarning
+                farovonligi va muvaffaqiyati uchun kurashadi.
+              </p>
+              <button
+                class="time-btn"
+                onclick="
+                  showModal(
+                    'Barnoev Sanjar Qurbonovich',
+                    'Qabul vaqtlari: Dushanba va Payshanba (14:00 - 17:00)',
+                  )
+                "
+              >
+                <i data-lucide="clock"></i> Qabul vaqtlari
+              </button>
+            </div>
+          </div>
+      </div>
+    </section>
+
+    <!-- Modal (Qabul vaqtlari oynasi) -->
+    <div id="infoModal" class="modal-backdrop">
+      <div class="modal-box" id="modalContent">
+        <div class="modal-header">
+          <h3 id="modalTitle">Ism</h3>
+          <button onclick="closeModal()" class="close-modal-btn">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <i data-lucide="calendar-clock" class="modal-icon text-blue"></i>
+          <p id="modalText">Ma'lumot...</p>
+        </div>
+        <button onclick="closeModal()" class="modal-action-btn">
+          Tushunarli
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= FAQ (Tez-tez so'raladigan savollar) ================= -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+        
+        <!-- Sarlavha qismi -->
+        <div class="faq-header">
+            <h2 class="section-title">Ko'p beriladigan savollar</h2>
+            <p class="section-text">
+                Litseyga qabul va o'quv jarayoni bo'yicha eng ko'p so'raladigan savollarga javoblar.
+            </p>
+        </div>
+
+        <!-- Akkordeonlar ro'yxati -->
+        <div class="faq-container">
+            
+            <!-- 1-Savol -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    Litseyga qabul qachon boshlanadi?
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer">
+                    <p>Odatda qabul jarayoni har yili iyun oyining boshlarida boshlanadi va iyul oyining oxirigacha davom etadi. Aniq sanalar litseyning rasmiy veb-sayti va ijtimoiy tarmoqlardagi sahifalarida e'lon qilinadi.</p>
+                </div>
+            </div>
+
+            <!-- 2-Savol -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    Qanday hujjatlar talab etiladi?
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer">
+                    <p>Qabul uchun quyidagi asosiy hujjatlar kerak: tug'ilganlik haqida guvohnoma yoki pasport nusxasi, maktabdan ma'lumotnoma (tabel), 3x4 o'lchamdagi 6 ta rasm, 9x12 o'lchamdagi 2 ta rasm va ota-onaning arizasi.</p>
+                </div>
+            </div>
+
+            <!-- 3-Savol -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    Qaysi fanlardan imtihon olinadi?
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer">
+                    <p>Imtihonlar yo'nalishga qarab farq qiladi. Asosan ona tili va adabiyot, matematika hamda tarix fanlaridan test sinovlari, shuningdek, jismoniy tayyorgarlik bo'yicha me'yoriy sinovlar o'tkaziladi.</p>
+                </div>
+            </div>
+
+            <!-- 4-Savol -->
+            <div class="faq-item">
+                <button class="faq-question">
+                    Litseyda yotoqxona (yotoqjoy) bormi?
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer">
+                    <p>Ha, litseyimizda uzoq viloyat va tumanlardan kelgan o'quvchilar uchun barcha zamonaviy sharoitlarga ega, issiq va qulay yotoqxona mavjud va <span style="color: red;">bepul</span>. Yotoqxona 3 mahal issiq ovqat bilan ta'minlanadi.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+  </section>
+
+    <!-- ================= FOOTER (Pastki qism) ================= -->
+    <footer class="main-footer">
+      <div class="container footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">IIV Buxoro Akademik Litseyi</div>
+          <p class="footer-text">
+            O'zbekiston Respublikasi Ichki Ishlar Vazirligi Akademik Litseyi -
+            kelajak posbonlarini tayyorlovchi zamonaviy va yetakchi ta'lim
+            maskani.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Tezkor havolalar</h4>
+          <ul class="footer-links">
+            <li><a href="#">Bosh sahifa</a></li>
+            <li><a href="#">Litsey tarixi</a></li>
+            <li><a href="#">Rahbariyat</a></li>
+            <li><a href="#">Qabul jarayoni</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Bog'lanish</h4>
+          <ul class="footer-contact">
+            <li>
+              <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+              Buxoro sh. Navoiy shoh ko'chasi 1-uy
+            </li>
+            <li> <i class="fa-solid fa-phone"></i> +998991742220</li>
+            <li> <i class="fa-solid fa-envelope"></i> [EMAIL_ADDRESS]</li>
+          </ul>
+          <div class="footer-social">
+        <h4 class="footer-title">Ijtimoiy tarmoqlar</h4>
+        <div class="social-links">
+          <a href="https://t.me/iivbuxorolitsey" title="Telegram" style="color: #34a4ff;">
+            <i class="fab fa-telegram-plane"></i>
+          </a>
+        </div>
+      </div>  
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container bottom-flex">
+          <p>
+            &copy; <span id="currentYear"></span> IIV Buxoro Akademik Litseyi. Barcha huquqlar
+            himoyalangan.
+          </p>
+          <p>Developer: Nematov Begzod | +998919775159</p>
+        </div>
+      </div>
+    </footer>
+
+    <a href="#home" class="topToScrollBtn">
+        <i data-lucide="arrow-up"></i>
+    </a>
+
+    <!-- O'zingizning JS faylingizni shu yerga ulaysiz -->
+    <script src=".//js/script.js"></script>
+    <script src=".//js/news.js"></script>
+  </body>
+</html>

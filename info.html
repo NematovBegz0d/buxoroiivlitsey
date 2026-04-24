@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IIV Buxoro Akademik Litseyi</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/infoStyle.css" />
+    <link rel="stylesheet" href="./css/handleStyle.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Header / Navbar -->
+    <header class="main-header">
+      <div class="container">
+        <!-- Logo qismi -->
+        <div class="logo-wrapper">
+          <div class="logo-icon">
+            <img src="./imgs/logo.png" alt="IIV Akademik Litseyi logotipi" />
+          </div>
+          <div class="logo-text">
+            <h1>IIV Buxoro Akademik</h1>
+            <p>Litseyi</p>
+          </div>
+        </div>
+
+        <!-- Asosiy menyu -->
+        <nav class="desktop-nav">
+          <ul class="nav-links">
+            <li><a href="index.html">Bosh sahifa</a></li>
+            <li><a href="#about">Litsey haqida</a></li>
+          </ul>
+        </nav>
+
+        <!-- Harakat tugmalari -->
+        <div class="header-actions">
+          <button class="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <a href="#" class="btn-apply">Online ariza yuborish</a>
+        </div>
+
+        <!-- Mobil menyu tugmasi -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      </div>
+
+      <!-- Mobil menyu (Boshlang'ich holatda yashiringan bo'lishi kerak css orqali) -->
+      <nav class="mobile-nav" id="mobileMenu">
+        <ul class="mobile-nav-links">
+          <li><a href="index.html">Bosh sahifa</a></li>
+          <li><a href="#about">Litsey haqida</a></li>
+          <li><a href="#">Qabul</a></li>
+          <li><a href="#">Yo'nalishlar</a></li>
+          <li>
+            <a href="#" class="btn-apply-mobile">Online ariza yuborish</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="section-title-2">
+        <span>Litsey haqida</span>
+      </div>
+      <section class="cards-section">
+        <div class="container cards-grid">
+          <div class="info-card">
+            <div class="info-content">
+              <h3>Ta'lim yo'nalishlari</h3>
+              <p>
+                Litseydagi aniq, ijtimoiy-gumanitar va boshqa ixtisoslashgan
+                fanlar haqida.
+              </p>
+            </div>
+            <!-- data-target orqali qaysi qism ochilishini belgilaymiz -->
+            <button class="card-action-btn bg-green" data-target="modal-1">
+              Batafsil ko'rish &rarr;
+            </button>
+          </div>
+
+          <div class="info-card">
+            <div class="info-content">
+              <h3>Qabul jarayoni - 2026</h3>
+              <p>
+                Hujjatlarni topshirish muddatlari, talablar va imtihon tartibi.
+              </p>
+            </div>
+            <button class="card-action-btn bg-red" data-target="modal-2">
+              Batafsil ko'rish &rarr;
+            </button>
+          </div>
+
+          <div class="info-card">
+            <div class="info-content">
+              <h3>Fan to'garaklari</h3>
+              <p>
+                O'quvchilarning bo'sh vaqtini mazmunli o'tkazish uchun tashkil
+                etilgan to'garaklar.
+              </p>
+            </div>
+            <button class="card-action-btn bg-blue" data-target="modal-3">
+              Batafsil ko'rish &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- 2. BIZ HAQIMIZDA (1-rasm pastki qismi) -->
+      <section class="about-section" id="about">
+        <div class="container about-flex">
+          <div class="about-image">
+            <!-- Buxoro litseyi rasmi -->
+            <img src="./imgs/1.jpg" alt="IIV Buxoro Akademik litseyi" />
+          </div>
+          <div class="about-text">
+            <h2>
+              IIV Buxoro Akademik litseyi - kelajak posbonlarini tayyorlovchi
+              maskan
+            </h2>
+            <p>
+              IIV Akademik litseyi nafaqat chuqurlashtirilgan bilim berish,
+              balki o'quvchilarda yuksak vatanparvarlik, tartib-intizom va
+              qonunlarga hurmat ruhini tarbiyalashga qaratilgan ilg'or ta'lim
+              muassasasidir.
+            </p>
+
+            <ul class="check-list">
+              <li>
+                <span class="check-icon">✔️</span> Zamonaviy o'quv xonalari va
+                laboratoriyalar
+              </li>
+              <li>
+                <span class="check-icon">✔️</span> Malakali va tajribali
+                o'qituvchilar jamoasi
+              </li>
+              <li>
+                <span class="check-icon">✔️</span> Sport va jangovar
+                tayyorgarlik mashg'ulotlari
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="container about-flex">
+          <div class="about-text">
+            <h2>
+              IIV Buxoro Akademik litseyi - kelajak posbonlarini tayyorlovchi
+              maskan
+            </h2>
+            <p>
+              IIV Akademik litseyi nafaqat chuqurlashtirilgan bilim berish,
+              balki o'quvchilarda yuksak vatanparvarlik, tartib-intizom va
+              qonunlarga hurmat ruhini tarbiyalashga qaratilgan ilg'or ta'lim
+              muassasasidir.
+            </p>
+
+            <ul class="check-list">
+              <li>
+                <span class="check-icon">✔️</span> Zamonaviy o'quv xonalari va
+                laboratoriyalar
+              </li>
+              <li>
+                <span class="check-icon">✔️</span> Malakali va tajribali
+                o'qituvchilar jamoasi
+              </li>
+              <li>
+                <span class="check-icon">✔️</span> Sport va jangovar
+                tayyorgarlik mashg'ulotlari
+              </li>
+            </ul>
+          </div>
+          <div class="about-image">
+            <!-- Buxoro litseyi rasmi -->
+            <img src="./imgs/1.jpg" alt="IIV Buxoro Akademik litseyi" />
+          </div>
+        </div>
+      </section>
+
+      <div class="section-title-2">
+        <span>Dars Jarayonidan lavhalar</span>
+      </div>
+      <!-- 3. FOTOGALEREYA (2-rasm) -->
+      <section class="gallery-section" id="gallery">
+        <div class="container">
+          <div class="custom-gallery-grid">
+            <!-- Chapdagi katta rasm -->
+            <div class="gal-img img-large relative">
+              <img
+                src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+                alt="Zamonaviy IT xonalari"
+              />
+              <div class="img-caption">Zamonaviy IT xonalari</div>
+            </div>
+            <!-- O'ng tepa birinchi -->
+            <div class="gal-img img-top-1">
+              <img
+                src="https://images.unsplash.com/photo-1664382953518-4a664ab8a8c9"
+                alt="Interaktiv taxta"
+              />
+            </div>
+            <!-- O'ng tepa ikkinchi -->
+            <div class="gal-img img-top-2">
+              <img
+                src="https://images.unsplash.com/photo-1716654716581-3c92ba53de10"
+                alt="Muzey"
+              />
+            </div>
+            <!-- O'ng pastki uzun -->
+            <div class="gal-img img-bottom">
+              <img
+                src="https://images.unsplash.com/photo-1767595789539-cd012af80914"
+                alt="Dars jarayoni"
+              />
+            </div>
+          </div>
+
+          <div class="gallery-btn-wrapper">
+            <!-- Barcha rasmlarni ochuvchi tugma -->
+            <button class="btn-outline" data-target="modal-gallery">
+              Barcha suratlarni ko'rish &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="main-footer">
+      <div class="container footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">IIV Buxoro Akademik Litseyi</div>
+          <p class="footer-text">
+            O'zbekiston Respublikasi Ichki Ishlar Vazirligi Akademik Litseyi -
+            kelajak posbonlarini tayyorlovchi zamonaviy va yetakchi ta'lim
+            maskani.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Tezkor havolalar</h4>
+          <ul class="footer-links">
+            <li><a href="#">Bosh sahifa</a></li>
+            <li><a href="#">Litsey tarixi</a></li>
+            <li><a href="#">Rahbariyat</a></li>
+            <li><a href="#">Qabul jarayoni</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Bog'lanish</h4>
+          <ul class="footer-contact">
+            <li>
+              <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+              Buxoro sh., Ahmad Donish k, 1-uy
+            </li>
+            <li><i class="fa-solid fa-phone"></i> +998919775159</li>
+            <li>
+              <i class="fa-solid fa-envelope"></i> nematovbegzodb@gmail.com
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container bottom-flex">
+          <p>
+            &copy; 2026 IIV Buxoro Akademik Litseyi. Barcha huquqlar
+            himoyalangan.
+          </p>
+          <p>Developer: Nematov Begzod</p>
+          <div class="bottom-links">
+            <a href="#">Maxfiylik siyosati</a>
+            <a href="#">Foydalanish shartlari</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Yuqoriga chiqish tugmasi -->
+    <a href="#" class="scroll-top-btn" id="scrollTop">&uarr;</a>
+
+    <!-- ================= YASHIRIN HTML QISMLAR (MODALS) ================= -->
+    <!-- HTML faylning o'zida yozilgan, tugma bosilganda JS orqali ko'rsatiladi -->
+
+    <!-- Modal 1 -->
+    <div class="modal-info" id="modal-1">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Ta'lim yo'nalishlari</h2>
+        <p>
+          Bu yerda ijtimoiy-gumanitar, aniq fanlar va huquqshunoslikka oid
+          barcha fanlar, ularning o'quv dasturlari haqida to'liq ma'lumot
+          joylashadi...
+        </p>
+      </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div class="modal-info" id="modal-2">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Qabul komissiyasi ma'lumotlari</h2>
+        <p>
+          Hujjatlar yoz oylarida qabul qilinadi. Kerakli hujjatlar:
+          pasport/metrka, maktabdan shahodatnoma va boshqalar...
+        </p>
+      </div>
+    </div>
+
+    <!-- Modal 3 -->
+    <div class="modal-info" id="modal-3">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>To'garaklar haqida</h2>
+        <p>
+          Boks, dzyudo, sambo kabi sport turlari hamda IT va chet tillari
+          to'garaklari bepul faoliyat ko'rsatadi...
+        </p>
+      </div>
+    </div>
+
+    <!-- Gallery Modal (Barcha suratlar) -->
+    <div class="modal-info" id="modal-gallery">
+      <div class="modal-content modal-large">
+        <span class="close-btn">&times;</span>
+        <h2>Barcha suratlar galereyasi</h2>
+        <div class="full-gallery-grid">
+          <img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          /><img
+            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
+            alt="1"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1664382953518-4a664ab8a8c9"
+            alt="2"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1716654716581-3c92ba53de10"
+            alt="3"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1767595789539-cd012af80914"
+            alt="4"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1541726260-e6b6a6a08b27"
+            alt="5"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1759310610325-2c7cb621e5e3"
+            alt="6"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- JS faylni ulash -->
+    <script src="./js/info.js"></script>
+  </body>
+</html>

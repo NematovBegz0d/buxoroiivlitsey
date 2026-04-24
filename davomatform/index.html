@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Davomat Tizimi</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="data.js"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <!-- Logo qismi -->
+        <div class="logo-wrapper">
+          <div class="logo-icon">
+            <img
+              src="../imgs/logo.png"
+              alt="IIV Akademik Litseyi logotipi"
+              width="50px"
+            />
+          </div>
+          <div class="logo-text">
+            <h1>IIV Buxoro Akademik</h1>
+            <p>Litseyi</p>
+          </div>
+        </div>
+
+        <!-- Asosiy menyu -->
+        <nav class="desktop-nav">
+          <ul class="nav-links">
+            <li><a href="../index.html">Bosh sahifa</a></li>
+            <li><a href="../index.html">Litsey haqida</a></li>
+            <li><a href="../index.html">Qabul</a></li>
+            <li><a href="../index.html">Statistika</a></li>
+            <li><a href="../index.html#news">Yangiliklar</a></li>
+          </ul>
+        </nav>
+
+        <!-- Harakat tugmalari -->
+        <div class="header-actions">
+          <button class="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <a href="#" class="btn-apply">Online ariza yuborish</a>
+        </div>
+
+        <!-- Mobil menyu tugmasi -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      </div>
+
+      <!-- Mobil menyu (Boshlang'ich holatda yashiringan bo'lishi kerak css orqali) -->
+      <nav class="mobile-nav" id="mobileMenu">
+        <ul class="mobile-nav-links">
+          <li><a href="#">Bosh sahifa</a></li>
+          <li><a href="#about">Litsey haqida</a></li>
+          <li><a href="#">Qabul</a></li>
+          <li><a href="#">Yo'nalishlar</a></li>
+          <li>
+            <a href="#" class="btn-apply-mobile">Online ariza yuborish</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-icon">📋</div>
+        <div>
+          <h1>Davomat Tizimi</h1>
+          <div class="header-subtitle">Kunlik davomat nazorati</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div class="date-badge" id="todayDate"></div>
+        <button class="btn-add" onclick="openLoginModal()">
+          <span>＋</span> Davomat qo'shish
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="courses-container">
+        <div class="course-column">
+          <h2 class="course-title">1-kurslar <span>101-108</span></h2>
+          <div id="gridKurs1" class="course-column"></div>
+        </div>
+
+        <div class="course-column">
+          <h2 class="course-title" style="color: var(--accent2)">
+            2-kurslar
+            <span
+              style="
+                background: rgba(52, 211, 153, 0.15);
+                color: var(--accent2);
+              "
+              >201-208</span
+            >
+          </h2>
+          <div id="gridKurs2" class="course-column"></div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>🔐 Kirish</h2>
+          <button class="modal-close" onclick="closeLoginModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Guruh Logini</label>
+            <input
+              class="form-input"
+              type="text"
+              id="loginInput"
+              placeholder="guruh101"
+              autocomplete="off"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Parol</label>
+            <input
+              class="form-input"
+              type="password"
+              id="passInput"
+              placeholder="••••"
+            />
+          </div>
+          <div class="modal-error" id="loginError">
+            ❌ Login yoki parol noto'g'ri
+          </div>
+          <button class="btn-login" onclick="doLogin()">Kirish</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="davomatModal">
+      <div class="modal davomat-modal">
+        <div class="modal-header">
+          <div>
+            <h2>📝 Davomat qo'shish</h2>
+            <div
+              style="font-size: 12px; color: var(--text2); margin-top: 2px"
+              id="activeGuruhLabel"
+            ></div>
+          </div>
+          <button class="modal-close" onclick="closeDavomatModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sana *</label>
+              <input class="form-input" type="date" id="sanaInput" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Para *</label>
+              <select class="form-select" id="paraSelect">
+                <option value="1">1-para (08:00 - 09:30)</option>
+                <option value="2">2-para (09:45 - 11:15)</option>
+                <option value="3">3-para (11:30 - 13:00)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">O'qituvchi paroli * (4 xonali)</label>
+              <input
+                class="form-input"
+                type="password"
+                id="teacherPass"
+                placeholder="••••"
+                maxlength="4"
+              />
+              <span
+                id="teacherBadge"
+                class="teacher-badge"
+                style="color: var(--text3)"
+                >Qulfni ochish uchun parolni kiriting</span
+              >
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mashg'ulot sababi</label>
+              <input
+                class="form-input"
+                type="text"
+                id="sababInput"
+                placeholder="Informatika, Matematika..."
+              />
+            </div>
+          </div>
+
+          <div class="students-divider">O'quvchilar ro'yxati</div>
+          <div id="studentsChecklist" class="students-locked"></div>
+        </div>
+        <div class="modal-footer">
+          <div
+            style="font-size: 12px; color: var(--text2); align-self: center"
+            id="countLabel"
+          ></div>
+          <button class="btn-cancel" onclick="closeDavomatModal()">
+            Bekor qilish
+          </button>
+          <button
+            class="btn-save"
+            id="saveBtn"
+            disabled
+            onclick="saveDavomat()"
+          >
+            💾 Saqlash
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <span class="toast-icon">✅</span>
+      <span id="toastMsg">Davomat saqlandi!</span>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

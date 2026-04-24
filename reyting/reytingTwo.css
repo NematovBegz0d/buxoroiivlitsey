@@ -1,0 +1,331 @@
+:root {
+  --bg-main: #0f172a; /* Slate 900 */
+  --bg-card: #1e293b; /* Slate 800 */
+  --bg-card-hover: #334155; /* Slate 700 */
+  --border-color: #334155;
+  --teal-accent: #0d9488;
+  --teal-light: #2dd4bf;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --gold: #eab308;
+  --silver: #94a3b8;
+  --bronze: #d97706;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+.rating-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Header qismi */
+.rating-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.trophy-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--teal-light);
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.5));
+}
+.rating-header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* KPI Kartochkalar */
+.kpi-grid {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.kpi-card {
+  width: 250px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+.kpi-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--teal-light);
+  margin-bottom: 8px;
+}
+.kpi-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.kpi-label svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Qidiruv Paneli */
+.filter-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+.search-box input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 20px 16px 48px;
+  color: var(--text-main);
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.search-box input:focus {
+  border-color: var(--teal-light);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+}
+.search-box svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 20px;
+  height: 20px;
+}
+
+/* Asosiy Ustunlar Grid'i */
+.main-columns {
+  width: 95%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.column-header {
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+.column-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--teal-light);
+}
+.gold-title {
+  color: var(--gold);
+}
+
+/* O'quvchi ro'yxati (Student Card) */
+.student-card {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+.student-card:hover {
+  border-color: rgba(45, 212, 191, 0.5);
+  transform: translateX(4px);
+  background: var(--bg-card-hover);
+}
+
+.student-rank {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.rank-gold {
+  background: var(--gold);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
+}
+.rank-silver {
+  background: #cbd5e1;
+  color: #1e293b;
+  box-shadow: 0 0 12px rgba(203, 213, 225, 0.4);
+}
+.rank-bronze {
+  background: #b45309;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(180, 83, 9, 0.4);
+}
+.rank-normal {
+  border: 1px solid var(--border-color);
+  background: #0f172a;
+  color: var(--text-muted);
+}
+
+.student-info {
+  flex-grow: 1;
+}
+.student-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.student-info p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.student-info p svg {
+  width: 14px;
+  height: 14px;
+}
+
+.student-score {
+  text-align: right;
+  border-left: 1px solid var(--border-color);
+  padding-left: 16px;
+  min-width: 60px;
+}
+.score-val {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--teal-light);
+}
+.score-lbl {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Guruhlar Kesimi Grid'i */
+.groups-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.group-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.group-card:hover {
+  border-color: var(--gold);
+  background: rgba(234, 179, 8, 0.05);
+  transform: translateY(-2px);
+}
+.group-name {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.group-score {
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* --- YANGI: Scrollbar va Top-10 dizaynlari --- */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--teal-accent);
+}
+
+.scrollable-rest {
+  max-height: 500px; /* Qolgan o'quvchilar uchun quti balandligi. Xoxlasangiz o'zgartirishingiz mumkin */
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-top: 16px;
+  border-top: 2px dashed var(--border-color);
+  padding-top: 16px;
+}
+
+/* Mobil moslashuvchanlik */
+@media (max-width: 1024px) {
+  .main-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .main-columns {
+    grid-template-columns: 1fr;
+  }
+  .rating-header h1 {
+    font-size: 28px;
+  }
+  .groups-container {
+    grid-template-columns: 1fr;
+  }
+}
