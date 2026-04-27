@@ -179,8 +179,8 @@ function renderParaRow(paraData, paraNum, total) {
           <span>Jami: ${total}</span>
           <span class="meta-kelgan">Kelgan: ${keldi.length}</span>
           <span class="meta-kelmagan">Kelmagan: ${kelmadi.length}</span>
-          ${paraData.sabab ? `<span>📚 ${paraData.sabab}</span>` : ""}
-          ${paraData.teacherName ? `<span style="color:var(--accent)">👤 ${paraData.teacherName}</span>` : ""}
+          ${paraData.sabab ? `<span><i class="fa-solid fa-book"></i> ${paraData.sabab}</span>` : ""}
+          ${paraData.teacherName ? `<span style="color:var(--accent)"><i class="fa-solid fa-user"></i> ${paraData.teacherName}</span>` : ""}
         </div>
       </div>
     </div>
@@ -261,7 +261,7 @@ document.getElementById("teacherPass").addEventListener("input", function (e) {
     list.classList.add("students-locked");
     saveBtn.disabled = true;
     if (pass.length === 4) {
-      badge.textContent = "❌ Noto'g'ri parol";
+      badge.innerHTML = "<i class='fa-solid fa-circle-xmark'></i> Noto'g'ri parol";
       badge.style.color = "var(--danger)";
     } else {
       badge.textContent = "Qulfni ochish uchun parolni kiriting";
@@ -338,7 +338,7 @@ function saveDavomat() {
   const sabab = document.getElementById("sababInput").value.trim();
 
   if (!OQITUVCHILAR[teacherPass]) {
-    showToast("❌ Avval to'g'ri o'qituvchi parolini kiriting!", true);
+    showToast("<i class='fa-solid fa-circle-xmark'></i> Avval to'g'ri o'qituvchi parolini kiriting!", true);
     return;
   }
 
@@ -368,7 +368,7 @@ function saveDavomat() {
 
   closeDavomatModal();
   renderGuruhlar();
-  showToast(`✅ ${guruhId}-guruh ${para}-para davomati saqlandi!`);
+  showToast(`<i class="fa-solid fa-circle-check"></i> ${guruhId}-guruh ${para}-para davomati saqlandi!`);
 }
 
 // =============================================
@@ -376,7 +376,7 @@ function saveDavomat() {
 // =============================================
 function showToast(msg, isError = false) {
   const toast = document.getElementById("toast");
-  document.getElementById("toastMsg").textContent = msg;
+  document.getElementById("toastMsg").innerHTML = msg;
   toast.style.borderColor = isError
     ? "rgba(248,113,113,0.3)"
     : "rgba(52,211,153,0.3)";

@@ -1,25 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IIV Buxoro Akademik Litseyi</title>
-    <link rel="stylesheet" href="./css/style.css" />
-    <link rel="stylesheet" href="./css/infoStyle.css" />
-    <link rel="stylesheet" href="./css/handleStyle.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-  </head>
-  <body>
-    <!-- Header / Navbar -->
-    <header class="main-header">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Litsey haqida — Ichki Ishlar Akademik Litseyi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/infoStyle.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<header class="main-header">
       <div class="container">
         <!-- Logo qismi -->
         <div class="logo-wrapper">
           <div class="logo-icon">
-            <img src="./imgs/logo.png" alt="IIV Akademik Litseyi logotipi" />
+            <img src="./imgs/logo.png" alt="IIV Akademik Litseyi logotipi" width="60px" />
           </div>
           <div class="logo-text">
             <h1>IIV Buxoro Akademik</h1>
@@ -31,7 +31,9 @@
         <nav class="desktop-nav">
           <ul class="nav-links">
             <li><a href="index.html">Bosh sahifa</a></li>
-            <li><a href="#about">Litsey haqida</a></li>
+            <li><a href="info.html">Litsey haqida</a></li>
+            <li><a href="index.html#statistika">Statistika</a></li>
+            <li><a href="index.html#news">Yangiliklar</a></li>
           </ul>
         </nav>
 
@@ -50,9 +52,8 @@
       <!-- Mobil menyu (Boshlang'ich holatda yashiringan bo'lishi kerak css orqali) -->
       <nav class="mobile-nav" id="mobileMenu">
         <ul class="mobile-nav-links">
-          <li><a href="index.html">Bosh sahifa</a></li>
+          <li><a href="#">Bosh sahifa</a></li>
           <li><a href="#about">Litsey haqida</a></li>
-          <li><a href="#">Qabul</a></li>
           <li><a href="#">Yo'nalishlar</a></li>
           <li>
             <a href="#" class="btn-apply-mobile">Online ariza yuborish</a>
@@ -60,324 +61,449 @@
         </ul>
       </nav>
     </header>
-    <main>
-      <div class="section-title-2">
-        <span>Litsey haqida</span>
+<section class="hero">
+  <div class="hero-emblem">
+    <img src="./imgs/logo.png" alt="logo" width="100px">
+  </div>
+
+  <p class="hero-tag">O'zbekiston Respublikasi · Ichki Ishlar Vazirligi</p>
+
+  <h1>Ichki Ishlar <br>
+    <span> Buxoro Akademik Litseyi</span></h1>
+
+  <p class="hero-sub">
+    Huquqshunoslik va axborot xavfsizligi yo'nalishlarida kelajak kadrlarini tayyorlovchi
+    ixtisoslashgan o'quv muassasasi
+  </p>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="360" data-suffix="+">360+</div>
+      <div class="hero-stat-label">O'quvchilar</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="40" data-suffix="+">40+</div>
+      <div class="hero-stat-label">O'qituvchilar</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="2" data-suffix="">2</div>
+      <div class="hero-stat-label">Yo'nalish</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-target="72" data-suffix="%">72%</div>
+      <div class="hero-stat-label">Oliy ta'limga qabul</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">Pastga suring</div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     TARIX
+════════════════════════════════════════ -->
+<section class="tarix" id="tarix">
+  <div class="container">
+    <div class="tarix-grid">
+
+      <div class="tarix-text reveal">
+        <p class="section-label">Litsey tarixi</p>
+        <h2 class="section-title">O'tmishdan bugunga uzluksiz yo'l</h2>
+        <div class="section-line"></div>
+        <p>
+          Ichki Ishlar Akademik Litseyi O'zbekiston Respublikasi Ichki Ishlar Vazirligi tizimida
+          yuridik va texnik ta'lim beradigan maxsus o'quv muassasasi sifatida tashkil etilgan.
+          Litsey o'z faoliyatini davlat xavfsizligiga sodiq, bilimli va intizomli yoshlarni
+          tarbiyalash maqsadida boshlagan.
+        </p>
+        <p>
+          Yillar davomida litsey o'z o'quv dasturlarini takomillashtirdi, zamonaviy texnologiyalar
+          bilan jihozlandi va mamlakatimizning eng nufuzli litseylari qatoridan munosib o'rin egalladi.
+          Bugungi kunda minglab bitiruvchilarimiz davlat organlari, huquqshunoslik va IT sohasida
+          muvaffaqiyatli faoliyat ko'rsatmoqda.
+        </p>
       </div>
-      <section class="cards-section">
-        <div class="container cards-grid">
-          <div class="info-card">
-            <div class="info-content">
-              <h3>Ta'lim yo'nalishlari</h3>
-              <p>
-                Litseydagi aniq, ijtimoiy-gumanitar va boshqa ixtisoslashgan
-                fanlar haqida.
-              </p>
-            </div>
-            <!-- data-target orqali qaysi qism ochilishini belgilaymiz -->
-            <button class="card-action-btn bg-green" data-target="modal-1">
-              Batafsil ko'rish &rarr;
-            </button>
-          </div>
 
-          <div class="info-card">
-            <div class="info-content">
-              <h3>Qabul jarayoni - 2026</h3>
-              <p>
-                Hujjatlarni topshirish muddatlari, talablar va imtihon tartibi.
-              </p>
-            </div>
-            <button class="card-action-btn bg-red" data-target="modal-2">
-              Batafsil ko'rish &rarr;
-            </button>
+      <div class="tarix-visual reveal reveal-delay-2">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">Tashkil etilgan</div>
+            <div class="tl-text">Ichki Ishlar vazirligi tizimida ixtisoslashgan akademik litsey sifatida asoslandi</div>
           </div>
-
-          <div class="info-card">
-            <div class="info-content">
-              <h3>Fan to'garaklari</h3>
-              <p>
-                O'quvchilarning bo'sh vaqtini mazmunli o'tkazish uchun tashkil
-                etilgan to'garaklar.
-              </p>
-            </div>
-            <button class="card-action-btn bg-blue" data-target="modal-3">
-              Batafsil ko'rish &rarr;
-            </button>
+          <div class="tl-item">
+            <div class="tl-year">Rivojlanish bosqichi</div>
+            <div class="tl-text">Axborot xavfsizligi yo'nalishi ochildi, zamonaviy kompyuter laboratoriyalari ishga tushirildi</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Kengayish</div>
+            <div class="tl-text">Yotoqxona kompleksi, sport zali va yangi o'quv binolari qurildi</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Bugun</div>
+            <div class="tl-text">360 dan ortiq o'quvchi ikki ixtisoslashgan yo'nalishda ta'lim olmoqda</div>
           </div>
         </div>
-      </section>
-      <!-- 2. BIZ HAQIMIZDA (1-rasm pastki qismi) -->
-      <section class="about-section" id="about">
-        <div class="container about-flex">
-          <div class="about-image">
-            <!-- Buxoro litseyi rasmi -->
-            <img src="./imgs/1.jpg" alt="IIV Buxoro Akademik litseyi" />
-          </div>
-          <div class="about-text">
-            <h2>
-              IIV Buxoro Akademik litseyi - kelajak posbonlarini tayyorlovchi
-              maskan
-            </h2>
-            <p>
-              IIV Akademik litseyi nafaqat chuqurlashtirilgan bilim berish,
-              balki o'quvchilarda yuksak vatanparvarlik, tartib-intizom va
-              qonunlarga hurmat ruhini tarbiyalashga qaratilgan ilg'or ta'lim
-              muassasasidir.
-            </p>
-
-            <ul class="check-list">
-              <li>
-                <span class="check-icon">✔️</span> Zamonaviy o'quv xonalari va
-                laboratoriyalar
-              </li>
-              <li>
-                <span class="check-icon">✔️</span> Malakali va tajribali
-                o'qituvchilar jamoasi
-              </li>
-              <li>
-                <span class="check-icon">✔️</span> Sport va jangovar
-                tayyorgarlik mashg'ulotlari
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="container about-flex">
-          <div class="about-text">
-            <h2>
-              IIV Buxoro Akademik litseyi - kelajak posbonlarini tayyorlovchi
-              maskan
-            </h2>
-            <p>
-              IIV Akademik litseyi nafaqat chuqurlashtirilgan bilim berish,
-              balki o'quvchilarda yuksak vatanparvarlik, tartib-intizom va
-              qonunlarga hurmat ruhini tarbiyalashga qaratilgan ilg'or ta'lim
-              muassasasidir.
-            </p>
-
-            <ul class="check-list">
-              <li>
-                <span class="check-icon">✔️</span> Zamonaviy o'quv xonalari va
-                laboratoriyalar
-              </li>
-              <li>
-                <span class="check-icon">✔️</span> Malakali va tajribali
-                o'qituvchilar jamoasi
-              </li>
-              <li>
-                <span class="check-icon">✔️</span> Sport va jangovar
-                tayyorgarlik mashg'ulotlari
-              </li>
-            </ul>
-          </div>
-          <div class="about-image">
-            <!-- Buxoro litseyi rasmi -->
-            <img src="./imgs/1.jpg" alt="IIV Buxoro Akademik litseyi" />
-          </div>
-        </div>
-      </section>
-
-      <div class="section-title-2">
-        <span>Dars Jarayonidan lavhalar</span>
       </div>
-      <!-- 3. FOTOGALEREYA (2-rasm) -->
-      <section class="gallery-section" id="gallery">
-        <div class="container">
-          <div class="custom-gallery-grid">
-            <!-- Chapdagi katta rasm -->
-            <div class="gal-img img-large relative">
-              <img
-                src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-                alt="Zamonaviy IT xonalari"
-              />
-              <div class="img-caption">Zamonaviy IT xonalari</div>
-            </div>
-            <!-- O'ng tepa birinchi -->
-            <div class="gal-img img-top-1">
-              <img
-                src="https://images.unsplash.com/photo-1664382953518-4a664ab8a8c9"
-                alt="Interaktiv taxta"
-              />
-            </div>
-            <!-- O'ng tepa ikkinchi -->
-            <div class="gal-img img-top-2">
-              <img
-                src="https://images.unsplash.com/photo-1716654716581-3c92ba53de10"
-                alt="Muzey"
-              />
-            </div>
-            <!-- O'ng pastki uzun -->
-            <div class="gal-img img-bottom">
-              <img
-                src="https://images.unsplash.com/photo-1767595789539-cd012af80914"
-                alt="Dars jarayoni"
-              />
-            </div>
-          </div>
 
-          <div class="gallery-btn-wrapper">
-            <!-- Barcha rasmlarni ochuvchi tugma -->
-            <button class="btn-outline" data-target="modal-gallery">
-              Barcha suratlarni ko'rish &rarr;
-            </button>
-          </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     BUGUNGI KUN
+════════════════════════════════════════ -->
+<section class="bugun" id="bugun">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Bugungi kun</p>
+      <h2 class="section-title">Zamonaviy ta'lim muhiti</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="bugun-cards">
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/></svg>
         </div>
-      </section>
-    </main>
-
-    <footer class="main-footer">
-      <div class="container footer-grid">
-        <div class="footer-col">
-          <div class="footer-logo">IIV Buxoro Akademik Litseyi</div>
-          <p class="footer-text">
-            O'zbekiston Respublikasi Ichki Ishlar Vazirligi Akademik Litseyi -
-            kelajak posbonlarini tayyorlovchi zamonaviy va yetakchi ta'lim
-            maskani.
-          </p>
+        <h3>Yuqori sifatli ta'lim</h3>
+        <p>Davlat standartlaridan yuqori darajadagi o'quv dasturlari, tajribali o'qituvchi-professorlar jamoasi va zamonaviy o'quv materiallari bilan jihozlangan darslar.</p>
+      </div>
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
-
-        <div class="footer-col">
-          <h4 class="footer-title">Tezkor havolalar</h4>
-          <ul class="footer-links">
-            <li><a href="#">Bosh sahifa</a></li>
-            <li><a href="#">Litsey tarixi</a></li>
-            <li><a href="#">Rahbariyat</a></li>
-            <li><a href="#">Qabul jarayoni</a></li>
-          </ul>
+        <h3>Raqamli infratuzilma</h3>
+        <p>Zamonaviy kompyuter sinflari, tezkor internet, elektron kutubxona va interaktiv doskalar bilan ta'minlangan o'quv muhiti.</p>
+      </div>
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M3 20a9 9 0 0 1 18 0"/></svg>
         </div>
+        <h3>Intizomli muhit</h3>
+        <p>Harbiy-akademik intizom tamoyillari asosida qurilgan tartib, o'quvchilarni mas'uliyatli shaxs sifatida tarbiyalash.</p>
+      </div>
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        </div>
+        <h3>Sport va salomatlik</h3>
+        <p>Zamonaviy sport zallari, ochiq maydonlar, muntazam jismoniy mashg'ulotlar va sport musobaqalari.</p>
+      </div>
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Jamoaviy tarbiya</h3>
+        <p>O'quvchilar jamoasi, yoshlar tashkilotlari, madaniy tadbirlar va hamkorlik ruhiyatini shakllantiruvchi dasturlar.</p>
+      </div>
+      <div class="bugun-card">
+        <div class="bugun-icon">
+          <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        </div>
+        <h3>Nufuzli bitiruvchilar</h3>
+        <p>Litsey bitiruvchilari mamlakatning eng nufuzli oliy o'quv yurtlarida va davlat organlarida muvaffaqiyatli faoliyat ko'rsatmoqda.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div class="footer-col">
-          <h4 class="footer-title">Bog'lanish</h4>
-          <ul class="footer-contact">
-            <li>
-              <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
-              Buxoro sh., Ahmad Donish k, 1-uy
-            </li>
-            <li><i class="fa-solid fa-phone"></i> +998919775159</li>
-            <li>
-              <i class="fa-solid fa-envelope"></i> nematovbegzodb@gmail.com
-            </li>
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     TA'LIM YO'NALISHLARI
+════════════════════════════════════════ -->
+<section class="talim" id="talim">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Ta'lim yo'nalishlari</p>
+      <h2 class="section-title">Ikki ixtisoslashgan yo'nalish</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="talim-grid">
+      <div class="talim-card huquq reveal">
+        <div class="talim-card-inner">
+          <span class="talim-badge">Yo'nalish — 01</span>
+          <h3>Huquqshunoslik</h3>
+          <ul class="talim-list">
+            <li>Konstitutsiyaviy va ma'muriy huquq asoslari</li>
+            <li>Jinoiy huquq va kriminalistika</li>
+            <li>Fuqarolik va oilaviy huquq</li>
+            <li>Huquqiy mantiq va dalil tahlili</li>
+            <li>O'zbekiston Respublikasi qonunchilik tizimi</li>
+            <li>Xalqaro huquq va diplomatiya asoslari</li>
+            <li>Advokatlik va prokuratura faoliyati</li>
           </ul>
         </div>
       </div>
 
-      <div class="footer-bottom">
-        <div class="container bottom-flex">
-          <p>
-            &copy; 2026 IIV Buxoro Akademik Litseyi. Barcha huquqlar
-            himoyalangan.
-          </p>
-          <p>Developer: Nematov Begzod</p>
-          <div class="bottom-links">
-            <a href="#">Maxfiylik siyosati</a>
-            <a href="#">Foydalanish shartlari</a>
+      <div class="talim-card it reveal reveal-delay-2">
+        <div class="talim-card-inner">
+          <span class="talim-badge">Yo'nalish — 02</span>
+          <h3>Axborot xavfsizligi</h3>
+          <ul class="talim-list">
+            <li>Kiberxavfsizlik asoslari va protokollari</li>
+            <li>Tarmoq xavfsizligi va kriptografiya</li>
+            <li>Dasturlash tillari (Python, C++, Java)</li>
+            <li>Ma'lumotlar bazasi va axborot tizimlari</li>
+            <li>Axborotni himoyalash texnologiyalari</li>
+            <li>Dronlarni boshqarish</li>
+            <li>Etik xakerlik va penetratsion test</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     FAN TO'GARAKLARI
+════════════════════════════════════════ -->
+<section class="togarak" id="togarak">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Fan to'garaklari</p>
+      <h2 class="section-title">Bilim va ijod markazi</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="togarak-grid">
+      <div class="togarak-item reveal">
+        <span class="togarak-emoji"><i class="fa-solid fa-building-columns"></i></span>
+        <h4>Huquq va Tarix to'garagi</h4>
+        <p>Munozaralar, sud muhokamasi simulyatsiyalari, huquqiy olimpiadalar</p>
+      </div>
+      <div class="togarak-item reveal reveal-delay-1">
+        <span class="togarak-emoji"><i class="fa-solid fa-laptop-code"></i></span>
+        <h4>Dasturlash klubi</h4>
+        <p>Hackathon, algoritmik masalalar, loyiha ishlanmalari</p>
+      </div>
+      <div class="togarak-item reveal reveal-delay-2">
+        <span class="togarak-emoji"><i class="fa-solid fa-lock"></i></span>
+        <h4>Kiber xavfsizlik to'garagi</h4>
+        <p>CTF musobaqalari, zaifliklarni topish, real tizimlar bilan ishlash</p>
+      </div>
+      <div class="togarak-item reveal reveal-delay-1">
+        <span class="togarak-emoji"><i class="fa-solid fa-earth-americas"></i></span>
+        <h4>Chet tillari klubi</h4>
+        <p>Ingliz, rus, xitoy tillari, xalqaro sertifikatlarga tayyorgarlik</p>
+      </div>
+      <div class="togarak-item reveal reveal-delay-2">
+        <span class="togarak-emoji"><i class="fa-solid fa-helicopter"></i></span>
+        <h4>Dronlarni boshqarish</h4>
+        <p> Zamonaviy dronlarni boshqarish texnikalari, dron operatsiyalari, havo sensorlari bilan ishlash</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     DARS JARAYONI
+════════════════════════════════════════ -->
+<section class="dars" id="dars">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Dars jarayonidan lavhalar</p>
+      <h2 class="section-title">Bilim o'rganish — jangovar jarayon</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="dars-grid">
+      <div class="dars-card reveal">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><rect x="10" y="10" width="60" height="45" rx="4"/><line x1="10" y1="25" x2="70" y2="25"/><line x1="25" y1="55" x2="25" y2="70"/><line x1="55" y1="55" x2="55" y2="70"/><line x1="15" y1="70" x2="65" y2="70"/></svg>
+        </div>
+        <div class="dars-card-label">Interaktiv ta'lim</div>
+        <h3>Aqlli darsxonalar</h3>
+        <p>Zamonaviy multimedia vositalar, interaktiv doskalar va real vaqtda muhokama usullari</p>
+      </div>
+      <div class="dars-card reveal reveal-delay-1">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><rect x="8" y="15" width="20" height="50" rx="2"/><rect x="34" y="25" width="20" height="40" rx="2"/><rect x="60" y="10" width="12" height="55" rx="2"/></svg>
+        </div>
+        <div class="dars-card-label">Amaliy mashg'ulotlar</div>
+        <h3>Laboratoriya darslari</h3>
+        <p>Kiberxavfsizlik laboratoriyalarida real tahdidlar bilan ishlash va himoya ko'nikmalarini shakllantirish</p>
+      </div>
+      <div class="dars-card reveal reveal-delay-2">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><circle cx="40" cy="30" r="18"/><path d="M25 55 C25 45 55 45 55 55L60 72H20L25 55z"/></svg>
+        </div>
+        <div class="dars-card-label">Individual yondashuv</div>
+        <h3>Mentor darslari</h3>
+        <p>Har bir o'quvchi bilan individual ishlash, zaif tomonlarni aniqlash va mustahkamlash</p>
+      </div>
+      <div class="dars-card reveal reveal-delay-1">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><path d="M20 60 L40 20 L60 60"/><line x1="28" y1="44" x2="52" y2="44"/></svg>
+        </div>
+        <div class="dars-card-label">Baholi darslar</div>
+        <h3>Munozara va debatlar</h3>
+        <p>Huquqiy masalalar bo'yicha simulyatsion sud muhokamasi, argument tuzish va tahlil qilish</p>
+      </div>
+      <div class="dars-card reveal reveal-delay-2">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><circle cx="25" cy="35" r="12"/><circle cx="55" cy="35" r="12"/><path d="M37 35 L43 35"/><path d="M25 47 L25 65"/><path d="M55 47 L55 65"/></svg>
+        </div>
+        <div class="dars-card-label">Hamkorlik</div>
+        <h3>Guruhli loyihalar</h3>
+        <p>Jamoaviy ishlash ko'nikmalarini rivojlantirish, birgalikdagi ilmiy va ijodiy ishlanmalar</p>
+      </div>
+      <div class="dars-card reveal reveal-delay-3">
+        <div class="dars-card-bg">
+          <svg viewBox="0 0 80 80"><path d="M15 65 L15 25 L65 25 L65 65"/><path d="M40 25 L40 10 L55 25"/><line x1="25" y1="40" x2="55" y2="40"/><line x1="25" y1="50" x2="45" y2="50"/></svg>
+        </div>
+        <div class="dars-card-label">Mustaqil ish</div>
+        <h3>Kutubxona va tadqiqot</h3>
+        <p>Elektron kutubxona resurslari, ilmiy maqolalar tahlili va mustaqil tadqiqot ko'nikmalari</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     YOTOQXONA
+════════════════════════════════════════ -->
+<section class="yotoq" id="yotoq">
+  <div class="container">
+    <div class="yotoq-grid">
+
+      <div class="reveal">
+        <p class="section-label">Yotoqxona</p>
+        <h2 class="section-title">Qulay va xavfsiz yashash muhiti</h2>
+        <div class="section-line"></div>
+        <p class="yotoq-intro">
+          Litsey yotoqxonasi o'quvchilar uchun uy kabi qulay, xavfsiz va tartibli muhitni ta'minlaydi.
+          Har bir o'quvchi lozim bo'lgan barcha sharoit bilan ta'minlanadi.
+        </p>
+
+        <div class="yotoq-features">
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-bed"></i></span>
+            <h4>Qulay xonalar</h4>
+            <p>2–4 kishilik yotoqxona xonalari, zamonaviy mebel</p>
+          </div>
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-utensils"></i></span>
+            <h4>Oshxona</h4>
+            <p>To'liq ovqatlanish, dietaolog nazoratida to'g'ri ovqat</p>
+          </div>
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-book"></i></span>
+            <h4>O'quv xonasi</h4>
+            <p>Doimiy ishlash uchun jihozlangan kechki tayyorgarlik xonasi</p>
+          </div>
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-hospital"></i></span>
+            <h4>Tibbiy punkt</h4>
+            <p>24 soat tibbiy xizmat va doktor nazorati</p>
+          </div>
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-shield-halved"></i></span>
+            <h4>Xavfsizlik</h4>
+            <p>Qo'riqchi, kamera tizimi va kirish nazorati</p>
+          </div>
+          <div class="yotoq-feat">
+            <span class="yotoq-feat-icon"><i class="fa-solid fa-wifi"></i></span>
+            <h4>Wi-Fi</h4>
+            <p>Barcha qavatlarda tezkor internet ulanishi</p>
           </div>
         </div>
       </div>
-    </footer>
 
-    <!-- Yuqoriga chiqish tugmasi -->
-    <a href="#" class="scroll-top-btn" id="scrollTop">&uarr;</a>
-
-    <!-- ================= YASHIRIN HTML QISMLAR (MODALS) ================= -->
-    <!-- HTML faylning o'zida yozilgan, tugma bosilganda JS orqali ko'rsatiladi -->
-
-    <!-- Modal 1 -->
-    <div class="modal-info" id="modal-1">
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>Ta'lim yo'nalishlari</h2>
-        <p>
-          Bu yerda ijtimoiy-gumanitar, aniq fanlar va huquqshunoslikka oid
-          barcha fanlar, ularning o'quv dasturlari haqida to'liq ma'lumot
-          joylashadi...
-        </p>
-      </div>
-    </div>
-
-    <!-- Modal 2 -->
-    <div class="modal-info" id="modal-2">
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>Qabul komissiyasi ma'lumotlari</h2>
-        <p>
-          Hujjatlar yoz oylarida qabul qilinadi. Kerakli hujjatlar:
-          pasport/metrka, maktabdan shahodatnoma va boshqalar...
-        </p>
-      </div>
-    </div>
-
-    <!-- Modal 3 -->
-    <div class="modal-info" id="modal-3">
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>To'garaklar haqida</h2>
-        <p>
-          Boks, dzyudo, sambo kabi sport turlari hamda IT va chet tillari
-          to'garaklari bepul faoliyat ko'rsatadi...
-        </p>
-      </div>
-    </div>
-
-    <!-- Gallery Modal (Barcha suratlar) -->
-    <div class="modal-info" id="modal-gallery">
-      <div class="modal-content modal-large">
-        <span class="close-btn">&times;</span>
-        <h2>Barcha suratlar galereyasi</h2>
-        <div class="full-gallery-grid">
-          <img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          /><img
-            src="https://images.unsplash.com/photo-1723987135977-ae935608939e"
-            alt="1"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1664382953518-4a664ab8a8c9"
-            alt="2"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1716654716581-3c92ba53de10"
-            alt="3"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1767595789539-cd012af80914"
-            alt="4"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1541726260-e6b6a6a08b27"
-            alt="5"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1759310610325-2c7cb621e5e3"
-            alt="6"
-          />
+      <div class="yotoq-img-block reveal reveal-delay-2">
+        <div class="img-card tall">
+          <svg viewBox="0 0 32 32"><rect x="4" y="8" width="24" height="18" rx="2"/><line x1="4" y1="14" x2="28" y2="14"/><line x1="16" y1="14" x2="16" y2="26"/></svg>
+          <span>Xonalar ko'rinishi</span>
+        </div>
+        <div class="img-card short">
+          <svg viewBox="0 0 32 32"><path d="M4 28V16l12-10 12 10v12"/><rect x="12" y="20" width="8" height="8"/></svg>
+          <span>Yotoqxona binosi</span>
+        </div>
+        <div class="img-card short">
+          <svg viewBox="0 0 32 32"><circle cx="16" cy="12" r="6"/><path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10"/></svg>
+          <span>Oshxona va dam olish</span>
         </div>
       </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     YUTUQLAR
+════════════════════════════════════════ -->
+<section class="yutuq" id="yutuq">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">O'quvchilar yutuqlari</p>
+      <h2 class="section-title">G'ururlarimiz</h2>
+      <div class="section-line"></div>
     </div>
 
-    <!-- JS faylni ulash -->
-    <script src="./js/info.js"></script>
-  </body>
+    <div class="yutuq-grid">
+      <div class="yutuq-card">
+        <div class="yutuq-medal gold"><i class="fa-solid fa-medal"></i></div>
+        <h3>Olimpiada g'oliblari</h3>
+        <p>Respublika va xalqaro huquq, informatika va matematika olimpiadalarida o'quvchilarimiz muntazam ravishda oltin o'rin egallaydi.</p>
+        <div class="yutuq-number">01</div>
+      </div>
+      <div class="yutuq-card">
+        <div class="yutuq-medal silver"><i class="fa-solid fa-trophy"></i></div>
+        <h3>Xalqaro musobaqalar</h3>
+        <p>CTF (Capture The Flag) kibersport musobaqalarida va xalqaro huquq debat turnirlarida respublikamizni munosib vakil etish.</p>
+        <div class="yutuq-number">02</div>
+      </div>
+      <div class="yutuq-card">
+        <div class="yutuq-medal bronze"><i class="fa-solid fa-graduation-cap"></i></div>
+        <h3>Oliy ta'limga qabul</h3>
+        <p>Bitiruvchilarimizning 100 foizi davlatning eng nufuzli oliy o'quv yurtlarida — MIA Akademiyasi, Toshkent davlat yuridik universitetida davom etadi.</p>
+        <div class="yutuq-number">03</div>
+      </div>
+      <div class="yutuq-card">
+        <div class="yutuq-medal gold"><i class="fa-solid fa-lock"></i></div>
+        <h3>Kiberxavfsizlik sohasida</h3>
+        <p>O'quvchilarimiz milliy kiberxavfsizlik musobaqalarida yuqori o'rinlarni egallaydi va real loyihalarda ishtirok etadi.</p>
+        <div class="yutuq-number">04</div>
+      </div>
+      <div class="yutuq-card">
+        <div class="yutuq-medal silver"><i class="fa-solid fa-scroll"></i></div>
+        <h3>Ilmiy maqola va tadqiqotlar</h3>
+        <p>O'quvchilarimizning ilmiy ishlari respublika ilmiy jurnallarida nashr etiladi va anjumanlarda taqdim qilinadi.</p>
+        <div class="yutuq-number">05</div>
+      </div>
+      <div class="yutuq-card">
+        <div class="yutuq-medal bronze"><i class="fa-solid fa-futbol"></i></div>
+        <h3>Sport yutuqlari</h3>
+        <p>Litsey jamoalari respublika darajasidagi sport musobaqalarida — futbol, shaxmat va judo bo'yicha medallarga sazovor bo'lgan.</p>
+        <div class="yutuq-number">06</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer class="footer-band">
+  <p>
+    &copy; 2025 <span>Ichki Ishlar Akademik Litseyi</span> —
+    Huquqshunoslik va Axborot Xavfsizligi yo'nalishlari
+  </p>
+</footer>
+
+<script src="./js/info.js"></script>
+</body>
 </html>

@@ -10,6 +10,7 @@
     />
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="data.js"></script>
   </head>
@@ -70,7 +71,7 @@
 
     <header class="header">
       <div class="header-left">
-        <div class="logo-icon">📋</div>
+        <div class="logo-icon"><i class="fa-solid fa-clipboard-list"></i></div>
         <div>
           <h1>Davomat Tizimi</h1>
           <div class="header-subtitle">Kunlik davomat nazorati</div>
@@ -110,7 +111,7 @@
     <div class="modal-overlay" id="loginModal">
       <div class="modal">
         <div class="modal-header">
-          <h2>🔐 Kirish</h2>
+          <h2><i class="fa-solid fa-lock"></i> Kirish</h2>
           <button class="modal-close" onclick="closeLoginModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -134,7 +135,7 @@
             />
           </div>
           <div class="modal-error" id="loginError">
-            ❌ Login yoki parol noto'g'ri
+            <i class="fa-solid fa-circle-xmark"></i> Login yoki parol noto'g'ri
           </div>
           <button class="btn-login" onclick="doLogin()">Kirish</button>
         </div>
@@ -145,7 +146,7 @@
       <div class="modal davomat-modal">
         <div class="modal-header">
           <div>
-            <h2>📝 Davomat qo'shish</h2>
+            <h2><i class="fa-solid fa-pen-to-square"></i> Davomat qo'shish</h2>
             <div
               style="font-size: 12px; color: var(--text2); margin-top: 2px"
               id="activeGuruhLabel"
@@ -213,14 +214,14 @@
             disabled
             onclick="saveDavomat()"
           >
-            💾 Saqlash
+            <i class="fa-solid fa-floppy-disk"></i> Saqlash
           </button>
         </div>
       </div>
     </div>
 
     <div class="toast" id="toast">
-      <span class="toast-icon">✅</span>
+      <span class="toast-icon"><i class="fa-solid fa-circle-check"></i></span>
       <span id="toastMsg">Davomat saqlandi!</span>
     </div>
 

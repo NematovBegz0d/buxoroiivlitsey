@@ -6,13 +6,14 @@ function formatDate(str) {
   try {
     const d = new Date(str);
     if (isNaN(d)) return "";
-    return d.toLocaleDateString("uz-UZ", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
   } catch {
     return "";
   }
@@ -75,7 +76,7 @@ function createCard(item) {
           src="${imageUrl}"
           alt="${item.title || "Rasm"}"
           loading="lazy"
-          onerror="console.error('Rasm yuklanmadi:', this.src); this.style.display='none'; this.parentElement.innerHTML='<div class=\\'news-card__no-media\\'>📰</div>';"
+          onerror="console.error('Rasm yuklanmadi:', this.src); this.style.display='none'; this.parentElement.innerHTML='<div class=\\'news-card__no-media\\'><i class=\\'fa-regular fa-newspaper\\'></i></div>';"
         >
       </div>`;
   } else if (mediaType === "video" && item.video_url) {
@@ -89,7 +90,7 @@ function createCard(item) {
         ></iframe>
       </div>`;
   } else {
-    mediaHTML = `<div class="news-card__no-media">📰</div>`;
+    mediaHTML = `<div class="news-card__no-media"><i class="fa-regular fa-newspaper"></i></div>`;
   }
 
   const dateStr = formatDate(item.timestamp);

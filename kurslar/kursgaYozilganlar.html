@@ -7,6 +7,7 @@
   <meta name="description" content="Guruhlar bo'yicha kurslarga yozilgan o'quvchilar ro'yxati" />
   <link rel="icon" type="image/png" href="../imgs/logo.png" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
@@ -17,7 +18,7 @@
   <header class="dashboard-header">
     <div class="header-content">
       <div class="header-left">
-        <div class="header-icon">📑</div>
+        <div class="header-icon"><i class="fa-solid fa-file-contract"></i></div>
         <div class="header-title">
           <h1>Kurslarga Yozilganlar</h1>
           <p>Guruhlar bo'yicha kurs ro'yxati</p>
@@ -34,12 +35,12 @@
 
         <!-- Kurs nazoratga qaytish (kuzatuvchi ko'rmaydi) -->
         <a href="kursNazorat.html" class="btn-secondary-action" id="btnGoToNazorat">
-          📋 Kurs Nazorat
+          <i class="fa-solid fa-clipboard-list"></i> Kurs Nazorat
         </a>
 
         <!-- Admin paneli -->
         <button class="btn-admin-action" onclick="openAdminLogin()">
-          🔑 Admin
+          <i class="fa-solid fa-key"></i> Admin
         </button>
 
         <!-- Foydalanuvchi badge -->
@@ -83,7 +84,7 @@
     <div class="modal-container" style="max-width: 420px;">
       <div class="modal-header">
         <div class="modal-header-info">
-          <div class="modal-header-icon">🔐</div>
+          <div class="modal-header-icon"><i class="fa-solid fa-lock"></i></div>
           <div>
             <h2>Sinf rahbari tasdiqlash</h2>
             <p>Kursga yozish uchun login qiling</p>
@@ -117,7 +118,7 @@
     <div class="modal-container" style="max-width: 600px;">
       <div class="modal-header">
         <div class="modal-header-info">
-          <div class="modal-header-icon">📝</div>
+          <div class="modal-header-icon"><i class="fa-solid fa-pen-to-square"></i></div>
           <div>
             <h2>Kursga yozish</h2>
             <p id="enrollGroupName">Guruh: —</p>
@@ -190,7 +191,7 @@
 
       <div class="modal-footer">
         <button class="btn-modal-cancel" onclick="closeModal('enrollModal')">Bekor qilish</button>
-        <button class="btn-modal-save" onclick="saveEnrollment()">💾 Saqlash</button>
+        <button class="btn-modal-save" onclick="saveEnrollment()"><i class="fa-solid fa-floppy-disk"></i> Saqlash</button>
       </div>
     </div>
   </div>
@@ -200,7 +201,7 @@
     <div class="modal-container" style="max-width: 780px;">
       <div class="modal-header">
         <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: rgba(124,77,255,0.15);">👤</div>
+          <div class="modal-header-icon" style="background: rgba(124,77,255,0.15);"><i class="fa-solid fa-user"></i></div>
           <div>
             <h2 id="sdmStudentName">O'quvchi</h2>
             <p id="sdmStudentGroup">Guruh: —</p>
@@ -224,7 +225,7 @@
     <div class="modal-container" style="max-width: 400px;">
       <div class="modal-header">
         <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);">🔑</div>
+          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);"><i class="fa-solid fa-key"></i></div>
           <div>
             <h2>Admin kirish</h2>
             <p>Login va parolni kiriting</p>
@@ -255,7 +256,7 @@
     <div class="modal-container" style="max-width: 95vw; max-height: 92vh;">
       <div class="modal-header">
         <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);">📊</div>
+          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);"><i class="fa-solid fa-chart-pie"></i></div>
           <div>
             <h2>Bugungi davomat nazorati</h2>
             <p id="adminPanelDate">—</p>
@@ -665,7 +666,7 @@
             // Oxirgi 5 ta bahoni ko'rsatish
             const recentGrades = courseGrades.slice(-5);
             let gradesHtml = '<div class="sdm-grades-section">';
-            gradesHtml += '<div class="sdm-label" style="margin-bottom:6px;">⭐ Baholar:</div>';
+            gradesHtml += '<div class="sdm-label" style="margin-bottom:6px;"><i class="fa-solid fa-star"></i> Baholar:</div>';
             recentGrades.forEach(gr => {
               const studentGrade = gr.grades.find(g => g.studentId === studentId);
               if (studentGrade) {
@@ -1428,7 +1429,7 @@
 
     function showToast(message, type = "info") {
       const container = document.getElementById("toastContainer");
-      const icons = { success: "✅", error: "❌", info: "ℹ️" };
+      const icons = { success: '<i class="fa-solid fa-circle-check"></i>', error: '<i class="fa-solid fa-circle-xmark"></i>', info: '<i class="fa-solid fa-circle-info"></i>' };
 
       const toast = document.createElement("div");
       toast.className = `toast ${type}`;
