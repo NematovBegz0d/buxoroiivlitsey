@@ -7,7 +7,7 @@
   <meta name="description" content="Guruhlar bo'yicha kurslarga yozilgan o'quvchilar ro'yxati" />
   <link rel="icon" type="image/png" href="../imgs/logo.png" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
@@ -26,6 +26,13 @@
       </div>
 
       <div class="header-right">
+        <!-- Qidiruv maydoni -->
+        <div class="search-wrapper" style="position:relative; margin-right: 15px;">
+          <i class="fa-solid fa-magnifying-glass search-icon" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af;"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="O'quvchi izlash..." autocomplete="off">
+          <div class="search-results" id="searchResults"></div>
+        </div>
+
         <span class="date-badge" id="currentDate"></span>
 
         <!-- Kursga yozish tugmasi (kuzatuvchi ko'rmaydi) -->
@@ -146,13 +153,19 @@
             <option value="">— Avval fan tanlang —</option>
           </select>
           <!-- Yangi o'qituvchi qo'shish -->
-          <div class="add-subject-row" id="addTeacherRow" style="display:none;">
-            <input type="text" class="form-input" id="newTeacherName" placeholder="O'qituvchi F.I.Sh" />
-            <select class="form-input" id="newTeacherType" style="width:120px;flex:none;">
-              <option value="ichki">Ichki</option>
-              <option value="tashqi">Tashqi</option>
-            </select>
-            <button class="btn-add-small" onclick="addNewTeacher()">Qo'shish</button>
+          <div class="add-subject-row" id="addTeacherRow" style="display:none; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:10px; width:100%;">
+              <input type="text" class="form-input" id="newTeacherName" placeholder="O'qituvchi F.I.Sh" style="flex:1;" />
+              <select class="form-input" id="newTeacherType" style="width:120px;flex:none;">
+                <option value="ichki">Ichki</option>
+                <option value="tashqi">Tashqi</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px; width:100%;">
+              <input type="text" class="form-input" id="newTeacherLogin" placeholder="Login (ms: doston_tarix)" style="flex:1;" />
+              <input type="password" class="form-input" id="newTeacherPassword" placeholder="Parol (4 ta son)" maxlength="4" style="width:120px;flex:none;" />
+              <button class="btn-add-small" onclick="addNewTeacher()" style="flex:none; padding:8px 16px;">Saqlash</button>
+            </div>
           </div>
           <button class="btn-add-small mt-2" onclick="toggleAddTeacher()" style="font-size:0.75rem;padding:4px 10px;">+ Yangi o'qituvchi</button>
         </div>
@@ -331,9 +344,10 @@
       checkAuth();
       setCurrentDate();
       setupWeekdayButtons();
+      setupSearch();
       
       const container = document.getElementById("groupsContainer");
-      if(container) container.insertAdjacentHTML("afterbegin", '<div id="fbLoad" style="text-align:center; padding: 20px; color:#666;">⏳ Ma\'lumotlar Firebase\'dan yuklanmoqda...</div>');
+      if(container) container.insertAdjacentHTML("afterbegin", '<div id="fbLoad" style="text-align:center; padding: 20px; color:#666;"> <i class="fas fa-spinner fa-spin"></i> Ma\'lumotlar Firebase\'dan yuklanmoqda...</div>');
 
       try {
         const collections = [
@@ -406,6 +420,44 @@
       const month = String(now.getMonth() + 1).padStart(2, "0");
       const year = now.getFullYear();
       document.getElementById("currentDate").textContent = `${day}.${month}.${year}`;
+    }
+
+    function setupSearch() {
+      const searchInput = document.getElementById("searchInput");
+      const searchResults = document.getElementById("searchResults");
+      if (!searchInput || !searchResults) return;
+
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (query.length < 2) {
+          searchResults.classList.remove("show");
+          return;
+        }
+
+        const students = JSON.parse(localStorage.getItem("students") || "[]");
+        const filtered = students.filter(s =>
+          s.fullName.toLowerCase().includes(query) ||
+          s.groupCode.toLowerCase().includes(query)
+        ).slice(0, 15);
+
+        if (filtered.length === 0) {
+          searchResults.innerHTML = '<div class="search-no-results">Hech narsa topilmadi</div>';
+        } else {
+          searchResults.innerHTML = filtered.map(s => `
+            <div class="search-result-item" onclick="document.getElementById('searchResults').classList.remove('show'); document.getElementById('searchInput').value=''; openStudentDetail(${s.id}, '${s.groupCode}')">
+              <span class="student-name">${s.fullName}</span>
+              <span class="student-group">${s.groupCode}-guruh</span>
+            </div>
+          `).join("");
+        }
+        searchResults.classList.add("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-wrapper")) {
+          searchResults.classList.remove("show");
+        }
+      });
     }
 
     /* ============================================================
@@ -507,7 +559,7 @@
 
         groupStudents.forEach((student, i) => {
           // Bu o'quvchining kurslari
-          const studentCourses = assignments.filter(a => a.studentId === student.id);
+          const studentCourses = assignments.filter(a => String(a.studentId) === String(student.id));
           const courseNames = studentCourses.map(c => c.subjectName);
 
           // Kurslar badge ko'rinishida
@@ -556,7 +608,7 @@
       const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
       const allAttendance = JSON.parse(localStorage.getItem("attendance") || "[]");
 
-      const student = allStudents.find(s => s.id === studentId);
+      const student = allStudents.find(s => String(s.id) === String(studentId));
       if (!student) return;
 
       // Bugungi sana
@@ -573,7 +625,7 @@
       document.getElementById("sdmTodayDate").textContent = `${String(today.getDate()).padStart(2,"0")}.${String(today.getMonth()+1).padStart(2,"0")}.${today.getFullYear()}`;
 
       // Bu o'quvchining kurslari
-      const studentCourses = assignments.filter(a => a.studentId === studentId);
+      const studentCourses = assignments.filter(a => String(a.studentId) === String(studentId));
 
       const contentEl = document.getElementById("sdmCoursesContent");
 
@@ -615,12 +667,12 @@
                 (courseTime ? attTime === courseTime : true);
             });
             if (todayRecord) {
-              const rec = todayRecord.records.find(r => r.studentId === studentId);
+              const rec = todayRecord.records.find(r => String(r.studentId) === String(studentId));
               if (rec) {
                 if (rec.status === "kelgan") {
-                  davomatHtml = '<span class="davomat-badge davomat-kelgan">✓ Kelgan</span>';
+                  davomatHtml = '<span class="davomat-badge davomat-kelgan">✓ Bugungi darsga Keldi</span>';
                 } else {
-                  davomatHtml = '<span class="davomat-badge davomat-kelmagan">✕ Kelmagan</span>';
+                  davomatHtml = '<span class="davomat-badge davomat-kelmagan">✕ Kelmadi</span>';
                 }
               }
             }
@@ -633,15 +685,15 @@
                 ${davomatHtml}
               </div>
               <div class="sdm-card-row">
-                <span class="sdm-label">👨‍🏫 O'qituvchi:</span>
+                <span class="sdm-label" style="color: #fff;"><i class="fa-solid fa-user-graduate"></i> O'qituvchi:</span>
                 <span class="sdm-value">${course.teacherName}</span>
               </div>
               <div class="sdm-card-row">
-                <span class="sdm-label">🕐 Dars vaqti:</span>
+                <span class="sdm-label" style="color: #fff;"><i class="fa-solid fa-clock"></i> Dars vaqti:</span>
                 <span class="sdm-value">${course.classTime}</span>
               </div>
               <div class="sdm-card-row">
-                <span class="sdm-label">📅 Hafta kunlari:</span>
+                <span class="sdm-label" style="color: #fff;"><i class="fa-solid fa-calendar-days"></i> Hafta kunlari:</span>
                 <div class="weekday-small-badges">
                   ${courseWeekDays.map(d => {
                     const isToday = d === todayWeekDay;
@@ -666,9 +718,9 @@
             // Oxirgi 5 ta bahoni ko'rsatish
             const recentGrades = courseGrades.slice(-5);
             let gradesHtml = '<div class="sdm-grades-section">';
-            gradesHtml += '<div class="sdm-label" style="margin-bottom:6px;"><i class="fa-solid fa-star"></i> Baholar:</div>';
+            gradesHtml += '<div class="sdm-label" style="margin-bottom:6px; color: yellow"><i class="fa-solid fa-star"></i> Baholar:</div>';
             recentGrades.forEach(gr => {
-              const studentGrade = gr.grades.find(g => g.studentId === studentId);
+              const studentGrade = gr.grades.find(g => String(g.studentId) === String(studentId));
               if (studentGrade) {
                 gradesHtml += `<span class="grade-badge grade-${studentGrade.grade}">${studentGrade.grade}</span> `;
               }
@@ -796,11 +848,11 @@
 
           courses.forEach(([key, c]) => {
             const assignment = student.courses[key];
-            let cellHtml = '<span class="adm-none">—</span>';
+            let cellHtml = '<span class="adm-none"><i class="fa-solid fa-minus"></i></span>';
 
             if (assignment) {
               if (!c.isToday) {
-                cellHtml = '<span class="adm-noclass">📅</span>';
+                cellHtml = '<span class="adm-noclass"><i class="fa-solid fa-calendar-days"></i></span>';
                 totalNoClass++;
               } else {
                 // Bugun kurs kuni — davomat tekshirish
@@ -813,21 +865,21 @@
                     (courseTimeVal ? attTime === courseTimeVal : true);
                 });
                 if (todayRecord) {
-                  const rec = todayRecord.records.find(r => r.studentId === student.id);
+                  const rec = todayRecord.records.find(r => String(r.studentId) === String(student.id));
                   if (rec) {
                     if (rec.status === "kelgan") {
-                      cellHtml = '<span class="adm-kelgan">✓</span>';
+                      cellHtml = '<span class="adm-kelgan"><i class="fa-solid fa-check"></i></span>';
                       totalKelgan++;
                     } else {
-                      cellHtml = '<span class="adm-kelmagan">✕</span>';
+                      cellHtml = '<span class="adm-kelmagan"><i class="fa-solid fa-xmark"></i></span>';
                       totalKelmagan++;
                     }
                   } else {
-                    cellHtml = '<span class="adm-pending">⏳</span>';
+                    cellHtml = '<span class="adm-pending"><i class="fa-solid fa-clock"></i></span>';
                     totalPending++;
                   }
                 } else {
-                  cellHtml = '<span class="adm-pending">⏳</span>';
+                  cellHtml = '<span class="adm-pending"><i class="fa-solid fa-clock"></i></span>';
                   totalPending++;
                 }
               }
@@ -853,7 +905,7 @@
       document.getElementById("adminStats").innerHTML = `
         <span class="adm-stat"><span class="adm-kelgan">✓</span> ${totalKelgan}</span>
         <span class="adm-stat"><span class="adm-kelmagan">✕</span> ${totalKelmagan}</span>
-        <span class="adm-stat"><span class="adm-pending">⏳</span> ${totalPending}</span>
+        <span class="adm-stat"><span class="adm-pending"><i class="fa-solid fa-clock"></i></span> ${totalPending}</span>
       `;
     }
 
@@ -1173,13 +1225,13 @@
     }
 
     function onSubjectChange() {
-      const subjectId = parseInt(document.getElementById("enrollSubject").value);
+      const subjectId = document.getElementById("enrollSubject").value;
       const teacherSelect = document.getElementById("enrollTeacher");
       teacherSelect.innerHTML = '<option value="">— O\'qituvchi tanlang —</option>';
       if (!subjectId) return;
 
       const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const selectedSubject = subjects.find(s => s.id === subjectId);
+      const selectedSubject = subjects.find(s => String(s.id) === String(subjectId));
       if (!selectedSubject) return;
 
       const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
@@ -1254,41 +1306,65 @@
     }
 
     /** Yangi o'qituvchi qo'shish */
-    function addNewTeacher() {
+    async function addNewTeacher() {
       const name = document.getElementById("newTeacherName").value.trim();
       const type = document.getElementById("newTeacherType").value;
+      const login = document.getElementById("newTeacherLogin").value.trim();
+      const password = document.getElementById("newTeacherPassword").value.trim();
+      
       if (!name) { showToast("O'qituvchi nomini kiriting!", "error"); return; }
+      if (!login || login.length < 3) { showToast("Login kamida 3 harfdan iborat bo'lishi kerak!", "error"); return; }
+      if (!password || password.length !== 4) { showToast("Parol aniq 4 ta son bo'lishi kerak!", "error"); return; }
 
-      const subjectId = parseInt(document.getElementById("enrollSubject").value);
+      const subjectId = document.getElementById("enrollSubject").value;
       if (!subjectId) { showToast("Avval fan tanlang!", "error"); return; }
 
       const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const selectedSubject = subjects.find(s => s.id === subjectId);
+      const selectedSubject = subjects.find(s => String(s.id) === String(subjectId));
       if (!selectedSubject) return;
 
-      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
-      const newId = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1;
-      const badgeLabel = type === "ichki" ? "Ichki o'qituvchi" : "Tashqi o'qituvchi";
-      const loginNum = String(newId).padStart(3, '0');
+      const btn = document.querySelector("#addTeacherRow button");
+      const oldText = btn.textContent;
+      btn.textContent = "Kuting..."; btn.disabled = true;
 
-      teachers.push({
-        id: newId,
-        fullName: name,
-        subject: selectedSubject.name,
-        type: type,
-        role: "oqituvchi",
-        badgeLabel: badgeLabel,
-        login: "teacher" + loginNum,
-        password: String(newId * 10).padStart(4, '0')
-      });
+      try {
+        const snap = await db.collection("teachers").where("login", "==", login).get();
+        if (!snap.empty) { showToast("Bu login o'qituvchilar bazasida band!", "error"); return; }
 
-      localStorage.setItem("teachers", JSON.stringify(teachers));
-      onSubjectChange();
-      document.getElementById("enrollTeacher").value = newId;
+        const badgeLabel = type === "ichki" ? "Ichki o'qituvchi" : "Tashqi o'qituvchi";
+        const newRef = db.collection("teachers").doc();
 
-      document.getElementById("newTeacherName").value = "";
-      document.getElementById("addTeacherRow").style.display = "none";
-      showToast(`"${name}" o'qituvchi qo'shildi! (${badgeLabel})`, "success");
+        const newTeacher = {
+          id: newRef.id,
+          fullName: name,
+          subject: selectedSubject.name,
+          type: type,
+          role: "oqituvchi",
+          badgeLabel: badgeLabel,
+          login: login,
+          password: password
+        };
+
+        await newRef.set(newTeacher);
+
+        let teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+        teachers.push(newTeacher);
+        localStorage.setItem("teachers", JSON.stringify(teachers));
+        
+        onSubjectChange();
+        document.getElementById("enrollTeacher").value = newRef.id;
+
+        document.getElementById("newTeacherName").value = "";
+        document.getElementById("newTeacherLogin").value = "";
+        document.getElementById("newTeacherPassword").value = "";
+        document.getElementById("addTeacherRow").style.display = "none";
+        
+        showToast(`"${name}" bazaga saqlandi!`, "success");
+      } catch(err) {
+        showToast("Xatolik: " + err.message, "error");
+      } finally {
+        if(btn) { btn.textContent = oldText; btn.disabled = false; }
+      }
     }
 
     /** Dars vaqti tanlovi o'zgarganda */
@@ -1316,8 +1392,8 @@
     function saveEnrollment() {
       if (!enrollMentor) return;
 
-      const subjectId = parseInt(document.getElementById("enrollSubject").value);
-      const teacherId = parseInt(document.getElementById("enrollTeacher").value);
+      const subjectId = document.getElementById("enrollSubject").value;
+      const teacherId = document.getElementById("enrollTeacher").value;
       const classTime = getSelectedTime();
 
       if (!subjectId) { showToast("Fan tanlang!", "error"); return; }
@@ -1330,8 +1406,8 @@
 
       const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
       const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
-      const subject = subjects.find(s => s.id === subjectId);
-      const teacher = teachers.find(t => t.id === teacherId);
+      const subject = subjects.find(s => String(s.id) === String(subjectId));
+      const teacher = teachers.find(t => String(t.id) === String(teacherId));
 
       const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
 
@@ -1339,17 +1415,17 @@
       let skipCount = 0;
 
       checkedBoxes.forEach(cb => {
-        const studentId = parseInt(cb.value);
+        const studentId = cb.value;
         const studentName = cb.dataset.name;
 
         const alreadyExists = assignments.some(a =>
-          a.studentId === studentId && a.subjectId === subjectId && a.teacherId === teacherId
+          String(a.studentId) === String(studentId) && String(a.subjectId) === String(subjectId) && String(a.teacherId) === String(teacherId)
         );
 
         const inOtherTeacher = assignments.find(a =>
-          a.studentId === studentId &&
-          a.subjectId === subjectId &&
-          a.teacherId !== teacherId
+          String(a.studentId) === String(studentId) &&
+          String(a.subjectId) === String(subjectId) &&
+          String(a.teacherId) !== String(teacherId)
         );
 
         if (inOtherTeacher) {

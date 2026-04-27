@@ -217,3 +217,47 @@ document.addEventListener('DOMContentLoaded', () => {
   if (yutuqGrid) yutuqObs.observe(yutuqGrid);
 
 });
+
+
+const dot = document.querySelector('.cursor-dot');
+const ring = document.querySelector('.cursor-ring');
+
+let mouseX = 0;
+let mouseY = 0;
+let ringX = 0;
+let ringY = 0;
+
+// Mishka harakatlanganda kordinatalarni olish
+window.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  
+  // Nuqta darhol (kechikmasdan) harakatlanadi
+  // (Nuqta 8px bo'lgani uchun markazga keltirish maqsadida 4px ayiramiz)
+  dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+});
+
+// Halqani silliq (kechikib) ergashishini ta'minlash
+function animateRing() {
+  // 0.15 - ergashish tezligi. Raqam qancha kichik bo'lsa, shuncha sekin ergashadi
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+  
+  // Halqa 36px bo'lgani uchun markazlashtirish maqsadida 18px ayiramiz
+  ring.style.transform = `translate3d(${ringX - 18}px, ${ringY - 18}px, 0)`;
+  
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+// Tugma yoki ssilkalar ustiga borganda halqani kattalashtirish
+const hoverElements = document.querySelectorAll('a, button, .togarak-item, .yutuq-card, .talim-card, .img-card');
+
+hoverElements.forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.classList.add('hovered');
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.classList.remove('hovered');
+  });
+});
