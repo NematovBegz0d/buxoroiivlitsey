@@ -119,7 +119,7 @@
   transition: color 0.3s ease;
   /* Sarlavha uzun bo'lsa 2 qatordan keyin kesib (...) qo'yadi */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  --webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -136,7 +136,7 @@
   flex-grow: 1; /* Sana qismini doim pastga itarib turish uchun */
   /* Matn uzun bo'lsa 3 qatordan keyin kesib (...) qo'yadi */
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  --webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

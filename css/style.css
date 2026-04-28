@@ -589,49 +589,71 @@ a {
 
 /* ================= FOOTER ================= */
 .main-footer {
-  background-color: var(--dark-blue);
+  background: linear-gradient(180deg, var(--dark-blue) 0%, #0f172a 100%);
   color: rgba(255, 255, 255, 0.7);
-  border-top: 3px solid var(--accent-red);
-  padding-top: 30px;
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--primary-blue), var(--accent-orange), var(--accent-red)) 1;
+  padding-top: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 20px;
+  gap: 60px;
+  margin-bottom: 40px;
 }
 
 .footer-logo {
   color: var(--white);
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 24px;
+  display: inline-block;
+  transition: var(--transition-fast);
+}
+
+.footer-logo:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
 }
 
 .footer-text {
   font-size: 0.95rem;
   line-height: 1.8;
   max-width: 400px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .footer-title {
   color: var(--white);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   position: relative;
+  padding-bottom: 12px;
 }
 
 .footer-title::after {
   content: "";
   position: absolute;
-  bottom: -6px;
+  bottom: 0;
   left: 0;
-  width: 150px;
+  width: 60px;
   height: 3px;
-  background: var(--accent-red);
-  background: #fff;
+  background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange));
+  border-radius: 2px;
 }
 
 .footer-links,
@@ -641,22 +663,35 @@ a {
 
 .footer-links li,
 .footer-contact li {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.7);
-  transition: var(--transition);
+  color: rgba(255, 255, 255, 0.6);
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-links a:hover {
   color: var(--white);
-  padding-left: 5px;
+  padding-left: 8px;
+}
+
+.footer-links a::before {
+  content: '→';
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.footer-links a:hover::before {
+  opacity: 1;
 }
 
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 25px 0;
+  padding: 30px 0;
 }
 
 .bottom-flex {
@@ -667,86 +702,39 @@ a {
 }
 
 .bottom-links a {
-  color: rgba(255, 255, 255, 0.7);
-  margin-left: 25px;
-  transition: var(--transition);
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 28px;
+  transition: var(--transition-fast);
+  position: relative;
 }
 
 .bottom-links a:hover {
   color: var(--white);
 }
 
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
 .social-links a {
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  padding: 1px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  backdrop-filter: blur(10px);
 }
 
-/* ================= RESPONSIVE (Moslashuvchanlik) ================= */
-@media (max-width: 992px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .about-flex {
-    flex-direction: column;
-  }
-
-  .slide-title {
-    font-size: 2.5rem;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .top-bar {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-  }
-
-  .desktop-nav,
-  .header-actions {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: block;
-  }
-
-  .hero-section {
-    height: 450px;
-  }
-
-  .slide-title {
-    font-size: 1.8rem;
-  }
-
-  .slide-buttons {
-    flex-direction: column;
-  }
-
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .bottom-flex {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-
-  .bottom-links a {
-    margin: 0 10px;
-  }
+.social-links a:hover {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
 }
 
 /* ================= FOTOGALEREYA CSS ================= */

@@ -261,3 +261,4 @@ hoverElements.forEach(el => {
     ring.classList.remove('hovered');
   });
 });
+

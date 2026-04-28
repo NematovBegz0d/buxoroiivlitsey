@@ -249,7 +249,7 @@ section { padding: var(--section-pad); }
 
 /* ─── 2. TARIX (LIGHT - Nafas olish maydoni) ─── */
 .tarix { 
-  background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.95)), 
+  background: linear-gradient(rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.9)), 
               url('../imgs/boshliq.jpg') center/cover fixed no-repeat;
   position: relative;
 }
@@ -328,14 +328,14 @@ section { padding: var(--section-pad); }
 
 /* ─── 4. TA'LIM YO'NALISHLARI (DARK GLASS) ── */
 .talim { 
-  background: radial-gradient(circle at center, rgba(11, 17, 32, 0.9), rgba(11, 17, 32, 0.98)), 
+  background: radial-gradient(circle at center, rgba(11, 17, 32, 0.7), rgba(11, 17, 32, 0.8)), 
               url('../imgs/forma.jpg') center/cover fixed no-repeat;
 }
 .talim .section-title { color: #fff; }
 
 .talim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 
-.talim-card { 
+.talim-card {   
   border-radius: 24px; overflow: hidden; position: relative;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
@@ -436,7 +436,7 @@ section { padding: var(--section-pad); }
 
 /* ─── 7. YOTOQXONA (DARK SHIMMER) ───────── */
 .yotoq { 
-  background: linear-gradient(rgba(11, 17, 32, 0.95), rgba(11, 17, 32, 0.98)), 
+  background: linear-gradient(rgba(11, 17, 32, 0.8), rgba(11, 17, 32, 0.8)), 
               url('../imgs/gallery-04.jpg') center/cover fixed no-repeat;
 }
 .yotoq .section-title { color: #fff; }
