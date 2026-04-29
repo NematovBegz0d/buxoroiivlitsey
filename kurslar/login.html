@@ -1,246 +1,315 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kirish — Kurs Nazorat Tizimi</title>
-  <meta name="description" content="IIV Buxoro Akademik Litseyi kurs nazorati va davomat boshqaruvi tizimiga kirish" />
-  <link rel="icon" type="image/png" href="../imgs/logo.png" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kirish — Kurs Nazorat Tizimi</title>
+    <meta
+      name="description"
+      content="IIV Buxoro Akademik Litseyi kurs nazorati va davomat boshqaruvi tizimiga kirish"
+    />
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="login-card" id="loginCard">
+        <div class="login-header">
+          <div class="login-logo">
+            <i class="fa-solid fa-clipboard-list"></i>
+          </div>
+          <h1>Kurs Nazorat Tizimi</h1>
+          <p>IIV Buxoro Akademik Litseyi</p>
+        </div>
 
-  <!-- ===== LOGIN SAHIFASI ===== -->
-  <div class="login-page">
-    <div class="login-card" id="loginCard">
+        <div
+          class="login-error"
+          id="loginError"
+          role="alert"
+          aria-live="polite"
+        >
+          Email yoki parol noto‘g‘ri.
+        </div>
 
-      <!-- Sarlavha -->
-      <div class="login-header">
-        <div class="login-logo"><i class="fa-solid fa-clipboard-list"></i></div>
-        <h1>Kurs Nazorat Tizimi</h1>
-        <p>IIV Buxoro Akademik Litseyi</p>
-      </div>
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label for="loginInput">Email</label>
+            <input
+              type="email"
+              id="loginInput"
+              class="form-input"
+              placeholder="Masalan: mentor101@litsey.uz"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="passwordInput">Parol</label>
+            <input
+              type="password"
+              id="passwordInput"
+              class="form-input"
+              placeholder="Parolni kiriting"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <div class="login-buttons-row">
+            <button type="submit" class="btn-login" id="btnLogin">
+              Tizimga kirish
+            </button>
+            <a
+              href="../index.html"
+              class="btn-back-home"
+              title="Bosh sahifaga qaytish"
+            >
+              <span class="btn-back-icon"
+                ><i class="fa-solid fa-house"></i
+              ></span>
+            </a>
+          </div>
+        </form>
 
-      <!-- Tab tugmalari: Sinf rahbari / O'qituvchi -->
-      <div class="login-tabs" id="loginTabs">
-        <button class="login-tab active" data-role="sinf_rahbari" id="tabMentor">
-          Sinf rahbari
+        <div class="observer-divider">yoki</div>
+        <button class="btn-observer" id="btnObserver" type="button">
+          <i class="fa-solid fa-eye"></i> O'quvchilarni kuzatish
         </button>
-        <button class="login-tab" data-role="oqituvchi" id="tabTeacher">
-          O'qituvchi
-        </button>
       </div>
-
-      <!-- Xato xabari -->
-      <div class="login-error" id="loginError">
-        Login yoki parol noto'g'ri. Qaytadan urinib ko'ring.
-      </div>
-
-      <!-- Login formasi -->
-      <form class="login-form" id="loginForm" onsubmit="return handleLogin(event)">
-        <div class="form-group">
-          <label for="loginInput">Login</label>
-          <input
-            type="text"
-            id="loginInput"
-            class="form-input"
-            placeholder="Loginni kiriting"
-            autocomplete="off"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="passwordInput">Parol</label>
-          <input
-            type="password"
-            id="passwordInput"
-            class="form-input"
-            placeholder="Parolni kiriting"
-            required
-          />
-        </div>
-
-        <div class="login-buttons-row">
-          <button type="submit" class="btn-login" id="btnLogin">
-            Tizimga kirish
-          </button>
-          <a href="../index.html" class="btn-back-home" title="Bosh sahifaga qaytish">
-            <span class="btn-back-icon"><i class="fa-solid fa-house"></i></span>
-          </a>
-        </div>
-      </form>
-
-      <!-- Kuzatuvchi bo'limi -->
-      <div class="observer-divider">yoki</div>
-      <button class="btn-observer" id="btnObserver" onclick="loginAsObserver()">
-        <i class="fa-solid fa-eye"></i> Kuzatuvchi sifatida kirish
-      </button>
-
     </div>
-  </div>
 
-  <!-- ===== FIREBASE YUKLANADI ===== -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-  <script src="../js/firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
 
-  <script>
-    /* ============================================================
-       LOGIN SAHIFASI LOGIKASI
-       ============================================================ */
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const loginInput = document.getElementById("loginInput");
+      const passwordInput = document.getElementById("passwordInput");
+      const loginError = document.getElementById("loginError");
+      const btnLogin = document.getElementById("btnLogin");
+      const btnObserver = document.getElementById("btnObserver");
 
-    // ===== O'zgaruvchilar =====
-    let currentRole = "sinf_rahbari"; // Joriy tanlangan tab (sinf_rahbari / oqituvchi)
-
-    // ===== DOM elementlari =====
-    const loginTabs = document.querySelectorAll(".login-tab");
-    const loginForm = document.getElementById("loginForm");
-    const loginInput = document.getElementById("loginInput");
-    const passwordInput = document.getElementById("passwordInput");
-    const loginError = document.getElementById("loginError");
-
-    // ===== TAB ALMASHISH =====
-    loginTabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        // Barcha tablardan "active" ni olib tashla
-        loginTabs.forEach(t => t.classList.remove("active"));
-        // Bosilgan tabga "active" qo'sh
-        tab.classList.add("active");
-        // Rolni yangila
-        currentRole = tab.dataset.role;
-        // Xato xabarini yashir
+      function showError(message) {
+        loginError.textContent = message;
+        loginError.classList.add("show");
+      }
+      function hideError() {
         loginError.classList.remove("show");
-        // Placeholder'larni yangilab qo'y
-        if (currentRole === "sinf_rahbari") {
-          loginInput.placeholder = "Masalan: mentor101";
-          passwordInput.placeholder = "Masalan: 1010";
-        } else {
-          loginInput.placeholder = "Masalan: teacher001";
-          passwordInput.placeholder = "Masalan: 0010";
+        loginError.textContent = "";
+      }
+      function setLoginLoading(isLoading) {
+        btnLogin.disabled = isLoading;
+        btnLogin.innerHTML = isLoading
+          ? '<i class="fa-solid fa-spinner fa-spin"></i> Tekshirilmoqda...'
+          : "Tizimga kirish";
+      }
+      function checkFirebaseReady() {
+        if (typeof firebase === "undefined") {
+          showError(
+            "Firebase SDK yuklanmadi. Internet yoki script path’ni tekshiring.",
+          );
+          return false;
         }
-        // Inputlarni tozala
-        loginInput.value = "";
-        passwordInput.value = "";
-        loginInput.focus();
-      });
-    });
+        if (typeof auth === "undefined" || typeof db === "undefined") {
+          showError("firebase-config.js ichida auth yoki db aniqlanmagan.");
+          return false;
+        }
+        return true;
+      }
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+      function buildCurrentUser(firebaseUser, profile) {
+        return {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          role: profile.role || "",
+          login: profile.login || "",
+          fullName: profile.fullName || "",
+          groupCode: profile.groupCode || "",
+          id:
+            profile.id !== undefined && profile.id !== null
+              ? Number(profile.id)
+              : null,
+          subjectIds: Array.isArray(profile.subjectIds)
+            ? profile.subjectIds
+            : [],
+          active: profile.active === true,
+        };
+      }
+      // function redirectByRole(currentUser) {
+      //   if (currentUser.role === "admin") {
+      //     window.location.href = "admin.html";
+      //     return;
+      //   }
+      //   if (
+      //     currentUser.role === "observer" ||
+      //     currentUser.role === "kuzatuvchi"
+      //   ) {
+      //     window.location.href = "kursgaYozilganlar.html";
+      //     return;
+      //   }
+      //   showError("Bu foydalanuvchiga role biriktirilmagan.");
+      // }
+      async function getUserProfile(uid) {
+        const profileDoc = await db.collection("userProfiles").doc(uid).get();
+        return profileDoc.exists ? profileDoc.data() : null;
+      }
+      function redirectByRole(currentUser) {
+        if (!currentUser || !currentUser.role) {
+          showError("Bu foydalanuvchiga role biriktirilmagan.");
+          return;
+        }
 
-    // ===== LOGIN TEKSHIRISH =====
-    async function handleLogin(e) {
-      e.preventDefault();
+        if (currentUser.role === "admin") {
+          window.location.href = "admin.html";
+          return;
+        }
 
-      const login = loginInput.value.trim();
-      const password = passwordInput.value.trim();
+        if (currentUser.role === "sinf_rahbari") {
+          window.location.href = "kursNazorat.html";
+          return;
+        }
 
-      // Bo'sh maydonlarni tekshir
-      if (!login || !password) {
-        showError("Iltimos, login va parolni kiriting.");
+        if (currentUser.role === "oqituvchi") {
+          window.location.href = "kursNazorat.html";
+          return;
+        }
+
+        if (
+          currentUser.role === "observer" ||
+          currentUser.role === "kuzatuvchi"
+        ) {
+          window.location.href = "kursgaYozilganlar.html";
+          return;
+        }
+
+        showError("Bu foydalanuvchiga role biriktirilmagan.");
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+        hideError();
+        if (!checkFirebaseReady()) return false;
+        const email = loginInput.value.trim();
+        const password = passwordInput.value.trim();
+        if (!email || !password) {
+          showError("Email va parolni kiriting.");
+          return false;
+        }
+        if (!isValidEmail(email)) {
+          showError("Email formati noto‘g‘ri.");
+          return false;
+        }
+        setLoginLoading(true);
+        try {
+          await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+          const result = await auth.signInWithEmailAndPassword(email, password);
+          const firebaseUser = result.user;
+          const profile = await getUserProfile(firebaseUser.uid);
+          if (!profile) {
+            await auth.signOut();
+            sessionStorage.removeItem("currentUser");
+            showError("Bu foydalanuvchi uchun userProfiles hujjati topilmadi.");
+            return false;
+          }
+          if (profile.active !== true) {
+            await auth.signOut();
+            sessionStorage.removeItem("currentUser");
+            showError("Bu akkaunt bloklangan yoki faol emas.");
+            return false;
+          }
+          if (!profile.role) {
+            await auth.signOut();
+            sessionStorage.removeItem("currentUser");
+            showError("Bu foydalanuvchiga role berilmagan.");
+            return false;
+          }
+          const currentUser = buildCurrentUser(firebaseUser, profile);
+          sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
+          redirectByRole(currentUser);
+        } catch (error) {
+          console.error("Login error:", error);
+          if (error.code === "auth/invalid-credential")
+            showError("Email yoki parol noto'g'ri.");
+          else if (error.code === "auth/user-not-found")
+            showError("Bunday foydalanuvchi topilmadi.");
+          else if (error.code === "auth/wrong-password")
+            showError("Parol noto'g'ri.");
+          else if (error.code === "auth/too-many-requests")
+            showError(
+              "Juda ko‘p urinish bo‘ldi. Birozdan keyin qayta urinib ko'ring.",
+            );
+          else if (error.code === "auth/network-request-failed")
+            showError("Internet bilan muammo bor. Qayta urinib ko'ring.");
+          else showError("Login vaqtida xatolik yuz berdi.");
+        } finally {
+          setLoginLoading(false);
+        }
         return false;
       }
-
-      const btn = document.getElementById("btnLogin");
-      const originalText = btn.textContent;
-      btn.textContent = "Tekshirilmoqda...";
-      btn.disabled = true;
-
-      try {
-        if (currentRole === "sinf_rahbari") {
-          // Sinf rahbarlaridan qidirish (Firebase)
-          const snapshot = await db.collection("classMentors").where("login", "==", login).get();
-
-          if (!snapshot.empty) {
-            const mentor = snapshot.docs[0].data();
-            if (mentor.password === password) {
-              // Muvaffaqiyatli kirish — sessiyaga yozish
-              const userData = {
-                role: "sinf_rahbari",
-                login: mentor.login,
-                groupCode: mentor.groupCode,
-                fullName: mentor.fullName,
-                id: mentor.id
-              };
-              sessionStorage.setItem("currentUser", JSON.stringify(userData));
-              // kursNazorat sahifasiga o'tish
-              window.location.href = "kursNazorat.html";
-            } else {
-              showError("Parol noto'g'ri!");
-            }
-          } else {
-            showError("Bunday login (sinf rahbari) mavjud emas!");
-          }
-
-        } else if (currentRole === "oqituvchi") {
-          // O'qituvchilardan qidirish (Firebase)
-          const snapshot = await db.collection("teachers").where("login", "==", login).get();
-
-          if (!snapshot.empty) {
-            const teacher = snapshot.docs[0].data();
-            if (teacher.password === password) {
-              // Muvaffaqiyatli kirish
-              const userData = {
-                role: "oqituvchi",
-                login: teacher.login,
-                subject: teacher.subject,
-                fullName: teacher.fullName,
-                id: teacher.id,
-                password: teacher.password // Davomat tasdiqlash uchun
-              };
-              sessionStorage.setItem("currentUser", JSON.stringify(userData));
-              window.location.href = "kursNazorat.html";
-            } else {
-              showError("Parol noto'g'ri!");
-            }
-          } else {
-            showError("Bunday login (o'qituvchi) mavjud emas!");
+      async function loginAsObserver() {
+        hideError();
+        if (checkFirebaseReady()) {
+          try {
+            if (auth.currentUser) await auth.signOut();
+          } catch (error) {
+            console.warn(
+              "Observer rejimga o‘tishda auth signOut xatosi:",
+              error,
+            );
           }
         }
-      } catch (error) {
-        console.error("Firebase xatosi:", error);
-        showError("Tarmoqqa ulanishda xatolik yuz berdi!");
+        const observerUser = {
+          uid: "public_observer",
+          email: "",
+          role: "observer",
+          login: "observer",
+          fullName: "Kuzatuvchi",
+          groupCode: "",
+          subjectIds: [],
+          active: true,
+        };
+        sessionStorage.setItem("currentUser", JSON.stringify(observerUser));
+        window.location.href = "kursgaYozilganlar.html";
       }
-
-      btn.textContent = originalText;
-      btn.disabled = false;
-      return false;
-    }
-
-    // ===== KUZATUVCHI SIFATIDA KIRISH =====
-    function loginAsObserver() {
-      const userData = {
-        role: "kuzatuvchi",
-        login: "kuzatuvchi",
-        fullName: "Kuzatuvchi",
-      };
-      sessionStorage.setItem("currentUser", JSON.stringify(userData));
-      // Kuzatuvchi faqat yozilganlar sahifasini ko'radi
-      window.location.href = "kursgaYozilganlar.html";
-    }
-
-    // ===== XATO XABARI =====
-    function showError(message) {
-      loginError.textContent = message;
-      loginError.classList.add("show");
-      // 4 soniyadan keyin yashir
-      setTimeout(() => loginError.classList.remove("show"), 4000);
-    }
-
-    // ===== SAHIFA YUKLANGANDA =====
-    document.addEventListener("DOMContentLoaded", () => {
-      // Agar allaqachon login bo'lgan bo'lsa, kursNazorat'ga yo'naltiramiz
-      const existingUser = sessionStorage.getItem("currentUser");
-      if (existingUser) {
-        window.location.href = "kursNazorat.html";
-        return;
+      function checkExistingSession() {
+        if (!checkFirebaseReady()) return;
+        auth.onAuthStateChanged(async (firebaseUser) => {
+          if (!firebaseUser) return;
+          try {
+            const profile = await getUserProfile(firebaseUser.uid);
+            if (!profile || profile.active !== true || !profile.role) {
+              await auth.signOut();
+              sessionStorage.removeItem("currentUser");
+              return;
+            }
+            const currentUser = buildCurrentUser(firebaseUser, profile);
+            sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
+            redirectByRole(currentUser);
+          } catch (error) {
+            console.error("Session check error:", error);
+            await auth.signOut();
+            sessionStorage.removeItem("currentUser");
+          }
+        });
       }
-      // Birinchi input ga fokus
-      loginInput.focus();
-      // Default placeholder
-      loginInput.placeholder = "Masalan: mentor101";
-      passwordInput.placeholder = "Masalan: 1010";
-    });
-  </script>
-
-</body>
+      btnObserver.addEventListener("click", loginAsObserver);
+      loginForm.addEventListener("submit", handleLogin);
+      loginInput.addEventListener("input", hideError);
+      passwordInput.addEventListener("input", hideError);
+      document.addEventListener("DOMContentLoaded", () => {
+        loginInput.focus();
+        checkExistingSession();
+      });
+    </script>
+  </body>
 </html>

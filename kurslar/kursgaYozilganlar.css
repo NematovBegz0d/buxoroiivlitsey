@@ -1,0 +1,213 @@
+/* Extracted from kursgaYozilganlar.html. Kept external to avoid inline style blocks. */
+
+/* ===== O'QUVCHI KARTIDAGI HAFTALIK/OYLIK STATISTIKA ===== */
+      .sdm-stats-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .sdm-stat-chip {
+        flex: 1;
+        min-width: 100px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 10px;
+        padding: 8px 12px;
+        text-align: center;
+      }
+      .sdm-stat-chip-label {
+        font-size: 0.68rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+      }
+      .sdm-stat-chip-nums {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-bottom: 5px;
+      }
+      .sdm-stat-bar-bg {
+        height: 5px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .sdm-stat-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+      }
+
+      /* ===== GURUH JADVALI USTIDAGI KURS STATISTIKA TUGMALARI ===== */
+      .group-course-stats-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .group-course-stats-bar-label {
+        font-size: 0.72rem;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        margin-right: 4px;
+        white-space: nowrap;
+      }
+      .btn-course-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1.5px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.16s;
+        white-space: nowrap;
+      }
+      .btn-course-stat:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #f1f5f9;
+      }
+
+      /* ===== GURUH KURSI STATISTIKA MODALI ===== */
+      .gcs-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .gcs-tab {
+        flex: 1;
+        padding: 8px 14px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        border: 1.5px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+        transition: all 0.16s;
+      }
+      .gcs-tab.active {
+        background: rgba(68, 138, 255, 0.15);
+        border-color: rgba(68, 138, 255, 0.5);
+        color: #64b5f6;
+      }
+      .gcs-summary-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .gcs-summary-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px 14px;
+        text-align: center;
+      }
+      .gcs-summary-num {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .gcs-summary-label {
+        font-size: 0.7rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .gcs-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.83rem;
+      }
+      .gcs-table thead th {
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #9ca3af;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .gcs-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background 0.12s;
+      }
+      .gcs-table tbody tr:last-child {
+        border-bottom: none;
+      }
+      .gcs-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .gcs-table td {
+        padding: 9px 12px;
+        color: #e2e8f0;
+        vertical-align: middle;
+      }
+      .gcs-table td:first-child {
+        color: #9ca3af;
+        font-size: 0.75rem;
+        width: 30px;
+      }
+      .gcs-pct-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gcs-pct-bg {
+        flex: 1;
+        min-width: 50px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .gcs-pct-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.4s ease;
+      }
+      .gcs-pct-label {
+        font-weight: 700;
+        font-size: 0.78rem;
+        min-width: 36px;
+        text-align: right;
+      }
+      #gcStatsModal .modal-body {
+        max-height: 65vh;
+        overflow-y: auto;
+      }
+
+
+/* PRO layout fixes after moving inline styles to external CSS */
+.search-wrapper { position: relative; margin-right: 15px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+#tableWrapper1, #tableWrapper2 { display: none; }
+#studentDetailModal .modal-container { max-width: 780px; }
+#studentDetailModal .modal-body { padding: 20px 24px 28px; }
+#gcStatsModal .modal-container { max-width: 680px; }
+#sdmTodayDate + .modal-close { margin-left: 10px; }
+#gcStatsIcon { background: rgba(68, 138, 255, 0.15); }
+#gcStatsIcon i { color: #64b5f6; }
+.group-course-stats-bar-label i { margin-right: 4px; }
+.sdm-course-card { border-left: 3px solid var(--accent-blue); }
+.sdm-card-subject { color: var(--accent-blue); }
+.sdm-label { color: var(--text-white); }
+.gcs-summary-card:nth-child(2) .gcs-summary-num { color: var(--accent-green); }
+.gcs-summary-card:nth-child(3) .gcs-summary-num { color: var(--accent-yellow); }
+@media (max-width: 650px) {
+  .search-wrapper { width: 100%; margin-right: 0; }
+}

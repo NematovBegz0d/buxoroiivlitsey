@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel — Kurs Nazorat Tizimi</title>
+    <meta
+      name="description"
+      content="Kurs Nazorat Tizimi admin boshqaruv paneli"
+    />
+
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+</head>
+  <body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header class="admin-topbar">
+      <div class="admin-topbar-inner">
+        <div class="brand">
+          <div class="brand-icon"><i class="fa-solid fa-user-shield"></i></div>
+          <div>
+            <h1>Admin Panel</h1>
+            <p>Kurs Nazorat Tizimi — to‘liq boshqaruv</p>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="badge"
+            ><span class="badge-dot"></span
+            ><span id="adminName">Tekshirilmoqda...</span></span
+          >
+          <a href="kursgaYozilganlar.html" class="btn blue"
+            ><i class="fa-solid fa-eye"></i> Kuzatuv</a
+          >
+          <button class="btn" id="btnRefresh">
+            <i class="fa-solid fa-rotate-right"></i> Yangilash
+          </button>
+          <button class="btn red" id="btnLogout">
+            <i class="fa-solid fa-right-from-bracket"></i> Chiqish
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section id="loadingScreen" class="loading">
+        <div>
+          <div class="spinner"></div>
+          <h2>Admin tekshirilmoqda...</h2>
+          <p>Firebase Auth va userProfiles tekshirilmoqda.</p>
+        </div>
+      </section>
+
+      <section id="adminContent">
+        <nav class="tabs">
+          <button class="tab active" data-view="dashboardView">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard
+          </button>
+          <button class="tab" data-view="enrollView">
+            <i class="fa-solid fa-user-plus"></i> Kursga yozish
+          </button>
+          <button class="tab" data-view="assignmentsView">
+            <i class="fa-solid fa-list-check"></i> Kurslar ro‘yxati
+          </button>
+          <button class="tab" data-view="referenceView">
+            <i class="fa-solid fa-database"></i> Ma’lumotlar
+          </button>
+          <button class="tab" data-view="ratingUploadView">
+            <i class="fa-solid fa-ranking-star"></i> Reyting yangilash
+          </button>
+          <button class="tab" data-view="createTeacherView">
+            <i class="fa-solid fa-user-plus"></i> Yangi o‘qituvchi
+          </button>
+        </nav>
+
+        <section class="view active" id="dashboardView">
+          <div class="grid">
+            <div class="stat">
+              <div class="stat-icon">
+                <i class="fa-solid fa-layer-group"></i>
+              </div>
+              <div class="stat-num" id="statGroups">0</div>
+              <div class="stat-label">Guruhlar</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="stat-num" id="statStudents">0</div>
+              <div class="stat-label">O‘quvchilar</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-chalkboard-user"></i>
+              </div>
+              <div class="stat-num" id="statTeachers">0</div>
+              <div class="stat-label">O‘qituvchilar</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-file-signature"></i>
+              </div>
+              <div class="stat-num" id="statAssignments">0</div>
+              <div class="stat-label">Kurs yozuvlari</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Guruhlar bo‘yicha holat</h2>
+                <p>O‘quvchilar va kurs yozuvlari.</p>
+              </div>
+              <button
+                class="btn small blue"
+                onclick="switchView('assignmentsView')"
+              >
+                Kurslarni ko‘rish
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Guruh</th>
+                      <th>O‘quvchilar</th>
+                      <th>Kurs yozuvlari</th>
+                      <th>Faol fanlar</th>
+                      <th>Harakat</th>
+                    </tr>
+                  </thead>
+                  <tbody id="groupSummaryBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="enrollView">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Admin orqali kursga yozish</h2>
+                <p>Guruh, fan, o‘qituvchi, vaqt va o‘quvchilarni tanlang.</p>
+              </div>
+              <span class="pill green" id="selectedStudentsCount"
+                >0 ta tanlandi</span
+              >
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="fg">
+                  <label>Guruh *</label
+                  ><select class="select" id="enrollGroupSelect"></select>
+                </div>
+                <div class="fg">
+                  <label>Fan *</label
+                  ><select class="select" id="enrollSubjectSelect"></select>
+                </div>
+                <div class="fg">
+                  <label>O‘qituvchi *</label
+                  ><select class="select" id="enrollTeacherSelect"></select>
+                </div>
+              </div>
+              <div class="form-grid two">
+                <div class="fg">
+                  <label>Dars vaqti *</label
+                  ><select class="select" id="enrollTimeSelect">
+                    <option value="">— Vaqt tanlang —</option>
+                    <option value="14:00 - 15:30">14:00 - 15:30</option>
+                    <option value="15:40 - 17:10">15:40 - 17:10</option>
+                    <option value="16:00 - 17:30">16:00 - 17:30</option>
+                    <option value="17:20 - 18:50">17:20 - 18:50</option>
+                    <option value="__custom__">Boshqa vaqt</option></select
+                  ><input
+                    class="input"
+                    id="customTimeInput"
+                    placeholder="Masalan: 09:00 - 10:30"
+                  />
+                </div>
+                <div class="fg">
+                  <label>Hafta kunlari *</label>
+                  <div class="weekday-row" id="weekdayRow">
+                    <button type="button" class="weekday" data-day="Dushanba">
+                      Du</button
+                    ><button type="button" class="weekday" data-day="Seshanba">
+                      Se</button
+                    ><button
+                      type="button"
+                      class="weekday"
+                      data-day="Chorshanba"
+                    >
+                      Cho</button
+                    ><button type="button" class="weekday" data-day="Payshanba">
+                      Pay</button
+                    ><button type="button" class="weekday" data-day="Juma">
+                      Ju</button
+                    ><button type="button" class="weekday" data-day="Shanba">
+                      Sha
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h2>O‘quvchilarni tanlash</h2>
+                    <p id="studentListHint">Avval guruh tanlang.</p>
+                  </div>
+                  <div class="toolbar">
+                    <input
+                      class="input"
+                      id="studentSearchInput"
+                      placeholder="O‘quvchi izlash..."
+                    /><button class="btn small" id="btnSelectAllStudents">
+                      Hammasini tanlash</button
+                    ><button class="btn small" id="btnClearStudents">
+                      Tozalash
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="student-list" id="studentsList">
+                    <div class="empty">Guruh tanlang.</div>
+                  </div>
+                  <div
+                  >
+                    <button class="btn" id="btnResetEnroll">
+                      <i class="fa-solid fa-eraser"></i> Formani tozalash</button
+                    ><button class="btn primary" id="btnSaveEnroll">
+                      <i class="fa-solid fa-floppy-disk"></i> Kursga yozish
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h2>Amal logi</h2>
+                    <p>Oxirgi natijalar.</p>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="log" id="actionLog">Admin panel tayyor.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="assignmentsView">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Kurslar ro‘yxati</h2>
+                <p>Guruh, fan, o‘qituvchi bo‘yicha filterlang.</p>
+              </div>
+              <span class="pill" id="assignmentsCountBadge">0 ta yozuv</span>
+            </div>
+            <div class="card-body">
+              <div class="toolbar">
+                <select
+                  class="select"
+                  id="filterGroup"
+                ></select
+                ><select
+                  class="select"
+                  id="filterSubject"
+                ></select
+                ><select
+                  class="select"
+                  id="filterTeacher"
+                ></select
+                ><input
+                  class="input"
+                  id="filterSearch"
+                  placeholder="O‘quvchi, fan, o‘qituvchi..."
+                /><button class="btn small" id="btnClearFilters">
+                  Filterlarni tozalash
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>O‘quvchi</th>
+                      <th>Guruh</th>
+                      <th>Fan</th>
+                      <th>O‘qituvchi</th>
+                      <th>Vaqt</th>
+                      <th>Kunlar</th>
+                      <th>Harakat</th>
+                    </tr>
+                  </thead>
+                  <tbody id="assignmentsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="referenceView">
+          <div class="grid">
+            <div class="stat">
+              <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
+              <div class="stat-num" id="refSubjectsCount">0</div>
+              <div class="stat-label">Fanlar</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-chalkboard-user"></i>
+              </div>
+              <div class="stat-num" id="refTeachersCount">0</div>
+              <div class="stat-label">O‘qituvchilar</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-user-tie"></i>
+              </div>
+              <div class="stat-num" id="refMentorsCount">0</div>
+              <div class="stat-label">Sinf rahbarlari</div>
+            </div>
+            <div class="stat">
+              <div
+                class="stat-icon"
+              >
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div class="stat-num" id="refCollectionsCount">0</div>
+              <div class="stat-label">Asosiy kolleksiyalar</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Fanlar</h2>
+                <p>subjects collection.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Document ID</th>
+                      <th>Nomi</th>
+                      <th>Qisqa nom</th>
+                      <th>Holat</th>
+                    </tr>
+                  </thead>
+                  <tbody id="subjectsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>O‘qituvchilar</h2>
+                <p>teachers collection.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>F.I.Sh</th>
+                      <th>Login</th>
+                      <th>Fan</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teachersTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="ratingUploadView">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>O‘quvchilar reytingini yangilash</h2>
+                <p>
+                  Har oygi <code>STUDENTS_DATA</code> faylini yuklang. Admin tasdiqlagandan keyin reyting hamma foydalanuvchilarga ko‘rinadi.
+                </p>
+              </div>
+              <span class="pill green" id="ratingCurrentStatus">Yangi Firebase bazasi</span>
+            </div>
+            <div class="card-body">
+              <div class="rating-upload-box">
+                <div class="form-grid two">
+                  <div class="fg">
+                    <label>Reyting oyi *</label>
+                    <input class="input" type="month" id="ratingMonthInput" />
+                  </div>
+                  <div class="fg">
+                    <label>Reyting fayli *</label>
+                    <input
+                      class="input file-input"
+                      type="file"
+                      id="ratingFileInput"
+                      accept=".js,.json,application/json,text/javascript,text/plain"
+                    />
+                  </div>
+                </div>
+
+                <div class="rating-help">
+                  <strong>Qabul qilinadigan format:</strong>
+                  <code>const STUDENTS_DATA = [{ id, name, group, total_score }];</code>
+                  yoki oddiy <code>.json</code> array.
+                </div>
+
+                <div class="toolbar rating-actions">
+                  <button class="btn blue" id="btnPreviewRating">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> Tekshirish
+                  </button>
+                  <button class="btn primary" id="btnUploadRating" disabled>
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Firebase’ga yuklash
+                  </button>
+                  <button class="btn" id="btnClearRatingPreview">
+                    <i class="fa-solid fa-eraser"></i> Tozalash
+                  </button>
+                </div>
+
+                <div class="rating-preview-stats" id="ratingPreviewStats">
+                  Fayl tanlang va “Tekshirish” tugmasini bosing.
+                </div>
+              </div>
+
+              <div class="card embedded-card rating-preview-card">
+                <div class="card-header">
+                  <div>
+                    <h2>Preview</h2>
+                    <p>Birinchi 20 ta yozuv ko‘rsatiladi. Saqlashdan oldin ball va guruhlarni tekshiring.</p>
+                  </div>
+                  <span class="pill" id="ratingPreviewCount">0 ta yozuv</span>
+                </div>
+                <div class="card-body">
+                  <div class="table-wrap">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>ID</th>
+                          <th>F.I.Sh</th>
+                          <th>Guruh</th>
+                          <th>Ball</th>
+                        </tr>
+                      </thead>
+                      <tbody id="ratingPreviewBody">
+                        <tr><td colspan="5"><div class="empty">Preview hali yo‘q.</div></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="createTeacherView">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Yangi o‘qituvchi yaratish</h2>
+                <p>
+                  Firebase Auth user, userProfiles va teachers yozuvi bir vaqtda
+                  yaratiladi.
+                </p>
+              </div>
+              <button class="btn blue" id="btnGenerateTeacherLogin">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Avto login/parol
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="fg">
+                  <label>O‘qituvchi F.I.Sh *</label
+                  ><input
+                    class="input"
+                    id="newTeacherFullName"
+                    placeholder="Masalan: Aliyev Doston"
+                  />
+                </div>
+                <div class="fg">
+                  <label>Teacher ID *</label
+                  ><input
+                    class="input"
+                    id="newTeacherIdAdmin"
+                    placeholder="48"
+                  />
+                </div>
+                <div class="fg">
+                  <label>Login *</label
+                  ><input
+                    class="input"
+                    id="newTeacherLoginAdmin"
+                    placeholder="teacher048"
+                  />
+                </div>
+              </div>
+              <div class="form-grid two">
+                <div class="fg">
+                  <label>Email *</label
+                  ><input
+                    class="input"
+                    id="newTeacherEmail"
+                    placeholder="teacher048@litsey.uz"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="fg">
+                  <label>Vaqtinchalik parol *</label
+                  ><input
+                    class="input"
+                    id="newTeacherPasswordAdmin"
+                    placeholder="Teacher048@2026"
+                    autocomplete="new-password"
+                  />
+                </div>
+              </div>
+              <div class="fg">
+                <label>Fanlar *</label>
+                <div id="newTeacherSubjectsBox" class="subject-check-list">
+                  <div class="empty">Fanlar yuklanmoqda...</div>
+                </div>
+              </div>
+              <div
+                class="credential-box"
+                id="teacherCredentialBox"
+              >
+                <strong>O‘qituvchiga beriladigan login ma’lumotlari</strong>
+                <div class="credential-line">
+                  <span>Email:</span><code id="createdTeacherEmail">—</code>
+                </div>
+                <div class="credential-line">
+                  <span>Parol:</span><code id="createdTeacherPassword">—</code>
+                </div>
+                <p class="muted">
+                  Parol Firestore’ga saqlanmaydi. Shu oynadan nusxa olib
+                  o‘qituvchiga yuboring.
+                </p>
+              </div>
+              <div
+              >
+                <button class="btn" id="btnResetTeacherForm">
+                  <i class="fa-solid fa-eraser"></i> Tozalash
+                </button>
+                <button class="btn primary" id="btnCreateTeacherAccount">
+                  <i class="fa-solid fa-user-plus"></i> O‘qituvchi yaratish
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      "use strict";
+      const state = {
+        currentUser: null,
+        groups: [],
+        subjects: [],
+        teachers: [],
+        classMentors: [],
+        students: [],
+        assignments: [],
+        attendance: [],
+        grades: [],
+        parsedRating: [],
+        selectedStudents: new Set(),
+        selectedWeekdays: new Set(),
+      };
+      const collectionMap = [
+        { name: "groups", key: "groups", ls: "groups" },
+        { name: "subjects", key: "subjects", ls: "subjects" },
+        { name: "teachers", key: "teachers", ls: "teachers" },
+        { name: "classMentors", key: "classMentors", ls: "classMentors" },
+        { name: "course_students", key: "students", ls: "students" },
+        {
+          name: "courseAssignments",
+          key: "assignments",
+          ls: "courseAssignments",
+        },
+        { name: "attendance", key: "attendance", ls: "attendance" },
+        { name: "grades", key: "grades", ls: "grades" },
+      ];
+      const $ = (id) => document.getElementById(id);
+      function toast(m, t = "success") {
+        const b = $("toastContainer");
+        const e = document.createElement("div");
+        e.className = `toast ${t}`;
+        e.textContent = m;
+        b.appendChild(e);
+        setTimeout(() => e.remove(), 4200);
+      }
+      function log(m) {
+        const e = $("actionLog");
+        if (!e) return;
+        const n = new Date().toLocaleTimeString("uz-UZ");
+        e.textContent = `[${n}] ${m}\n\n` + e.textContent;
+      }
+      function esc(v) {
+        return String(v ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+      function slug(v) {
+        return String(v || "")
+          .toLowerCase()
+          .trim()
+          .replace(/[ʼ'‘’ʻ`]/g, "")
+          .replace(/-/g, "_")
+          .replace(/\s+/g, "_")
+          .replace(/[^\w_]/g, "");
+      }
+      function safe(v) {
+        return slug(String(v || "x")).slice(0, 90) || "x";
+      }
+      function norm(doc) {
+        const d = doc.data() || {};
+        return {
+          docId: doc.id,
+          ...d,
+          id: d.id !== undefined && d.id !== null ? d.id : doc.id,
+        };
+      }
+      function subId(s) {
+        return String(s?.docId || s?.subjectId || s?.id || slug(s?.name || ""));
+      }
+      function subName(id) {
+        const f = state.subjects.find(
+          (s) =>
+            subId(s) === String(id) ||
+            String(s.id) === String(id) ||
+            slug(s.name) === String(id),
+        );
+        return f ? f.name || f.shortName || id : id;
+      }
+      function teacherId(t) {
+        return String(t?.id ?? t?.teacherId ?? t?.login ?? t?.docId ?? "");
+      }
+      function teacherName(id) {
+        const t = state.teachers.find((x) => teacherId(x) === String(id));
+        return t ? t.fullName : id;
+      }
+      function teacherMatches(t, sid) {
+        if (!sid) return true;
+        const s = String(sid);
+        if (String(t.subjectId || "") === s) return true;
+        if (slug(t.subject || "") === s) return true;
+        if (Array.isArray(t.subjectIds))
+          return t.subjectIds.map(String).includes(s);
+        return false;
+      }
+      function selectedTime() {
+        const v = $("enrollTimeSelect").value;
+        return v === "__custom__" ? $("customTimeInput").value.trim() : v;
+      }
+      function groupStudents(g) {
+        return state.students
+          .filter((s) => String(s.groupCode) === String(g))
+          .sort((a, b) =>
+            String(a.studentNumber || a.id).localeCompare(
+              String(b.studentNumber || b.id),
+              "uz",
+            ),
+          );
+      }
+      function duplicate(st, su, te, ti) {
+        return state.assignments.some(
+          (a) =>
+            a.active !== false &&
+            String(a.studentId) === String(st) &&
+            String(a.subjectId) === String(su) &&
+            String(a.teacherId) === String(te) &&
+            String(a.classTime) === String(ti),
+        );
+      }
+      function buildUser(u, p) {
+        return {
+          uid: u.uid,
+          email: u.email,
+          role: p.role || "",
+          login: p.login || "",
+          fullName: p.fullName || "",
+          groupCode: p.groupCode || "",
+          id: p.id !== undefined && p.id !== null ? Number(p.id) : null,
+          subjectIds: Array.isArray(p.subjectIds) ? p.subjectIds : [],
+          active: p.active === true,
+        };
+      }
+      async function checkAdmin(u) {
+        const d = await db.collection("userProfiles").doc(u.uid).get();
+        if (!d.exists) throw new Error("userProfiles hujjati topilmadi.");
+        const p = d.data();
+        if (p.active !== true) throw new Error("Bu akkaunt faol emas.");
+        if (p.role !== "admin") throw new Error("Bu sahifa faqat admin uchun.");
+        return buildUser(u, p);
+      }
+      async function loadCollection(i) {
+        const s = await db.collection(i.name).get();
+        const r = s.docs.map(norm);
+        state[i.key] = r;
+        localStorage.setItem(
+          i.ls,
+          JSON.stringify(
+            r.map((x) => {
+              const c = { ...x };
+              delete c.docId;
+              return c;
+            }),
+          ),
+        );
+        return r.length;
+      }
+      async function loadAll() {
+        const res = [];
+        for (const i of collectionMap) {
+          try {
+            res.push(`${i.name}: ${await loadCollection(i)}`);
+          } catch (e) {
+            console.error(i.name, e);
+            res.push(`${i.name}: ERROR — ${e.message}`);
+          }
+        }
+        log("Ma’lumotlar yuklandi:\n" + res.join("\n"));
+        state.groups.sort((a, b) =>
+          String(a.code || a.id).localeCompare(String(b.code || b.id), "uz"),
+        );
+        state.subjects.sort((a, b) =>
+          String(a.name || a.id).localeCompare(String(b.name || b.id), "uz"),
+        );
+        state.teachers.sort(
+          (a, b) => Number(a.id || 9999) - Number(b.id || 9999),
+        );
+        state.students.sort((a, b) =>
+          String(a.studentNumber || a.id).localeCompare(
+            String(b.studentNumber || b.id),
+            "uz",
+          ),
+        );
+        renderAll();
+      }
+      function renderAll() {
+        stats();
+        fillSelects();
+        renderStudents();
+        renderAssignments();
+        refs();
+        groupSummary();
+        renderTeacherSubjects();
+      }
+      function stats() {
+        statGroups.textContent = state.groups.length;
+        statStudents.textContent = state.students.length;
+        statTeachers.textContent = state.teachers.length;
+        statAssignments.textContent = state.assignments.length;
+        refSubjectsCount.textContent = state.subjects.length;
+        refTeachersCount.textContent = state.teachers.length;
+        refMentorsCount.textContent = state.classMentors.length;
+        refCollectionsCount.textContent = collectionMap.length;
+      }
+      function opt(v, l, s = false) {
+        return `<option value="${esc(v)}"${s ? " selected" : ""}>${esc(l)}</option>`;
+      }
+      function fillSelects() {
+        enrollGroupSelect.innerHTML = [
+          '<option value="">— Guruh tanlang —</option>',
+        ]
+          .concat(
+            state.groups.map((g) =>
+              opt(g.code || g.id, g.name || `${g.code}-guruh`),
+            ),
+          )
+          .join("");
+        filterGroup.innerHTML = ['<option value="">Barcha guruhlar</option>']
+          .concat(
+            state.groups.map((g) =>
+              opt(g.code || g.id, g.name || `${g.code}-guruh`),
+            ),
+          )
+          .join("");
+        enrollSubjectSelect.innerHTML = [
+          '<option value="">— Fan tanlang —</option>',
+        ]
+          .concat(state.subjects.map((s) => opt(subId(s), s.name || subId(s))))
+          .join("");
+        filterSubject.innerHTML = ['<option value="">Barcha fanlar</option>']
+          .concat(state.subjects.map((s) => opt(subId(s), s.name || subId(s))))
+          .join("");
+        fillTeachers();
+        filterTeacher.innerHTML = [
+          '<option value="">Barcha o‘qituvchilar</option>',
+        ]
+          .concat(
+            state.teachers.map((t) =>
+              opt(
+                teacherId(t),
+                `${t.fullName || t.login || teacherId(t)}${t.subject ? " — " + t.subject : ""}`,
+              ),
+            ),
+          )
+          .join("");
+      }
+      function fillTeachers() {
+        const sid = enrollSubjectSelect.value;
+        const list = state.teachers.filter((t) => teacherMatches(t, sid));
+        enrollTeacherSelect.innerHTML = [
+          '<option value="">— O‘qituvchi tanlang —</option>',
+        ]
+          .concat(
+            list.map((t) =>
+              opt(
+                teacherId(t),
+                `${t.fullName || t.login || teacherId(t)}${t.subject ? " — " + t.subject : ""}`,
+              ),
+            ),
+          )
+          .join("");
+      }
+      function renderStudents() {
+        const g = enrollGroupSelect.value;
+        const q = (studentSearchInput.value || "").toLowerCase().trim();
+        const box = studentsList;
+        if (!g) {
+          box.innerHTML = '<div class="empty">Avval guruh tanlang.</div>';
+          studentListHint.textContent = "Avval guruh tanlang.";
+          countSelected();
+          return;
+        }
+        let rows = groupStudents(g);
+        if (q)
+          rows = rows.filter(
+            (s) =>
+              String(s.fullName || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(s.studentNumber || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(s.id || "")
+                .toLowerCase()
+                .includes(q),
+          );
+        studentListHint.textContent = `${g}-guruh: ${rows.length} ta o‘quvchi ko‘rsatildi.`;
+        if (!rows.length) {
+          box.innerHTML =
+            '<div class="empty">Bu guruhda o‘quvchi topilmadi.</div>';
+          countSelected();
+          return;
+        }
+        box.innerHTML = rows
+          .map((s) => {
+            const id = String(s.id),
+              ch = state.selectedStudents.has(id) ? "checked" : "";
+            return `<label class="student-row"><input type="checkbox" class="student-check" value="${esc(id)}" ${ch}><div><div class="student-name">${esc(s.fullName)}</div><div class="student-meta">${esc(s.studentNumber || s.id)}</div></div><span class="pill">${esc(s.groupCode)}-guruh</span><span class="student-meta">${esc(s.totalScore ?? "")}</span></label>`;
+          })
+          .join("");
+        document.querySelectorAll(".student-check").forEach((c) =>
+          c.addEventListener("change", () => {
+            c.checked
+              ? state.selectedStudents.add(String(c.value))
+              : state.selectedStudents.delete(String(c.value));
+            countSelected();
+          }),
+        );
+        countSelected();
+      }
+      function countSelected() {
+        selectedStudentsCount.textContent = `${state.selectedStudents.size} ta tanlandi`;
+      }
+      function renderAssignments() {
+        const g = filterGroup.value,
+          s = filterSubject.value,
+          t = filterTeacher.value,
+          q = (filterSearch.value || "").toLowerCase().trim();
+        let rows = [...state.assignments];
+        if (g) rows = rows.filter((a) => String(a.groupCode) === String(g));
+        if (s) rows = rows.filter((a) => String(a.subjectId) === String(s));
+        if (t) rows = rows.filter((a) => String(a.teacherId) === String(t));
+        if (q)
+          rows = rows.filter((a) =>
+            [
+              a.studentName,
+              a.groupCode,
+              a.subjectName,
+              a.subjectId,
+              a.teacherName,
+              a.teacherId,
+              a.classTime,
+            ]
+              .join(" ")
+              .toLowerCase()
+              .includes(q),
+          );
+        assignmentsCountBadge.textContent = `${rows.length} ta yozuv`;
+        if (!rows.length) {
+          assignmentsTableBody.innerHTML = `<tr><td colspan="8"><div class="empty">Yozuv topilmadi.</div></td></tr>`;
+          return;
+        }
+        assignmentsTableBody.innerHTML = rows
+          .map(
+            (a, i) =>
+              `<tr><td>${i + 1}</td><td><strong>${esc(a.studentName || a.studentId)}</strong><div class="student-meta">ID: ${esc(a.studentId || "")}</div></td><td><span class="pill green">${esc(a.groupCode || "—")}</span></td><td>${esc(a.subjectName || subName(a.subjectId))}</td><td>${esc(a.teacherName || teacherName(a.teacherId))}</td><td>${esc(a.classTime || "—")}</td><td>${esc(Array.isArray(a.weekDays) ? a.weekDays.join(", ") : Array.isArray(a.weekdays) ? a.weekdays.join(", ") : a.weekDays || a.weekdays || "—")}</td><td><button class="btn small red" onclick="deleteAssignment('${esc(a.docId || a.id)}')"><i class="fa-solid fa-trash"></i> O‘chirish</button></td></tr>`,
+          )
+          .join("");
+      }
+      function refs() {
+        subjectsTableBody.innerHTML = state.subjects
+          .map(
+            (s) =>
+              `<tr><td><code>${esc(subId(s))}</code></td><td>${esc(s.name || "")}</td><td>${esc(s.shortName || "")}</td><td>${s.active === false ? '<span class="pill red">nofaol</span>' : '<span class="pill green">faol</span>'}</td></tr>`,
+          )
+          .join("");
+        teachersTableBody.innerHTML = state.teachers
+          .map(
+            (t) =>
+              `<tr><td>${esc(teacherId(t))}</td><td><strong>${esc(t.fullName || "")}</strong></td><td><code>${esc(t.login || "")}</code></td><td>${esc(t.subject || (Array.isArray(t.subjectIds) ? t.subjectIds.join(", ") : ""))}</td><td>${esc(t.type || t.badgeLabel || "")}</td></tr>`,
+          )
+          .join("");
+      }
+      function groupSummary() {
+        groupSummaryBody.innerHTML = state.groups
+          .map((g) => {
+            const code = String(g.code || g.id);
+            const sc = state.students.filter(
+              (s) => String(s.groupCode) === code,
+            ).length;
+            const as = state.assignments.filter(
+              (a) => String(a.groupCode) === code,
+            );
+            const fs = new Set(
+              as.map((a) => a.subjectId || a.subjectName).filter(Boolean),
+            ).size;
+            return `<tr><td><span class="pill green">${esc(code)}-guruh</span></td><td>${sc}</td><td>${as.length}</td><td>${fs}</td><td><button class="btn small blue" onclick="openEnrollForGroup('${esc(code)}')">Kursga yozish</button></td></tr>`;
+          })
+          .join("");
+      }
+
+      function currentMonthValue() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      }
+      function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(reader.error || new Error("Faylni o‘qib bo‘lmadi."));
+          reader.readAsText(file, "UTF-8");
+        });
+      }
+      function extractRatingArray(text) {
+        const raw = String(text || "").trim();
+        if (!raw) throw new Error("Fayl bo‘sh.");
+
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+          if (Array.isArray(parsed.STUDENTS_DATA)) return parsed.STUDENTS_DATA;
+        } catch (_) {}
+
+        const match = raw.match(/(?:const|let|var)\s+STUDENTS_DATA\s*=\s*(\[[\s\S]*?\])\s*;?\s*$/m);
+        if (!match) {
+          throw new Error("STUDENTS_DATA array topilmadi. Format: const STUDENTS_DATA = [...];");
+        }
+
+        try {
+          return Function('"use strict"; return (' + match[1] + ');')();
+        } catch (e) {
+          throw new Error("Fayldagi STUDENTS_DATA array o‘qilmadi: " + e.message);
+        }
+      }
+      function normalizeRatingRow(row, index) {
+        const id = row?.id ?? row?.studentId ?? row?.student_id;
+        const name = String(row?.name ?? row?.fullName ?? row?.full_name ?? "").trim().replace(/\s+/g, " ");
+        const group = row?.group ?? row?.groupCode ?? row?.group_code;
+        const scoreRaw = row?.total_score ?? row?.totalScore ?? row?.score;
+        const totalScore = Number(scoreRaw);
+
+        if (id === undefined || id === null || String(id).trim() === "") {
+          throw new Error(`${index + 1}-qatorda id yo‘q.`);
+        }
+        if (!name) throw new Error(`${index + 1}-qatorda name yo‘q.`);
+        if (group === undefined || group === null || String(group).trim() === "") {
+          throw new Error(`${index + 1}-qatorda group yo‘q.`);
+        }
+        if (!Number.isFinite(totalScore)) {
+          throw new Error(`${index + 1}-qatorda total_score raqam emas.`);
+        }
+
+        return {
+          id: String(id).trim(),
+          name,
+          group: String(group).trim(),
+          total_score: Number(totalScore.toFixed(2)),
+        };
+      }
+      function validateRatingRows(rows) {
+        if (!Array.isArray(rows)) throw new Error("STUDENTS_DATA array bo‘lishi kerak.");
+        if (!rows.length) throw new Error("STUDENTS_DATA ichida yozuv yo‘q.");
+
+        const seen = new Set();
+        const normalized = rows.map(normalizeRatingRow);
+        for (const row of normalized) {
+          if (seen.has(row.id)) throw new Error(`Duplicate ID topildi: ${row.id}`);
+          seen.add(row.id);
+        }
+        normalized.sort((a, b) => b.total_score - a.total_score || a.name.localeCompare(b.name, "uz"));
+        return normalized;
+      }
+      function renderRatingPreview(rows) {
+        ratingPreviewCount.textContent = `${rows.length} ta yozuv`;
+        if (!rows.length) {
+          ratingPreviewBody.innerHTML = '<tr><td colspan="5"><div class="empty">Preview hali yo‘q.</div></td></tr>';
+          return;
+        }
+        ratingPreviewBody.innerHTML = rows
+          .slice(0, 20)
+          .map(
+            (s, i) =>
+              `<tr><td>${i + 1}</td><td><code>${esc(s.id)}</code></td><td><strong>${esc(s.name)}</strong></td><td><span class="pill green">${esc(s.group)}-guruh</span></td><td><strong>${esc(s.total_score)}</strong></td></tr>`,
+          )
+          .join("");
+      }
+      function ratingStatsText(rows) {
+        const groups = new Set(rows.map((s) => s.group)).size;
+        const max = rows.length ? Math.max(...rows.map((s) => Number(s.total_score || 0))) : 0;
+        const avg = rows.length
+          ? (rows.reduce((sum, s) => sum + Number(s.total_score || 0), 0) / rows.length).toFixed(1)
+          : "0.0";
+        return `Tekshiruv muvaffaqiyatli: ${rows.length} ta o‘quvchi, ${groups} ta guruh, o‘rtacha ball ${avg}, eng yuqori ball ${max}.`;
+      }
+      async function previewRatingFile() {
+        const file = ratingFileInput.files?.[0];
+        if (!file) return toast("Avval reyting faylini tanlang.", "warning");
+        try {
+          btnPreviewRating.disabled = true;
+          btnPreviewRating.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Tekshirilmoqda...';
+          const text = await readFileAsText(file);
+          const rows = validateRatingRows(extractRatingArray(text));
+          state.parsedRating = rows;
+          renderRatingPreview(rows);
+          ratingPreviewStats.textContent = ratingStatsText(rows);
+          btnUploadRating.disabled = false;
+          toast("Reyting fayli tekshirildi.", "success");
+          log("Reyting preview tayyor:\n" + ratingStatsText(rows));
+        } catch (e) {
+          state.parsedRating = [];
+          renderRatingPreview([]);
+          ratingPreviewStats.textContent = "Xatolik: " + e.message;
+          btnUploadRating.disabled = true;
+          toast("Reyting faylida xatolik: " + e.message, "error");
+          log("Reyting tekshiruv xatosi: " + e.message);
+        } finally {
+          btnPreviewRating.disabled = false;
+          btnPreviewRating.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i> Tekshirish';
+        }
+      }
+      async function replaceRatingCollection(rows, month) {
+        const col = db.collection("students_rating");
+        const oldSnapshot = await col.get();
+        let batch = db.batch();
+        let ops = 0;
+
+        for (const doc of oldSnapshot.docs) {
+          batch.delete(doc.ref);
+          ops++;
+          if (ops >= 450) {
+            await batch.commit();
+            batch = db.batch();
+            ops = 0;
+          }
+        }
+
+        for (let index = 0; index < rows.length; index++) {
+          const row = rows[index];
+          const ref = col.doc(String(row.id));
+          batch.set(ref, {
+            ...row,
+            rank: index + 1,
+            ratingMonth: month,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedByUid: state.currentUser.uid,
+            updatedByLogin: state.currentUser.login || state.currentUser.email || "admin",
+          });
+          ops++;
+          if (ops >= 450) {
+            await batch.commit();
+            batch = db.batch();
+            ops = 0;
+          }
+        }
+
+        batch.set(db.collection("rating_meta").doc("current"), {
+          month,
+          count: rows.length,
+          groupsCount: new Set(rows.map((s) => s.group)).size,
+          avgScore: rows.length
+            ? Number((rows.reduce((sum, s) => sum + Number(s.total_score || 0), 0) / rows.length).toFixed(1))
+            : 0,
+          maxScore: rows.length ? Math.max(...rows.map((s) => Number(s.total_score || 0))) : 0,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedByUid: state.currentUser.uid,
+          updatedByLogin: state.currentUser.login || state.currentUser.email || "admin",
+        }, { merge: true });
+        ops++;
+        if (ops > 0) await batch.commit();
+      }
+      async function uploadRatingToFirestore() {
+        const month = ratingMonthInput.value || currentMonthValue();
+        if (!state.parsedRating.length) return toast("Avval faylni tekshiring.", "warning");
+        if (!confirm(`${month} oyi uchun ${state.parsedRating.length} ta reyting yozuvini Firebase’ga yuklaysizmi? Eski reyting to‘liq almashtiriladi.`)) return;
+
+        try {
+          btnUploadRating.disabled = true;
+          btnUploadRating.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yuklanmoqda...';
+          await replaceRatingCollection(state.parsedRating, month);
+          ratingCurrentStatus.textContent = `Yangilandi: ${month}`;
+          toast("Reyting Firebase’ga yuklandi. Endi hamma foydalanuvchida ko‘rinadi.", "success");
+          log(`Reyting Firebase’ga yuklandi:\nOy: ${month}\n${ratingStatsText(state.parsedRating)}`);
+        } catch (e) {
+          console.error(e);
+          toast("Reyting yuklashda xatolik: " + e.message, "error");
+          log("Reyting yuklash xatosi: " + e.message);
+        } finally {
+          btnUploadRating.disabled = false;
+          btnUploadRating.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Firebase’ga yuklash';
+        }
+      }
+      function clearRatingPreview() {
+        state.parsedRating = [];
+        if (ratingFileInput) ratingFileInput.value = "";
+        renderRatingPreview([]);
+        ratingPreviewStats.textContent = 'Fayl tanlang va “Tekshirish” tugmasini bosing.';
+        btnUploadRating.disabled = true;
+        toast("Reyting preview tozalandi.");
+      }
+
+      function switchView(id) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.toggle("active", t.dataset.view === id));
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.toggle("active", v.id === id));
+      }
+      function openEnrollForGroup(g) {
+        switchView("enrollView");
+        enrollGroupSelect.value = g;
+        state.selectedStudents.clear();
+        renderStudents();
+        scrollTo({ top: 0, behavior: "smooth" });
+      }
+      async function saveEnroll() {
+        const g = enrollGroupSelect.value,
+          s = enrollSubjectSelect.value,
+          t = enrollTeacherSelect.value,
+          time = selectedTime();
+        if (!g) return toast("Guruh tanlang.", "error");
+        if (!s) return toast("Fan tanlang.", "error");
+        if (!t) return toast("O‘qituvchi tanlang.", "error");
+        if (!time) return toast("Dars vaqtini tanlang.", "error");
+        if (!state.selectedWeekdays.size)
+          return toast("Hafta kunlarini tanlang.", "error");
+        if (!state.selectedStudents.size)
+          return toast("Kamida bitta o‘quvchi tanlang.", "error");
+        const sub = state.subjects.find((x) => subId(x) === String(s));
+        const teach = state.teachers.find((x) => teacherId(x) === String(t));
+        const students = state.students.filter((x) =>
+          state.selectedStudents.has(String(x.id)),
+        );
+        if (!teach) return toast("O‘qituvchi topilmadi.", "error");
+        if (!sub) return toast("Fan topilmadi.", "error");
+        const days = Array.from(state.selectedWeekdays),
+          batch = db.batch();
+        let created = 0,
+          skipped = 0;
+        students.forEach((st) => {
+          if (duplicate(st.id, s, t, time)) {
+            skipped++;
+            return;
+          }
+          const id = `ca_${safe(st.id)}_${safe(s)}_${safe(t)}_${safe(time)}`;
+          batch.set(
+            db.collection("courseAssignments").doc(id),
+            {
+              id,
+              studentId: String(st.id),
+              studentName: st.fullName || "",
+              groupCode: String(st.groupCode || g),
+              subjectId: String(s),
+              subjectName: sub.name || String(s),
+              teacherId: String(t),
+              teacherName: teach.fullName || teach.login || String(t),
+              teacherLogin: teach.login || "",
+              classTime: time,
+              weekdays: days,
+              weekDays: days,
+              createdBy: state.currentUser.login || "admin",
+              createdByUid: state.currentUser.uid,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              active: true,
+            },
+            { merge: true },
+          );
+          created++;
+        });
+        if (!created) {
+          toast(
+            `Yangi yozuv yo‘q. ${skipped} ta yozuv avval mavjud.`,
+            "warning",
+          );
+          return;
+        }
+        try {
+          btnSaveEnroll.disabled = true;
+          await batch.commit();
+          toast(`${created} ta o‘quvchi kursga yozildi.`, "success");
+          log(
+            `Kursga yozildi: ${created} ta\nGuruh: ${g}\nFan: ${sub.name}\nO‘qituvchi: ${teach.fullName}\nVaqt: ${time}\nKunlar: ${days.join(", ")}\nDuplicate: ${skipped}`,
+          );
+          await loadAll();
+          state.selectedStudents.clear();
+          renderStudents();
+        } catch (e) {
+          console.error(e);
+          toast("Kursga yozishda xatolik: " + e.message, "error");
+        } finally {
+          btnSaveEnroll.disabled = false;
+        }
+      }
+      async function deleteAssignment(id) {
+        if (!id) return;
+        if (!confirm("Bu kurs yozuvini o‘chirasizmi?")) return;
+        try {
+          await db.collection("courseAssignments").doc(id).delete();
+          toast("Kurs yozuvi o‘chirildi.");
+          await loadAll();
+        } catch (e) {
+          console.error(e);
+          toast("O‘chirishda xatolik: " + e.message, "error");
+        }
+      }
+      function resetForm() {
+        enrollGroupSelect.value = "";
+        enrollSubjectSelect.value = "";
+        enrollTeacherSelect.value = "";
+        enrollTimeSelect.value = "";
+        customTimeInput.value = "";
+        customTimeInput.style.display = "none";
+        studentSearchInput.value = "";
+        state.selectedStudents.clear();
+        state.selectedWeekdays.clear();
+        document
+          .querySelectorAll(".weekday")
+          .forEach((b) => b.classList.remove("active"));
+        fillTeachers();
+        renderStudents();
+        toast("Forma tozalandi.");
+      }
+
+      function renderTeacherSubjects() {
+        const box = $("newTeacherSubjectsBox");
+        if (!box) return;
+        if (!state.subjects.length) {
+          box.innerHTML = '<div class="empty">Fanlar topilmadi.</div>';
+          return;
+        }
+        box.innerHTML = state.subjects
+          .map((s) => {
+            const id = subId(s);
+            return `<label class="subject-check-row"><input type="checkbox" class="new-teacher-subject-check" value="${esc(id)}"><div><div class="student-name">${esc(s.name || id)}</div><div class="student-meta">${esc(id)}</div></div></label>`;
+          })
+          .join("");
+      }
+      function nextTeacherNumber() {
+        const nums = state.teachers
+          .map((t) => Number(t.id))
+          .filter((n) => Number.isFinite(n));
+        return nums.length ? Math.max(...nums) + 1 : 1;
+      }
+      function generateTeacherLoginPassword() {
+        const n = nextTeacherNumber();
+        const pad = String(n).padStart(3, "0");
+        const login = `teacher${pad}`;
+        newTeacherIdAdmin.value = n;
+        newTeacherLoginAdmin.value = login;
+        newTeacherEmail.value = `${login}@litsey.uz`;
+        newTeacherPasswordAdmin.value = `Teacher${pad}@2026`;
+        teacherCredentialBox.style.display = "none";
+      }
+      function selectedTeacherSubjects() {
+        return Array.from(
+          document.querySelectorAll(".new-teacher-subject-check:checked"),
+        ).map((x) => x.value);
+      }
+      function resetTeacherForm() {
+        newTeacherFullName.value = "";
+        document
+          .querySelectorAll(".new-teacher-subject-check")
+          .forEach((x) => (x.checked = false));
+        teacherCredentialBox.style.display = "none";
+        generateTeacherLoginPassword();
+      }
+      async function createTeacherAccount() {
+        const fullName = newTeacherFullName.value.trim();
+        const id = String(newTeacherIdAdmin.value || "").trim();
+        const login = newTeacherLoginAdmin.value.trim();
+        const email = newTeacherEmail.value.trim();
+        const password = newTeacherPasswordAdmin.value.trim();
+        const subjectIds = selectedTeacherSubjects();
+        if (!fullName) return toast("O‘qituvchi F.I.Sh kiriting.", "error");
+        if (!id) return toast("Teacher ID kiriting.", "error");
+        if (!login) return toast("Login kiriting.", "error");
+        if (!email) return toast("Email kiriting.", "error");
+        if (!password || password.length < 6)
+          return toast("Parol kamida 6 ta belgidan iborat bo‘lsin.", "error");
+        if (!subjectIds.length)
+          return toast("Kamida bitta fan tanlang.", "error");
+        if (state.teachers.some((t) => String(t.id) === String(id)))
+          return toast("Bu Teacher ID bazada bor.", "error");
+        if (state.teachers.some((t) => String(t.login) === String(login)))
+          return toast("Bu login bazada bor.", "error");
+        btnCreateTeacherAccount.disabled = true;
+        btnCreateTeacherAccount.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin"></i> Yaratilmoqda...';
+        let secondaryAuth = null,
+          createdUser = null;
+        try {
+          let app = firebase.apps.find((a) => a.name === "teacherCreatorApp");
+          if (!app)
+            app = firebase.initializeApp(
+              firebase.app().options,
+              "teacherCreatorApp",
+            );
+          secondaryAuth = app.auth();
+          const cred = await secondaryAuth.createUserWithEmailAndPassword(
+            email,
+            password,
+          );
+          createdUser = cred.user;
+          const subjectNames = subjectIds.map((x) => subName(x));
+          await db
+            .collection("userProfiles")
+            .doc(createdUser.uid)
+            .set({
+              active: true,
+              fullName,
+              id: String(id),
+              login,
+              role: "oqituvchi",
+              subjectIds,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: state.currentUser.uid,
+            });
+          await db
+            .collection("teachers")
+            .doc(login)
+            .set({
+              id: String(id),
+              fullName,
+              login,
+              role: "oqituvchi",
+              subjectIds,
+              subject: subjectNames.join(", "),
+              active: true,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: state.currentUser.uid,
+            });
+          await secondaryAuth.signOut();
+          createdTeacherEmail.textContent = email;
+          createdTeacherPassword.textContent = password;
+          teacherCredentialBox.style.display = "block";
+          toast("Yangi o‘qituvchi yaratildi.", "success");
+          log(
+            `Yangi o‘qituvchi yaratildi:\nF.I.Sh: ${fullName}\nID: ${id}\nLogin: ${login}\nEmail: ${email}\nParol: ${password}\nFanlar: ${subjectNames.join(", ")}`,
+          );
+          await loadAll();
+          renderTeacherSubjects();
+          generateTeacherLoginPassword();
+          createdTeacherEmail.textContent = email;
+          createdTeacherPassword.textContent = password;
+          teacherCredentialBox.style.display = "block";
+        } catch (e) {
+          console.error(e);
+          if (createdUser && secondaryAuth) {
+            try {
+              await createdUser.delete();
+            } catch (_) {}
+          }
+          if (secondaryAuth) {
+            try {
+              await secondaryAuth.signOut();
+            } catch (_) {}
+          }
+          if (e.code === "auth/email-already-in-use")
+            toast("Bu email Authentication’da allaqachon bor.", "error");
+          else if (e.code === "auth/invalid-email")
+            toast("Email formati noto‘g‘ri.", "error");
+          else if (e.code === "auth/weak-password")
+            toast("Parol juda kuchsiz.", "error");
+          else toast("O‘qituvchi yaratishda xatolik: " + e.message, "error");
+          log("O‘qituvchi yaratishda xatolik: " + e.message);
+        } finally {
+          btnCreateTeacherAccount.disabled = false;
+          btnCreateTeacherAccount.innerHTML =
+            '<i class="fa-solid fa-user-plus"></i> O‘qituvchi yaratish';
+        }
+      }
+      async function logout() {
+        try {
+          sessionStorage.clear();
+          [
+            "students",
+            "course_students",
+            "groups",
+            "subjects",
+            "teachers",
+            "classMentors",
+            "courseAssignments",
+            "attendance",
+            "grades",
+          ].forEach((k) => localStorage.removeItem(k));
+          await auth.signOut();
+          location.replace("login.html");
+        } catch (e) {
+          location.replace("login.html");
+        }
+      }
+      function bind() {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) =>
+            t.addEventListener("click", () => switchView(t.dataset.view)),
+          );
+        btnRefresh.addEventListener("click", loadAll);
+        btnLogout.addEventListener("click", logout);
+        enrollGroupSelect.addEventListener("change", () => {
+          state.selectedStudents.clear();
+          renderStudents();
+        });
+        enrollSubjectSelect.addEventListener("change", fillTeachers);
+        enrollTimeSelect.addEventListener(
+          "change",
+          () =>
+            (customTimeInput.style.display =
+              enrollTimeSelect.value === "__custom__" ? "block" : "none"),
+        );
+        studentSearchInput.addEventListener("input", renderStudents);
+        btnSelectAllStudents.addEventListener("click", () => {
+          const g = enrollGroupSelect.value;
+          if (!g) return toast("Avval guruh tanlang.", "warning");
+          groupStudents(g).forEach((s) =>
+            state.selectedStudents.add(String(s.id)),
+          );
+          renderStudents();
+        });
+        btnClearStudents.addEventListener("click", () => {
+          state.selectedStudents.clear();
+          renderStudents();
+        });
+        btnResetEnroll.addEventListener("click", resetForm);
+        btnSaveEnroll.addEventListener("click", saveEnroll);
+        document.querySelectorAll(".weekday").forEach((b) =>
+          b.addEventListener("click", () => {
+            const d = b.dataset.day;
+            if (state.selectedWeekdays.has(d)) {
+              state.selectedWeekdays.delete(d);
+              b.classList.remove("active");
+            } else {
+              state.selectedWeekdays.add(d);
+              b.classList.add("active");
+            }
+          }),
+        );
+        ["filterGroup", "filterSubject", "filterTeacher"].forEach((id) =>
+          $(id).addEventListener("change", renderAssignments),
+        );
+        filterSearch.addEventListener("input", renderAssignments);
+        btnClearFilters.addEventListener("click", () => {
+          filterGroup.value = "";
+          filterSubject.value = "";
+          filterTeacher.value = "";
+          filterSearch.value = "";
+          renderAssignments();
+        });
+        if ($("btnGenerateTeacherLogin"))
+          btnGenerateTeacherLogin.addEventListener(
+            "click",
+            generateTeacherLoginPassword,
+          );
+        if ($("btnCreateTeacherAccount"))
+          btnCreateTeacherAccount.addEventListener(
+            "click",
+            createTeacherAccount,
+          );
+        if ($("btnResetTeacherForm"))
+          btnResetTeacherForm.addEventListener("click", resetTeacherForm);
+        if ($("ratingMonthInput")) ratingMonthInput.value = currentMonthValue();
+        if ($("btnPreviewRating"))
+          btnPreviewRating.addEventListener("click", previewRatingFile);
+        if ($("btnUploadRating"))
+          btnUploadRating.addEventListener("click", uploadRatingToFirestore);
+        if ($("btnClearRatingPreview"))
+          btnClearRatingPreview.addEventListener("click", clearRatingPreview);
+        if ($("ratingFileInput"))
+          ratingFileInput.addEventListener("change", () => {
+            state.parsedRating = [];
+            btnUploadRating.disabled = true;
+            ratingPreviewStats.textContent = "Fayl tanlandi. Endi tekshirish tugmasini bosing.";
+          });
+      }
+      function accessError(m) {
+        loadingScreen.innerHTML = `<div><h2>Kirish rad etildi</h2><p>${esc(m)}</p><div><button class="btn red" onclick="logout()">Chiqish</button><a class="btn blue" href="login.html">Login sahifaga qaytish</a></div></div>`;
+      }
+      function init() {
+        bind();
+        if (
+          typeof firebase === "undefined" ||
+          typeof auth === "undefined" ||
+          typeof db === "undefined"
+        ) {
+          accessError(
+            "Firebase SDK yoki firebase-config.js to‘g‘ri ulanmagan.",
+          );
+          return;
+        }
+        auth.onAuthStateChanged(async (u) => {
+          if (!u) {
+            location.replace("login.html");
+            return;
+          }
+          try {
+            state.currentUser = await checkAdmin(u);
+            sessionStorage.setItem(
+              "currentUser",
+              JSON.stringify(state.currentUser),
+            );
+            adminName.textContent =
+              state.currentUser.fullName || state.currentUser.email || "Admin";
+            loadingScreen.style.display = "none";
+            adminContent.style.display = "block";
+            await loadAll();
+            generateTeacherLoginPassword();
+          } catch (e) {
+            console.error(e);
+            accessError(e.message);
+          }
+        });
+      }
+      window.switchView = switchView;
+      window.openEnrollForGroup = openEnrollForGroup;
+      window.deleteAssignment = deleteAssignment;
+      window.logout = logout;
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

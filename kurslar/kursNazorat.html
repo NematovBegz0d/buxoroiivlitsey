@@ -1,643 +1,885 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kurs Nazorat — Dashboard</title>
-  <meta name="description" content="Kurs nazorati va davomat boshqaruvi asosiy paneli" />
-  <link rel="icon" type="image/png" href="../imgs/logo.png" />
-  <link rel="stylesheet" href="style.css" />
-  <!-- FIX #1: Font Awesome 7.0.1 mavjud emas — 6.5.2 ga o'zgartirildi -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kurs Nazorat — Dashboard</title>
+    <meta
+      name="description"
+      content="Kurs nazorati va davomat boshqaruvi asosiy paneli"
+    />
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="kursNazorat.css" />
+    <!-- FIX #1: Font Awesome 7.0.1 mavjud emas — 6.5.2 ga o'zgartirildi -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <!-- ===== TOAST XABARLARI UCHUN KONTEYNER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ===== TOAST XABARLARI UCHUN KONTEYNER ===== -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- ===== HEADER ===== -->
-  <header class="dashboard-header" id="dashboardHeader">
-    <div class="header-content">
-      <div class="header-left">
-        <div class="header-icon"><i class="fa-solid fa-clipboard-list"></i></div>
-        <div class="header-title">
-          <h1>Kurs Nazorat Tizimi</h1>
-          <p>Kunlik kurs nazorati</p>
-        </div>
-      </div>
-      <div class="header-right">
-        <span class="date-badge" id="currentDate"></span>
-        <button class="btn-primary-action role-sinf-rahbari" id="btnOpenEnroll" onclick="openEnrollModal()">
-          + Kursga yozish
-        </button>
-        <a href="kursgaYozilganlar.html" class="btn-secondary-action" id="btnGoToEnrolled">
-          <i class="fa-solid fa-file-contract"></i> Yozilganlar
-        </a>
-        <div class="user-badge" id="userBadge">
-          <span class="role-dot"></span>
-          <span id="userNameDisplay"></span>
-        </div>
-        <button class="btn-logout" id="btnLogout" onclick="logout()">Chiqish</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== KURS KARTALARI ===== -->
-  <main class="courses-container" id="coursesContainer"></main>
-
-  <!-- ===== KURSGA YOZISH MODALI ===== -->
-  <div class="modal-overlay" id="enrollModal">
-    <div class="modal-container" style="max-width: 600px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-header-icon"><i class="fa-solid fa-pen-to-square"></i></div>
-          <div>
-            <h2>Kursga yozish</h2>
-            <p id="enrollGroupName">Guruh: —</p>
+    <!-- ===== HEADER ===== -->
+    <header class="dashboard-header" id="dashboardHeader">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="header-icon">
+            <i class="fa-solid fa-clipboard-list"></i>
+          </div>
+          <div class="header-title">
+            <h1>Kurs Nazorat Tizimi</h1>
+            <p>Kunlik kurs nazorati</p>
           </div>
         </div>
-        <button class="modal-close" onclick="closeModal('enrollModal')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-form-group">
-          <label>Guruh</label>
-          <input type="text" class="form-input" id="enrollGroup" readonly />
-        </div>
-        <div class="modal-form-group">
-          <label>Fan tanlash *</label>
-          <select id="enrollSubject" class="form-input" onchange="onSubjectChange()">
-            <option value="">— Fan tanlang —</option>
-          </select>
-          <div class="add-subject-row" id="addSubjectRow" style="display:none;">
-            <input type="text" class="form-input" id="newSubjectName" placeholder="Yangi fan nomi" />
-            <input type="text" class="form-input" id="newSubjectShort" placeholder="Qisqa" style="width:80px;flex:none;" />
-            <button class="btn-add-small" onclick="addNewSubject()">Qo'shish</button>
+        <div class="header-right">
+          <span class="date-badge" id="currentDate"></span>
+          <button
+            class="btn-primary-action role-sinf-rahbari"
+            id="btnOpenEnroll"
+            onclick="openEnrollModal()"
+          >
+            + Kursga yozish
+          </button>
+          <a
+            href="kursgaYozilganlar.html"
+            class="btn-secondary-action"
+            id="btnGoToEnrolled"
+          >
+            <i class="fa-solid fa-file-contract"></i> Yozilganlar
+          </a>
+          <div class="user-badge" id="userBadge">
+            <span class="role-dot"></span>
+            <span id="userNameDisplay"></span>
           </div>
-          <button class="btn-add-small mt-2" onclick="toggleAddSubject()" style="font-size:0.75rem;padding:4px 10px;">+ Yangi fan</button>
+          <button class="btn-logout" id="btnLogout" onclick="logout()">
+            Chiqish
+          </button>
         </div>
-        <div class="modal-form-group">
-          <label>O'qituvchi tanlash *</label>
-          <select id="enrollTeacher" class="form-input">
-            <option value="">— Avval fan tanlang —</option>
-          </select>
-          <div class="add-subject-row" id="addTeacherRow" style="display:none; flex-direction:column; gap:10px;">
-            <div style="display:flex; gap:10px; width:100%;">
-              <input type="text" class="form-input" id="newTeacherName" placeholder="O'qituvchi F.I.Sh" style="flex:1;" />
-              <select class="form-input" id="newTeacherType" style="width:120px;flex:none;">
-                <option value="ichki">Ichki</option>
-                <option value="tashqi">Tashqi</option>
+      </div>
+    </header>
+
+    <!-- ===== KURS KARTALARI ===== -->
+    <main class="courses-container" id="coursesContainer"></main>
+
+    <!-- ===== KURSGA YOZISH MODALI ===== -->
+    <div class="modal-overlay" id="enrollModal">
+      <div class="modal-container">
+        <!-- MODAL HEADER -->
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+
+            <div>
+              <h2>Kursga yozish</h2>
+              <p id="enrollGroupName">Guruh: —</p>
+            </div>
+          </div>
+
+          <button class="modal-close" onclick="closeModal('enrollModal')">
+            ✕
+          </button>
+        </div>
+
+        <!-- MODAL BODY -->
+        <div class="modal-body">
+          <!-- Guruh -->
+          <div class="modal-form-group">
+            <label>Guruh</label>
+            <input type="text" class="form-input" id="enrollGroup" readonly />
+          </div>
+
+          <!-- Fan tanlash -->
+          <div class="modal-form-group">
+            <label>Fan tanlash *</label>
+            <select
+              id="enrollSubject"
+              class="form-input"
+              onchange="onSubjectChange()"
+            >
+              <option value="">— Fan tanlang —</option>
+            </select>
+          </div>
+
+          <!-- O'qituvchi tanlash -->
+          <div class="modal-form-group">
+            <label>O‘qituvchi tanlash *</label>
+            <select id="enrollTeacher" class="form-input">
+              <option value="">— Avval fan tanlang —</option>
+            </select>
+          </div>
+
+          <!-- Vaqt va hafta kunlari -->
+          <div class="modal-form-row">
+            <div class="modal-form-group">
+              <label>Dars vaqti *</label>
+              <select
+                id="enrollTime"
+                class="form-input"
+                onchange="onTimeSelectChange()"
+              >
+                <option value="">— Vaqt tanlang —</option>
+                <option value="14:00 - 15:30">14:00 - 15:30</option>
+                <option value="15:40 - 17:10">15:40 - 17:10</option>
+                <option value="16:00 - 17:30">16:00 - 17:30</option>
+                <option value="17:20 - 18:50">17:20 - 18:50</option>
+                <option value="__custom__">Boshqa vaqt</option>
               </select>
-            </div>
-            <div style="display:flex; gap:10px; width:100%;">
-              <input type="text" class="form-input" id="newTeacherLogin" placeholder="Login (ms: doston_tarix)" style="flex:1;" />
-              <input type="password" class="form-input" id="newTeacherPassword" placeholder="Parol (4 ta son)" maxlength="4" style="width:120px;flex:none;" />
-              <button class="btn-add-small" id="btnAddTeacher" onclick="addNewTeacher()" style="flex:none; padding:8px 16px;">Saqlash</button>
-            </div>
-          </div>
-          <button class="btn-add-small mt-2" onclick="toggleAddTeacher()" style="font-size:0.75rem;padding:4px 10px;">+ Yangi o'qituvchi</button>
-        </div>
-        <div class="modal-form-row">
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>Dars vaqti *</label>
-            <select id="enrollTime" class="form-input" onchange="onTimeSelectChange()">
-              <option value="">— Vaqt tanlang —</option>
-              <option value="14:00 - 15:30">14:00 - 15:30</option>
-              <option value="15:40 - 17:10">15:40 - 17:10</option>
-              <option value="16:00 - 17:30">16:00 - 17:30</option>
-              <option value="17:20 - 18:50">17:20 - 18:50</option>
-              <option value="__custom__">✏️ Boshqa vaqt (qo'lda kiritish)</option>
-            </select>
-            <input type="text" class="form-input" id="enrollTimeCustom" placeholder="Masalan: 09:00 - 10:30" style="display:none; margin-top:6px;" />
-          </div>
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>Hafta kunlari *</label>
-            <div class="weekday-selector" id="weekdaySelector">
-              <button type="button" class="weekday-btn" data-day="Dushanba">Du</button>
-              <button type="button" class="weekday-btn" data-day="Seshanba">Se</button>
-              <button type="button" class="weekday-btn" data-day="Chorshanba">Cho</button>
-              <button type="button" class="weekday-btn" data-day="Payshanba">Pay</button>
-              <button type="button" class="weekday-btn" data-day="Juma">Ju</button>
-              <button type="button" class="weekday-btn" data-day="Shanba">Sha</button>
-            </div>
-          </div>
-        </div>
-        <div class="modal-form-group">
-          <label>O'quvchilar tanlash *</label>
-          <div class="student-select-list" id="enrollStudentList"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-modal-cancel" onclick="closeModal('enrollModal')">Bekor qilish</button>
-        <button class="btn-modal-save" id="btnSaveEnroll" onclick="saveEnrollment()">
-          <i class="fa-solid fa-floppy-disk"></i> Saqlash
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ===== DAVOMAT OLISH MODALI ===== -->
-  <div class="modal-overlay" id="attendanceModal">
-    <div class="modal-container" style="max-width: 580px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: var(--accent-blue-glow);"><i class="fa-solid fa-chart-pie"></i></div>
-          <div>
-            <h2>Davomat qo'shish</h2>
-            <p id="attendanceSubTitle">— uchun davomat</p>
+              <input
+                type="text"
+                class="form-input"
+                id="enrollTimeCustom"
+                placeholder="Masalan: 09:00 - 10:30"
+              />
+            </div>
+
+            <div class="modal-form-group">
+              <label>Hafta kunlari *</label>
+
+              <div class="weekday-selector" id="weekdaySelector">
+                <button type="button" class="weekday-btn" data-day="Dushanba">
+                  Du
+                </button>
+                <button type="button" class="weekday-btn" data-day="Seshanba">
+                  Se
+                </button>
+                <button type="button" class="weekday-btn" data-day="Chorshanba">
+                  Cho
+                </button>
+                <button type="button" class="weekday-btn" data-day="Payshanba">
+                  Pay
+                </button>
+                <button type="button" class="weekday-btn" data-day="Juma">
+                  Ju
+                </button>
+                <button type="button" class="weekday-btn" data-day="Shanba">
+                  Sha
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- O'quvchilar tanlash -->
+          <div class="modal-form-group">
+            <label>O‘quvchilar tanlash *</label>
+            <div class="student-select-list" id="enrollStudentList"></div>
           </div>
         </div>
-        <button class="modal-close" onclick="closeModal('attendanceModal')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-form-row">
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>Sana *</label>
-            <input type="date" id="attendanceDate" class="form-input" />
-          </div>
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>Para *</label>
-            <select id="attendancePara" class="form-input">
-              <option value="">— Tanlang —</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-form-row">
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>O'qituvchi paroli * (4 xonali)</label>
-            <input type="password" id="attendancePassword" class="form-input" maxlength="4" placeholder="••••" />
-            <div class="confirm-message" id="confirmMessage">✓ Tasdiqlandi</div>
-          </div>
-          <div class="modal-form-group" style="margin-bottom:0;">
-            <label>Mashg'ulot sababi</label>
-            <input type="text" id="attendanceReason" class="form-input" readonly />
-          </div>
-        </div>
-        <div class="attendance-list" id="attendanceList">
-          <div class="attendance-list-header">O'quvchilar ro'yxati</div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div class="attendance-summary" id="attendanceSummary">
-          <span>✓ Kelgan: <span class="kelgan" id="kelganCount">0</span></span>
-          <span>✕ Kelmagan: <span class="kelmagan" id="kelmaganCount">0</span></span>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-modal-cancel" onclick="closeModal('attendanceModal')">Bekor qilish</button>
-          <button class="btn-modal-save" id="btnSaveAttendance" onclick="saveAttendance()">
+
+        <!-- MODAL FOOTER -->
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" onclick="closeModal('enrollModal')">
+            Bekor qilish
+          </button>
+
+          <button
+            class="btn-modal-save"
+            id="btnSaveEnroll"
+            onclick="saveEnrollment()"
+          >
             <i class="fa-solid fa-floppy-disk"></i> Saqlash
           </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== BAHOLASH MODALI ===== -->
-  <div class="modal-overlay" id="gradingModal">
-    <div class="modal-container" style="max-width: 580px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: rgba(255,193,7,0.15);"><i class="fa-solid fa-star"></i></div>
-          <div>
-            <h2>Baholash</h2>
-            <p id="gradingSubTitle">— uchun baholar</p>
+    <!-- ===== DAVOMAT OLISH MODALI ===== -->
+    <div class="modal-overlay" id="attendanceModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+              <h2>Davomat qo'shish</h2>
+              <p id="attendanceSubTitle">— uchun davomat</p>
+            </div>
           </div>
-        </div>
-        <button class="modal-close" onclick="closeModal('gradingModal')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="attendance-list" id="gradingList">
-          <div class="attendance-list-header">O'quvchilarni baholash</div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div style="display:flex;gap:10px;">
-          <button class="btn-modal-cancel" onclick="closeModal('gradingModal')">Bekor qilish</button>
-          <button class="btn-modal-save" id="btnSaveGrades" onclick="saveGrades()">
-            <i class="fa-solid fa-floppy-disk"></i> Baholarni saqlash
+          <button class="modal-close" onclick="closeModal('attendanceModal')">
+            ✕
           </button>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== O'QUVCHI KURSLARI MODALI ===== -->
-  <div class="modal-overlay" id="studentCoursesModal">
-    <div class="modal-container" style="max-width: 520px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-header-icon" style="background: rgba(124,77,255,0.15);"><i class="fa-solid fa-user"></i></div>
-          <div>
-            <h2 id="scmStudentName">O'quvchi</h2>
-            <p id="scmStudentGroup">Guruh: —</p>
-          </div>
-        </div>
-        <button class="modal-close" onclick="closeModal('studentCoursesModal')">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="student-courses-list" id="studentCoursesList"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== KURS O'QUVCHILARI MODALI ===== -->
-  <div class="modal-overlay" id="courseStudentsModal">
-    <div class="modal-container" style="max-width: 680px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-header-icon" id="csmIcon"><i class="fa-solid fa-clipboard-list"></i></div>
-          <div>
-            <h2 id="csmTitle">Kurs o'quvchilari</h2>
-            <p id="csmSubTitle">—</p>
-          </div>
-        </div>
-        <button class="modal-close" onclick="closeModal('courseStudentsModal')">✕</button>
-      </div>
-      <div class="modal-body" style="padding: 16px 24px 24px;">
-        <div id="csmAddSection" style="display:none; margin-bottom: 16px;">
-          <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
-            <div style="flex:1; min-width:200px;">
-              <label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:4px;">O'quvchi qo'shish</label>
-              <select id="csmAddStudentSelect" class="form-input" style="width:100%;">
-                <option value="">— O'quvchi tanlang —</option>
+        <div class="modal-body">
+          <div class="modal-form-row">
+            <div class="modal-form-group">
+              <label>Sana *</label>
+              <input type="date" id="attendanceDate" class="form-input" />
+            </div>
+            <div class="modal-form-group">
+              <label>Para *</label>
+              <select id="attendancePara" class="form-input">
+                <option value="">— Tanlang —</option>
               </select>
             </div>
-            <button class="btn-primary-action" id="btnCsmAdd" onclick="addStudentToCourse()" style="padding:10px 16px;">+ Qo'shish</button>
+          </div>
+          <div class="modal-form-row">
+            <div class="modal-form-group">
+              <label>Mashg'ulot sababi</label>
+              <input
+                type="text"
+                id="attendanceReason"
+                class="form-input"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="attendance-list" id="attendanceList">
+            <div class="attendance-list-header">O'quvchilar ro'yxati</div>
           </div>
         </div>
-        <div id="csmStudentsList"></div>
+        <div class="modal-footer">
+          <div class="attendance-summary" id="attendanceSummary">
+            <span
+              >✓ Kelgan: <span class="kelgan" id="kelganCount">0</span></span
+            >
+            <span
+              >✕ Kelmagan:
+              <span class="kelmagan" id="kelmaganCount">0</span></span
+            >
+          </div>
+          <div>
+            <button
+              class="btn-modal-cancel"
+              onclick="closeModal('attendanceModal')"
+            >
+              Bekor qilish
+            </button>
+            <button
+              class="btn-modal-save"
+              id="btnSaveAttendance"
+              onclick="saveAttendance()"
+            >
+              <i class="fa-solid fa-floppy-disk"></i> Saqlash
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== FIREBASE ===== -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-  <script src="../js/firebase-config.js"></script>
+    <!-- ===== BAHOLASH MODALI ===== -->
+    <div class="modal-overlay" id="gradingModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div>
+              <h2>Baholash</h2>
+              <p id="gradingSubTitle">— uchun baholar</p>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('gradingModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="attendance-list" id="gradingList">
+            <div class="attendance-list-header">O'quvchilarni baholash</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div>
+            <button
+              class="btn-modal-cancel"
+              onclick="closeModal('gradingModal')"
+            >
+              Bekor qilish
+            </button>
+            <button
+              class="btn-modal-save"
+              id="btnSaveGrades"
+              onclick="saveGrades()"
+            >
+              <i class="fa-solid fa-floppy-disk"></i> Baholarni saqlash
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    /* ============================================================
-       KURS NAZORAT — TUZATILGAN ASOSIY LOGIKA
+    <!-- ===== DAVOMAT STATISTIKA MODALI ===== -->
+    <div class="modal-overlay" id="statsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon" id="statsIcon">
+              <i class="fa-solid fa-chart-bar"></i>
+            </div>
+            <div>
+              <h2 id="statsTitle">Davomat statistikasi</h2>
+              <p id="statsSubTitle">—</p>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('statsModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Tab tugmalari -->
+          <div class="stats-tabs">
+            <button
+              class="stats-tab active"
+              id="tabWeekly"
+              onclick="switchStatsTab('weekly')"
+            >
+              📅 Bu hafta
+            </button>
+            <button
+              class="stats-tab"
+              id="tabMonthly"
+              onclick="switchStatsTab('monthly')"
+            >
+              📆 Bu oy
+            </button>
+          </div>
+          <!-- Xulosa kartalar -->
+          <div id="statsSummary"></div>
+          <!-- O'quvchilar jadvali -->
+          <div id="statsTable"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== O'QUVCHI KURSLARI MODALI ===== -->
+    <div class="modal-overlay" id="studentCoursesModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+              <h2 id="scmStudentName">O'quvchi</h2>
+              <p id="scmStudentGroup">Guruh: —</p>
+            </div>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeModal('studentCoursesModal')"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="student-courses-list" id="studentCoursesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== KURS O'QUVCHILARI MODALI ===== -->
+    <div class="modal-overlay" id="courseStudentsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-header-icon" id="csmIcon">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <div>
+              <h2 id="csmTitle">Kurs o'quvchilari</h2>
+              <p id="csmSubTitle">—</p>
+            </div>
+          </div>
+          <button
+            class="modal-close"
+            onclick="closeModal('courseStudentsModal')"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="csmAddSection">
+            <div>
+              <div>
+                <label>O'quvchi qo'shish</label>
+                <select id="csmAddStudentSelect" class="form-input">
+                  <option value="">— O'quvchi tanlang —</option>
+                </select>
+              </div>
+              <button
+                class="btn-primary-action"
+                id="btnCsmAdd"
+                onclick="addStudentToCourse()"
+              >
+                + Qo'shish
+              </button>
+            </div>
+          </div>
+          <div id="csmStudentsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      /* ============================================================
+       KURS NAZORAT — FIREBASE AUTH MOSLANGAN ASOSIY LOGIKA
        Tuzatishlar:
-         1. Font Awesome 6.5.2 (HTML head da)
-         2. setupSearch() DOMContentLoaded da chaqirildi
-         3. hashPassword() + comparePassword() — xavfsiz parol taqqoslash
-         4. generateId() — to'qnashuvsiz ID generatsiya
-         5. setButtonLoading() — tugmalarni saqlash paytida bloklash
-         6. saveEnrollment, addStudentToCourse, saveAttendance, saveGrades
-            → async/await + try/catch + tugma bloklash
-         7. addNewTeacher → parol hash qilinib saqlanadi
-         8. todayAttendance filter — classTime bo'sh bo'lsa xato tuzatildi
-         9. attendancePassword tekshiruvi → comparePassword() ga o'tkazildi
+         1. Font Awesome 6.5.2 ishlatiladi.
+         2. Mentor faqat o'z guruhi bo'yicha kursga yozadi.
+         3. Fan/o'qituvchi mosligi subjectId, subjectIds va eski subject modeli bilan ishlaydi.
+         4. Davomat olishda 4 xonali eski parol tekshiruvi olib tashlandi.
+         5. O'qituvchi Firebase Auth orqali kirgan bo'lsa, o'z kursiga davomat saqlay oladi.
        ============================================================ */
 
-    // ===== GLOBAL O'ZGARUVCHILAR =====
-    let currentUser        = null;
-    let selectedWeekdays   = [];
-    let currentAttendanceCourse = null;
-    let currentGradingCourse    = null;
-    let currentCourseView       = null;
+      // ===== GLOBAL O'ZGARUVCHILAR =====
+      let currentUser = null;
+      let selectedWeekdays = [];
+      let currentAttendanceCourse = null;
+      let currentGradingCourse = null;
+      let currentCourseView = null;
+      let currentStatsCourse = null; // Statistika modali uchun joriy kurs
+      let currentStatsMode = "weekly"; // "weekly" | "monthly"
 
-    // ===== Fan ranglar xaritasi =====
-    const subjectColors = {
-      "Tarix": "#00e676",
-      "Ona-tili va adabiyot": "#ff9800",
-      "Rus tili": "#e91e63",
-      "Ingliz tili": "#448aff",
-      "Fransuz tili": "#7c4dff",
-      "Nemis tili": "#ff5722",
-      "Informatika fani": "#00bcd4",
-      "Matematika fani": "#ffc107",
-      "Fizika fani": "#9c27b0",
-      "Jismoniy tarbiya": "#4caf50",
-      "Huquqshunoslik": "#795548",
-      "Geografiya": "#009688",
-      "Kimyo fani": "#f44336",
-      "Biologiya fani": "#8bc34a",
-      "Kasbiy fan": "#607d8b",
-      "Maxsus fan": "#ff5252"
-    };
+      // ===== Fan ranglar xaritasi =====
+      const subjectColors = {
+        Tarix: "#00e676",
+        "Ona-tili va adabiyot": "#ff9800",
+        "Rus tili": "#e91e63",
+        "Ingliz tili": "#448aff",
+        "Fransuz tili": "#7c4dff",
+        "Nemis tili": "#ff5722",
+        "Informatika fani": "#00bcd4",
+        "Matematika fani": "#ffc107",
+        "Fizika fani": "#9c27b0",
+        "Jismoniy tarbiya": "#4caf50",
+        Huquqshunoslik: "#795548",
+        Geografiya: "#009688",
+        "Kimyo fani": "#f44336",
+        "Biologiya fani": "#8bc34a",
+        "Kasbiy fan": "#607d8b",
+        "Maxsus fan": "#ff5252",
+      };
 
-    /* ============================================================
+      /* ============================================================
        YORDAMCHI FUNKSIYALAR
        ============================================================ */
 
-    /**
-     * FIX #3a — SHA-256 yordamida parol hash qilish (Web Crypto API)
-     * Eslatma: login.html ham shu funksiyadan foydalanishi kerak.
-     */
-    async function hashPassword(password) {
-      const buf  = new TextEncoder().encode(String(password));
-      const hash = await crypto.subtle.digest("SHA-256", buf);
-      return Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-    }
-
-    /**
-     * FIX #3b — Parol taqqoslash (hash + eski ochiq matn backup)
-     * Eski ma'lumotlar bilan moslikni ta'minlaydi.
-     */
-    async function comparePassword(input, stored) {
-      if (!input || !stored) return false;
-      const hashed = await hashPassword(input);
-      if (hashed === stored) return true;
-      // Legacy: eski bazada ochiq matn bo'lsa ham ishlaydi
-      if (String(input) === String(stored)) return true;
-      return false;
-    }
-
-    /**
-     * FIX #4 — Xavfsiz noyob ID generatsiya qilish
-     * Date.now() o'rniga crypto.randomUUID() ishlatiladi.
-     */
-    function generateId(prefix = "id") {
-      const uid = (typeof crypto !== "undefined" && crypto.randomUUID)
-        ? crypto.randomUUID().replace(/-/g, "")
-        : Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-      return `${prefix}_${uid}`;
-    }
-
-    /**
-     * FIX #5 — Tugmani yuklash holati (ikki marta bosishni oldini olish)
-     */
-    function setButtonLoading(btnId, isLoading, originalText) {
-      const btn = document.getElementById(btnId);
-      if (!btn) return;
-      btn.disabled = isLoading;
-      if (isLoading) {
-        btn.dataset.originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
-      } else {
-        btn.innerHTML = btn.dataset.originalText || originalText || "Saqlash";
+      /**
+       * FIX #4 — Xavfsiz noyob ID generatsiya qilish
+       * Date.now() o'rniga crypto.randomUUID() ishlatiladi.
+       */
+      function generateId(prefix = "id") {
+        const uid =
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID().replace(/-/g, "")
+            : Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+        return `${prefix}_${uid}`;
       }
-    }
 
-    /* ============================================================
+      /**
+       * Firebase/Firestore importdan keyingi IDlarni bir xil formatda ishlatish uchun.
+       */
+      function makeSlug(value) {
+        return String(value || "")
+          .toLowerCase()
+          .trim()
+          .replace(/[ʼ'‘’ʻ`]/g, "")
+          .replace(/-/g, "_")
+          .replace(/\s+/g, "_")
+          .replace(/[^\w_]/g, "");
+      }
+
+      function getSubjectId(subject) {
+        return String(
+          subject?.docId ||
+            subject?.subjectId ||
+            subject?.id ||
+            makeSlug(subject?.name || ""),
+        );
+      }
+
+      function getTeacherId(teacher) {
+        return String(
+          teacher?.id ||
+            teacher?.teacherId ||
+            teacher?.docId ||
+            teacher?.login ||
+            "",
+        );
+      }
+
+      function teacherMatchesSubject(teacher, subjectId, selectedSubject) {
+        const sid = String(subjectId || "");
+        const subjectName = selectedSubject?.name || "";
+        const subjectSlug = makeSlug(subjectName);
+
+        // Yangi model: teacher.subjectIds = ["tarix", "huquq", ...]
+        if (Array.isArray(teacher.subjectIds)) {
+          return teacher.subjectIds.map(String).includes(sid);
+        }
+
+        // Yangi/yordamchi model: teacher.subjectId = "tarix"
+        if (teacher.subjectId) {
+          return String(teacher.subjectId) === sid;
+        }
+
+        // Eski data.js modeli: teacher.subject = "Tarix"
+        if (teacher.subject) {
+          return (
+            String(teacher.subject) === String(subjectName) ||
+            makeSlug(teacher.subject) === subjectSlug ||
+            makeSlug(teacher.subject) === sid
+          );
+        }
+
+        return false;
+      }
+
+      function makeSafeDocId(value) {
+        return makeSlug(String(value || "x")).slice(0, 90) || "x";
+      }
+
+      /**
+       * FIX #5 — Tugmani yuklash holati (ikki marta bosishni oldini olish)
+       */
+      function setButtonLoading(btnId, isLoading, originalText) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        btn.disabled = isLoading;
+        if (isLoading) {
+          btn.dataset.originalText = btn.innerHTML;
+          btn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
+        } else {
+          btn.innerHTML = btn.dataset.originalText || originalText || "Saqlash";
+        }
+      }
+
+      /* ============================================================
        SAHIFA YUKLANGANDA
        ============================================================ */
-    document.addEventListener("DOMContentLoaded", async () => {
-      checkAuth();
-      setCurrentDate();
-      setupWeekdayButtons();
-      // FIX #2 — setupSearch() chaqirilmagan edi, endi chaqirildi
-      setupSearch();
+      document.addEventListener("DOMContentLoaded", async () => {
+        checkAuth();
+        setCurrentDate();
+        setupWeekdayButtons();
+        const container = document.getElementById("coursesContainer");
+        if (container) {
+          container.innerHTML = "<div> ⏳ Ma'lumotlar yuklanmoqda...</div>";
+        }
 
-      const container = document.getElementById("coursesContainer");
-      if (container) {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;"> ⏳ Ma\'lumotlar yuklanmoqda...</div>';
-      }
+        try {
+          const collections = [
+            { name: "course_students", ls: "students" },
+            { name: "courseAssignments", ls: "courseAssignments" },
+            { name: "attendance", ls: "attendance" },
+            { name: "grades", ls: "grades" },
+            { name: "subjects", ls: "subjects" },
+            { name: "teachers", ls: "teachers" },
+            { name: "classMentors", ls: "classMentors" },
+            // FIX #2 — "groups" kolleksiyasi olib tashlandi: hech qayerda ishlatilmaydi
+          ];
+          await Promise.all(
+            collections.map(async (c) => {
+              const snap = await db.collection(c.name).get();
+              localStorage.setItem(
+                c.ls,
+                JSON.stringify(
+                  snap.docs.map((d) => ({ docId: d.id, ...d.data() })),
+                ),
+              );
+            }),
+          );
+        } catch (err) {
+          console.error("Baza sync xatosi:", err);
+          showToast("Ma'lumotlar yuklanishida xatolik", "error");
+        }
 
-      try {
-        const collections = [
-          { name: "course_students",    ls: "students"          },
-          { name: "courseAssignments",  ls: "courseAssignments" },
-          { name: "attendance",         ls: "attendance"        },
-          { name: "grades",             ls: "grades"            },
-          { name: "subjects",           ls: "subjects"          },
-          { name: "teachers",           ls: "teachers"          },
-          { name: "classMentors",       ls: "classMentors"      },
-          { name: "groups",             ls: "groups"            }
-        ];
-        await Promise.all(collections.map(async c => {
-          const snap = await db.collection(c.name).get();
-          localStorage.setItem(c.ls, JSON.stringify(snap.docs.map(d => d.data())));
-        }));
-      } catch (err) {
-        console.error("Baza sync xatosi:", err);
-        showToast("Ma'lumotlar yuklanishida xatolik", "error");
-      }
+        loadCourseCards();
+      });
 
-      loadCourseCards();
-    });
-
-    /* ============================================================
+      /* ============================================================
        AUTENTIFIKATSIYA
        ============================================================ */
-    function checkAuth() {
-      const userData = sessionStorage.getItem("currentUser");
-      if (!userData) { window.location.href = "login.html"; return; }
-      currentUser = JSON.parse(userData);
-      updateUIForRole();
-    }
+      function checkAuth() {
+        const userData = sessionStorage.getItem("currentUser");
+        if (!userData) {
+          window.location.href = "login.html";
+          return;
+        }
 
-    function updateUIForRole() {
-      const userNameEl = document.getElementById("userNameDisplay");
-      const roleDot    = document.querySelector(".role-dot");
+        try {
+          currentUser = JSON.parse(userData);
+        } catch (error) {
+          sessionStorage.removeItem("currentUser");
+          window.location.href = "login.html";
+          return;
+        }
 
-      if (currentUser.role === "sinf_rahbari") {
-        userNameEl.textContent = `${currentUser.fullName} (${currentUser.groupCode})`;
-        roleDot.style.background = "var(--accent-green)";
-      } else if (currentUser.role === "oqituvchi") {
-        userNameEl.textContent = `${currentUser.fullName} (${currentUser.subject})`;
-        roleDot.style.background = "var(--accent-blue)";
-      } else {
-        userNameEl.textContent = "Kuzatuvchi";
-        roleDot.style.background = "var(--accent-orange)";
+        // Admin alohida admin.html sahifasiga o'tkaziladi.
+        if (currentUser.role === "admin") {
+          window.location.replace("admin.html");
+          return;
+        }
+
+        // Ota-ona/kuzatuvchi bu sahifaga kira olmaydi.
+        if (
+          currentUser.role === "observer" ||
+          currentUser.role === "kuzatuvchi"
+        ) {
+          window.location.replace("kursgaYozilganlar.html");
+          return;
+        }
+
+        updateUIForRole();
       }
 
-      document.querySelectorAll(".role-sinf-rahbari").forEach(btn => {
-        btn.style.display = currentUser.role === "sinf_rahbari" ? "" : "none";
-      });
-    }
+      function updateUIForRole() {
+        const userNameEl = document.getElementById("userNameDisplay");
+        const roleDot = document.querySelector(".role-dot");
+        if (!userNameEl || !roleDot || !currentUser) return;
 
-    function logout() {
-      sessionStorage.removeItem("currentUser");
-      window.location.href = "login.html";
-    }
+        if (currentUser.role === "sinf_rahbari") {
+          userNameEl.textContent = `${currentUser.fullName} (${currentUser.groupCode})`;
+          roleDot.style.background = "var(--accent-green)";
+        } else if (currentUser.role === "oqituvchi") {
+          const subjectText =
+            Array.isArray(currentUser.subjectIds) &&
+            currentUser.subjectIds.length
+              ? currentUser.subjectIds.join(", ")
+              : currentUser.subject || currentUser.login || "o'qituvchi";
+          userNameEl.textContent = `${currentUser.fullName} (${subjectText})`;
+          roleDot.style.background = "var(--accent-blue)";
+        } else if (currentUser.role === "admin") {
+          userNameEl.textContent = currentUser.fullName || "Administrator";
+          roleDot.style.background = "var(--accent-yellow)";
+        } else {
+          userNameEl.textContent = "Kuzatuvchi";
+          roleDot.style.background = "var(--accent-orange)";
+        }
 
-    /* ============================================================
+        document.querySelectorAll(".role-sinf-rahbari").forEach((btn) => {
+          btn.style.display = currentUser.role === "sinf_rahbari" ? "" : "none";
+        });
+      }
+
+      async function logout() {
+        try {
+          sessionStorage.removeItem("currentUser");
+          [
+            "students",
+            "groups",
+            "courseAssignments",
+            "attendance",
+            "grades",
+            "subjects",
+            "teachers",
+            "classMentors",
+          ].forEach((key) => localStorage.removeItem(key));
+
+          if (typeof auth !== "undefined") {
+            await auth.signOut();
+          } else if (typeof firebase !== "undefined" && firebase.auth) {
+            await firebase.auth().signOut();
+          }
+
+          window.location.replace("login.html");
+        } catch (error) {
+          console.error("Logout xatosi:", error);
+          sessionStorage.clear();
+          window.location.replace("login.html");
+        }
+      }
+
+      /* ============================================================
        SANA
        ============================================================ */
-    function setCurrentDate() {
-      const now   = new Date();
-      const day   = String(now.getDate()).padStart(2, "0");
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const year  = now.getFullYear();
-      document.getElementById("currentDate").textContent = `${day}.${month}.${year}`;
-      const dateInput = document.getElementById("attendanceDate");
-      if (dateInput) dateInput.value = `${year}-${month}-${day}`;
-    }
+      function setCurrentDate() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, "0");
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const year = now.getFullYear();
+        document.getElementById("currentDate").textContent =
+          `${day}.${month}.${year}`;
+        const dateInput = document.getElementById("attendanceDate");
+        if (dateInput) dateInput.value = `${year}-${month}-${day}`;
+      }
 
-    /* ============================================================
-       QIDIRUV (SEARCH)
-       ============================================================ */
-    function setupSearch() {
-      const searchInput   = document.getElementById("searchInput");
-      const searchResults = document.getElementById("searchResults");
-      if (!searchInput || !searchResults) return;
+      function clampPercent(value) {
+        const num = Math.round(Number(value) || 0);
+        return Math.max(0, Math.min(100, num));
+      }
 
-      searchInput.addEventListener("input", (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        if (query.length < 2) { searchResults.classList.remove("show"); return; }
+      function widthClass(value) {
+        return `w-${clampPercent(value)}`;
+      }
 
-        const students = JSON.parse(localStorage.getItem("students") || "[]");
-        const filtered  = students.filter(s =>
-          s.fullName.toLowerCase().includes(query) ||
-          s.groupCode.toLowerCase().includes(query)
-        ).slice(0, 15);
+      function toneClass(percent) {
+        const pct = clampPercent(percent);
+        if (pct >= 80) return "tone-good";
+        if (pct >= 60) return "tone-warn";
+        return "tone-bad";
+      }
 
-        searchResults.innerHTML = filtered.length === 0
-          ? '<div class="search-no-results">Hech narsa topilmadi</div>'
-          : filtered.map(s => `
-              <div class="search-result-item" onclick="showStudentCourses(${s.id})">
-                <span class="student-name">${s.fullName}</span>
-                <span class="student-group">${s.groupCode}-guruh</span>
-              </div>`).join("");
-
-        searchResults.classList.add("show");
-      });
-
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".search-wrapper")) {
-          searchResults.classList.remove("show");
-        }
-      });
-    }
-
-    function showStudentCourses(studentId) {
-      const students    = JSON.parse(localStorage.getItem("students") || "[]");
-      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const student     = students.find(s => String(s.id) === String(studentId));
-      if (!student) return;
-
-      document.getElementById("scmStudentName").textContent  = student.fullName;
-      document.getElementById("scmStudentGroup").textContent = `${student.groupCode}-guruh`;
-
-      const studentCourses = assignments.filter(a => String(a.studentId) === String(studentId));
-      const listEl         = document.getElementById("studentCoursesList");
-
-      listEl.innerHTML = studentCourses.length === 0
-        ? '<div class="table-empty">Bu o\'quvchi hali hech qaysi kursga yozilmagan.</div>'
-        : studentCourses.map(c => `
-            <div class="student-course-item" style="border-left-color:${subjectColors[c.subjectName] || '#448aff'}">
-              <div class="course-name">${c.subjectName}</div>
-              <div class="course-detail">O'qituvchi: ${c.teacherName}</div>
-              <div class="course-detail">Vaqt: ${c.classTime} | ${(c.weekDays || []).join(", ")}</div>
-            </div>`).join("");
-
-      const sr = document.getElementById("searchResults");
-      const si = document.getElementById("searchInput");
-      if (sr) sr.classList.remove("show");
-      if (si) si.value = "";
-      openModal("studentCoursesModal");
-    }
-
-    /* ============================================================
+      /* ============================================================
        KURS KARTALARI
        ============================================================ */
-    function loadCourseCards() {
-      const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const container   = document.getElementById("coursesContainer");
+      function loadCourseCards() {
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+        const container = document.getElementById("coursesContainer");
 
-      if (assignments.length === 0) {
-        container.innerHTML = `
+        if (assignments.length === 0) {
+          container.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">📭</div>
             <h3>Hozircha kurslar mavjud emas</h3>
             <p>Sinf rahbari o'quvchilarni kurslarga yozgandan keyin, bu yerda kurs kartalari paydo bo'ladi.</p>
           </div>`;
-        return;
-      }
-
-      const courseMap = {};
-      assignments.forEach(a => {
-        const key = `${a.subjectId}_${a.teacherId}_${a.classTime}`;
-        if (!courseMap[key]) {
-          courseMap[key] = {
-            subjectId:   a.subjectId,
-            subjectName: a.subjectName,
-            teacherId:   a.teacherId,
-            teacherName: a.teacherName,
-            classTime:   a.classTime,
-            weekDays:    a.weekDays || [],
-            students:    [],
-            groups:      new Set()
-          };
+          return;
         }
-        courseMap[key].students.push({
-          studentId:   a.studentId,
-          studentName: a.studentName,
-          groupCode:   a.groupCode
+
+        const courseMap = {};
+        assignments.forEach((a) => {
+          const key = `${a.subjectId}_${a.teacherId}_${a.classTime}`;
+          if (!courseMap[key]) {
+            courseMap[key] = {
+              subjectId: a.subjectId,
+              subjectName: a.subjectName,
+              teacherId: a.teacherId,
+              teacherName: a.teacherName,
+              classTime: a.classTime,
+              weekDays: a.weekDays || a.weekdays || [],
+              students: [],
+              groups: new Set(),
+            };
+          }
+          courseMap[key].students.push({
+            studentId: a.studentId,
+            studentName: a.studentName,
+            groupCode: a.groupCode,
+          });
+          courseMap[key].groups.add(a.groupCode);
         });
-        courseMap[key].groups.add(a.groupCode);
-      });
 
-      let courses = Object.values(courseMap);
+        let courses = Object.values(courseMap);
 
-      if (currentUser.role === "oqituvchi") {
-        courses = courses.filter(c => String(c.teacherId) === String(currentUser.id));
-      }
+        if (currentUser.role === "oqituvchi") {
+          courses = courses.filter(
+            (c) => String(c.teacherId) === String(currentUser.id),
+          );
+        }
 
-      courses.sort((a, b) => a.subjectName.localeCompare(b.subjectName));
+        courses.sort((a, b) => a.subjectName.localeCompare(b.subjectName));
 
-      if (courses.length === 0) {
-        container.innerHTML = `
+        if (courses.length === 0) {
+          container.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">📭</div>
             <h3>Hozircha sizga kurslar biriktirilmagan</h3>
             <p>Sinf rahbarlari o'quvchilarni sizning faningizga yozgach, bu yerda ko'rinadi.</p>
           </div>`;
-        return;
-      }
-
-      const allAttendance = JSON.parse(localStorage.getItem("attendance") || "[]");
-      const now           = new Date();
-      const todayStr      = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-      const weekDaysUz    = ["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
-      const todayWeekDay  = weekDaysUz[now.getDay()];
-
-      let html = '<div class="course-cards-list" style="max-width:900px;margin:0 auto;">';
-      courses.forEach((c, i) => {
-        html += renderCourseCard(c, i, allAttendance, todayStr, todayWeekDay);
-      });
-      html += "</div>";
-      container.innerHTML = html;
-    }
-
-    function renderCourseCard(course, index, allAttendance, todayStr, todayWeekDay) {
-      const color        = subjectColors[course.subjectName] || "#448aff";
-      const subjects     = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const subj         = subjects.find(s => s.id === course.subjectId);
-      const shortName    = subj ? subj.shortName : course.subjectName.substring(0, 3).toUpperCase();
-      const totalStudents = course.students.length;
-      const groupsArr    = [...course.groups];
-
-      const safeClassTime = (course.classTime || "").replace(/'/g, "\\'");
-      const courseTime    = (course.classTime || "").trim();
-
-      // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi ta'minlandi
-      const todayAttendance = allAttendance.find(att =>
-        att.date === todayStr &&
-        String(att.subjectId) === String(course.subjectId) &&
-        String(att.teacherId) === String(course.teacherId) &&
-        (att.classTime || "").trim() === courseTime
-      );
-
-      const isTodayClass = (course.weekDays || []).includes(todayWeekDay);
-      let attendanceBtnHtml = "";
-
-      if (currentUser.role === "oqituvchi" && String(currentUser.id) === String(course.teacherId)) {
-        if (!isTodayClass) {
-          attendanceBtnHtml = `<button class="btn-attendance" disabled title="Bugun bu fandan dars yo'q" style="opacity:0.7;cursor:not-allowed;">📅 Bugun dars yo'q</button>`;
-        } else if (todayAttendance) {
-          attendanceBtnHtml = `<button class="btn-attendance btn-grade" onclick="event.stopPropagation();openGradingModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')"><i class="fa-solid fa-star"></i> Baholash</button>`;
-        } else {
-          attendanceBtnHtml = `<button class="btn-attendance" onclick="event.stopPropagation();openAttendanceModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')">Davomat olish</button>`;
+          return;
         }
-      } else if (currentUser.role === "oqituvchi") {
-        attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
-      } else if (currentUser.role === "kuzatuvchi") {
-        attendanceBtnHtml = `<button class="btn-attendance" disabled title="Kuzatuvchi davomat ola olmaydi">Davomat olish</button>`;
-      } else {
-        attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
+
+        const allAttendance = JSON.parse(
+          localStorage.getItem("attendance") || "[]",
+        );
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        const weekDaysUz = [
+          "Yakshanba",
+          "Dushanba",
+          "Seshanba",
+          "Chorshanba",
+          "Payshanba",
+          "Juma",
+          "Shanba",
+        ];
+        const todayWeekDay = weekDaysUz[now.getDay()];
+        // FIX #3 — subjects bir marta o'qiladi, har karta uchun qayta o'qilmaydi
+        const allSubjects = JSON.parse(
+          localStorage.getItem("subjects") || "[]",
+        );
+
+        let html = '<div class="course-cards-list">';
+        courses.forEach((c, i) => {
+          html += renderCourseCard(
+            c,
+            i,
+            allAttendance,
+            todayStr,
+            todayWeekDay,
+            allSubjects,
+          );
+        });
+        html += "</div>";
+        container.innerHTML = html;
       }
 
-      return `
-        <div class="course-card" style="animation-delay:${index * 0.08}s;cursor:pointer;"
+      // FIX #3 — allSubjects parametr sifatida qabul qilinadi (ichida qayta o'qilmaydi)
+      function renderCourseCard(
+        course,
+        index,
+        allAttendance,
+        todayStr,
+        todayWeekDay,
+        allSubjects,
+      ) {
+        const color = subjectColors[course.subjectName] || "#448aff";
+        const subj = allSubjects.find(
+          (s) => String(getSubjectId(s)) === String(course.subjectId),
+        );
+        const shortName = subj
+          ? subj.shortName
+          : course.subjectName.substring(0, 3).toUpperCase();
+        const totalStudents = course.students.length;
+        const groupsArr = [...course.groups];
+
+        const safeClassTime = (course.classTime || "").replace(/'/g, "\\'");
+        const courseTime = (course.classTime || "").trim();
+
+        // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi ta'minlandi
+        const todayAttendance = allAttendance.find(
+          (att) =>
+            att.date === todayStr &&
+            String(att.subjectId) === String(course.subjectId) &&
+            String(att.teacherId) === String(course.teacherId) &&
+            (att.classTime || "").trim() === courseTime,
+        );
+
+        const isTodayClass = (course.weekDays || []).includes(todayWeekDay);
+        let attendanceBtnHtml = "";
+
+        if (
+          currentUser.role === "oqituvchi" &&
+          String(currentUser.id) === String(course.teacherId)
+        ) {
+          if (!isTodayClass) {
+            attendanceBtnHtml = `<button class="btn-attendance" disabled title="Bugun bu fandan dars yo'q">📅 Bugun dars yo'q</button>`;
+          } else if (todayAttendance) {
+            attendanceBtnHtml = `<button class="btn-attendance btn-grade" onclick="event.stopPropagation();openGradingModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')"><i class="fa-solid fa-star"></i> Baholash</button>`;
+          } else {
+            attendanceBtnHtml = `<button class="btn-attendance" onclick="event.stopPropagation();openAttendanceModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')">Davomat olish</button>`;
+          }
+        } else if (currentUser.role === "oqituvchi") {
+          attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
+        } else if (currentUser.role === "kuzatuvchi") {
+          attendanceBtnHtml = `<button class="btn-attendance" disabled title="Kuzatuvchi davomat ola olmaydi">Davomat olish</button>`;
+        } else {
+          attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
+        }
+
+        return `
+        <div class="course-card"
              onclick="openCourseStudents('${course.subjectId}','${course.teacherId}','${safeClassTime}')">
           <div class="course-card-header">
             <div class="course-card-info">
-              <div class="subject-badge" style="background:${color};">${shortName}</div>
+              <div class="subject-badge">${shortName}</div>
               <div>
                 <div class="course-card-name">${course.subjectName} (${course.teacherName})</div>
                 <div class="course-card-teacher">${course.classTime || ""}</div>
@@ -647,69 +889,90 @@
           </div>
           <div class="course-card-details">
             ${course.classTime ? `<span class="detail-chip"><span class="chip-icon">🕐</span> ${course.classTime}</span>` : ""}
-            ${(course.weekDays || []).map(d => `<span class="detail-chip">${d}</span>`).join("")}
+            ${(course.weekDays || []).map((d) => `<span class="detail-chip">${d}</span>`).join("")}
             <span class="detail-chip">${groupsArr.length} ta guruh</span>
           </div>
           <div class="course-card-footer">
             <div class="groups-enrolled">
-              ${groupsArr.map(g => `<span class="group-mini-badge">${g}</span>`).join("")}
+              ${groupsArr.map((g) => `<span class="group-mini-badge">${g}</span>`).join("")}
             </div>
-            ${attendanceBtnHtml}
+            <div class="course-card-actions">
+              <button class="btn-stats" onclick="event.stopPropagation();openStatsModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')">
+                <i class="fa-solid fa-chart-bar"></i> Statistika
+              </button>
+              ${attendanceBtnHtml}
+            </div>
           </div>
         </div>`;
-    }
+      }
 
-    /* ============================================================
+      /* ============================================================
        KURS O'QUVCHILARI MODALI
        ============================================================ */
-    function openCourseStudents(subjectId, teacherId, classTime) {
-      const subjects  = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const teachers  = JSON.parse(localStorage.getItem("teachers") || "[]");
-      const subject   = subjects.find(s => String(s.id) === String(subjectId));
-      const teacher   = teachers.find(t => String(t.id) === String(teacherId));
-      if (!subject || !teacher) return;
+      function openCourseStudents(subjectId, teacherId, classTime) {
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+        const subject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+        const teacher = teachers.find(
+          (t) => String(getTeacherId(t)) === String(teacherId),
+        );
+        if (!subject || !teacher) return;
 
-      currentCourseView = { subjectId, teacherId, classTime, subjectName: subject.name, teacherName: teacher.fullName };
+        currentCourseView = {
+          subjectId,
+          teacherId,
+          classTime,
+          subjectName: subject.name,
+          teacherName: teacher.fullName,
+        };
 
-      const color = subjectColors[subject.name] || "#448aff";
-      document.getElementById("csmIcon").style.background   = color;
-      document.getElementById("csmTitle").textContent       = subject.name;
-      document.getElementById("csmSubTitle").textContent    = `O'qituvchi: ${teacher.fullName} | ${classTime || ""}`;
+        const color = subjectColors[subject.name] || "#448aff";
+        document.getElementById("csmIcon").style.background = color;
+        document.getElementById("csmTitle").textContent = subject.name;
+        document.getElementById("csmSubTitle").textContent =
+          `O'qituvchi: ${teacher.fullName} | ${classTime || ""}`;
 
-      renderCourseStudentsList(subjectId, teacherId, classTime);
+        renderCourseStudentsList(subjectId, teacherId, classTime);
 
-      const addSection = document.getElementById("csmAddSection");
-      if (currentUser.role === "sinf_rahbari") {
-        addSection.style.display = "block";
-        loadAddStudentOptions(subjectId, teacherId, classTime);
-      } else {
-        addSection.style.display = "none";
+        const addSection = document.getElementById("csmAddSection");
+        if (currentUser.role === "sinf_rahbari") {
+          addSection.style.display = "block";
+          loadAddStudentOptions(subjectId, teacherId, classTime);
+        } else {
+          addSection.style.display = "none";
+        }
+
+        openModal("courseStudentsModal");
       }
 
-      openModal("courseStudentsModal");
-    }
+      function renderCourseStudentsList(subjectId, teacherId, classTime) {
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+        const courseStudents = assignments.filter(
+          (a) =>
+            String(a.subjectId) === String(subjectId) &&
+            String(a.teacherId) === String(teacherId) &&
+            (a.classTime || "") === (classTime || ""),
+        );
+        const listEl = document.getElementById("csmStudentsList");
 
-    function renderCourseStudentsList(subjectId, teacherId, classTime) {
-      const assignments   = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const courseStudents = assignments.filter(a =>
-        String(a.subjectId)  === String(subjectId) &&
-        String(a.teacherId)  === String(teacherId) &&
-        (a.classTime || "") === (classTime || "")
-      );
-      const listEl = document.getElementById("csmStudentsList");
+        if (courseStudents.length === 0) {
+          listEl.innerHTML =
+            "<div class=\"table-empty\">Bu kursda hali o'quvchilar yo'q.</div>";
+          return;
+        }
 
-      if (courseStudents.length === 0) {
-        listEl.innerHTML = '<div class="table-empty">Bu kursda hali o\'quvchilar yo\'q.</div>';
-        return;
-      }
-
-      const safeTime = (classTime || "").replace(/'/g, "\\'");
-      let html = "";
-      courseStudents.forEach((s, i) => {
-        const deleteBtn = currentUser.role === "sinf_rahbari"
-          ? `<button class="btn-remove-student" onclick="event.stopPropagation();removeStudentFromCourse('${s.studentId}','${subjectId}','${teacherId}','${safeTime}')" title="O'chirish">✕</button>`
-          : "";
-        html += `
+        const safeTime = (classTime || "").replace(/'/g, "\\'");
+        let html = "";
+        courseStudents.forEach((s, i) => {
+          const deleteBtn =
+            currentUser.role === "sinf_rahbari"
+              ? `<button class="btn-remove-student" onclick="event.stopPropagation();removeStudentFromCourse('${s.studentId}','${subjectId}','${teacherId}','${safeTime}')" title="O'chirish">✕</button>`
+              : "";
+          html += `
           <div class="csm-student-item">
             <div class="csm-student-num">${String(i + 1).padStart(2, "0")}</div>
             <div class="csm-student-info">
@@ -718,185 +981,269 @@
             </div>
             ${deleteBtn}
           </div>`;
-      });
+        });
 
-      listEl.innerHTML = `
+        listEl.innerHTML = `
         <div class="csm-header-row"><span>Jami: ${courseStudents.length} ta o'quvchi</span></div>
         ${html}`;
-    }
+      }
 
-    async function removeStudentFromCourse(studentId, subjectId, teacherId, classTime) {
-      if (!confirm("Bu o'quvchini kursdan o'chirishni tasdiqlaysizmi?")) return;
+      async function removeStudentFromCourse(
+        studentId,
+        subjectId,
+        teacherId,
+        classTime,
+      ) {
+        if (!confirm("Bu o'quvchini kursdan o'chirishni tasdiqlaysizmi?"))
+          return;
 
-      let assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const target = assignments.find(a =>
-        String(a.studentId)  === String(studentId) &&
-        String(a.subjectId)  === String(subjectId) &&
-        String(a.teacherId)  === String(teacherId) &&
-        (a.classTime || "") === (classTime || "")
-      );
+        let assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+        const target = assignments.find(
+          (a) =>
+            String(a.studentId) === String(studentId) &&
+            String(a.subjectId) === String(subjectId) &&
+            String(a.teacherId) === String(teacherId) &&
+            (a.classTime || "") === (classTime || ""),
+        );
 
-      if (target) {
-        try {
-          await db.collection("courseAssignments").doc(target.id).delete();
-          assignments = assignments.filter(a => a.id !== target.id);
-          localStorage.setItem("courseAssignments", JSON.stringify(assignments));
-          renderCourseStudentsList(subjectId, teacherId, classTime);
-          loadAddStudentOptions(subjectId, teacherId, classTime);
-          loadCourseCards();
-          showToast("O'quvchi kursdan o'chirildi", "success");
-        } catch (err) {
-          showToast("O'chirishda xatolik: " + err.message, "error");
+        if (target) {
+          try {
+            await db.collection("courseAssignments").doc(target.id).delete();
+            assignments = assignments.filter((a) => a.id !== target.id);
+            localStorage.setItem(
+              "courseAssignments",
+              JSON.stringify(assignments),
+            );
+            renderCourseStudentsList(subjectId, teacherId, classTime);
+            loadAddStudentOptions(subjectId, teacherId, classTime);
+            loadCourseCards();
+            showToast("O'quvchi kursdan o'chirildi", "success");
+          } catch (err) {
+            showToast("O'chirishda xatolik: " + err.message, "error");
+          }
         }
       }
-    }
 
-    function loadAddStudentOptions(subjectId, teacherId, classTime) {
-      if (currentUser.role !== "sinf_rahbari") return;
+      function loadAddStudentOptions(subjectId, teacherId, classTime) {
+        if (currentUser.role !== "sinf_rahbari") return;
 
-      const allStudents   = JSON.parse(localStorage.getItem("students") || "[]");
-      const assignments   = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const groupStudents = allStudents
-        .filter(s => s.groupCode === currentUser.groupCode)
-        .sort((a, b) => a.fullName.localeCompare(b.fullName));
+        const allStudents = JSON.parse(
+          localStorage.getItem("students") || "[]",
+        );
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+        const groupStudents = allStudents
+          .filter((s) => String(s.groupCode) === String(currentUser.groupCode))
+          .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
-      const enrolledIds = assignments
-        .filter(a =>
-          String(a.subjectId) === String(subjectId) &&
-          String(a.teacherId) === String(teacherId) &&
-          (a.classTime || "") === (classTime || ""))
-        .map(a => a.studentId);
+        const enrolledIds = assignments
+          .filter(
+            (a) =>
+              String(a.subjectId) === String(subjectId) &&
+              String(a.teacherId) === String(teacherId) &&
+              (a.classTime || "") === (classTime || ""),
+          )
+          .map((a) => a.studentId);
 
-      const enrolledInOtherTeacher = assignments
-        .filter(a =>
-          String(a.subjectId) === String(subjectId) &&
-          String(a.teacherId) !== String(teacherId))
-        .map(a => a.studentId);
+        const enrolledInOtherTeacher = assignments
+          .filter(
+            (a) =>
+              String(a.subjectId) === String(subjectId) &&
+              String(a.teacherId) !== String(teacherId),
+          )
+          .map((a) => a.studentId);
 
-      const available = groupStudents.filter(s =>
-        !enrolledIds.includes(s.id) && !enrolledInOtherTeacher.includes(s.id)
-      );
+        const available = groupStudents.filter(
+          (s) =>
+            !enrolledIds.map(String).includes(String(s.id)) &&
+            !enrolledInOtherTeacher.map(String).includes(String(s.id)),
+        );
 
-      const select = document.getElementById("csmAddStudentSelect");
-      select.innerHTML = '<option value="">— O\'quvchi tanlang —</option>';
-      available.forEach(s => {
-        select.innerHTML += `<option value="${s.id}" data-name="${s.fullName}">${s.fullName}</option>`;
-      });
-    }
-
-    // FIX #6 — async qilindi, try/catch va tugma bloklash qo'shildi
-    async function addStudentToCourse() {
-      if (!currentCourseView || currentUser.role !== "sinf_rahbari") return;
-
-      const select    = document.getElementById("csmAddStudentSelect");
-      const studentId = select.value;
-      if (!studentId) { showToast("O'quvchi tanlang!", "error"); return; }
-
-      const studentName  = select.options[select.selectedIndex].dataset.name;
-      const assignments  = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-
-      const inOtherTeacher = assignments.find(a =>
-        String(a.studentId) === String(studentId) &&
-        String(a.subjectId) === String(currentCourseView.subjectId) &&
-        String(a.teacherId) !== String(currentCourseView.teacherId)
-      );
-      if (inOtherTeacher) {
-        showToast(`Bu o'quvchi ${currentCourseView.subjectName} faniga ${inOtherTeacher.teacherName} ga yozilgan!`, "error");
-        return;
+        const select = document.getElementById("csmAddStudentSelect");
+        select.innerHTML = '<option value="">— O\'quvchi tanlang —</option>';
+        available.forEach((s) => {
+          select.innerHTML += `<option value="${s.id}" data-name="${s.fullName}">${s.fullName}</option>`;
+        });
       }
 
-      const existingCourse = assignments.find(a =>
-        String(a.subjectId) === String(currentCourseView.subjectId) &&
-        String(a.teacherId) === String(currentCourseView.teacherId) &&
-        (a.classTime || "") === (currentCourseView.classTime || "")
-      );
+      // FIX #6 — async qilindi, try/catch va tugma bloklash qo'shildi
+      async function addStudentToCourse() {
+        if (!currentCourseView || currentUser.role !== "sinf_rahbari") return;
 
-      // FIX #4 — generateId() ishlatildi
-      const newAssignment = {
-        id:          generateId("ca"),
-        studentId:   studentId,
-        studentName: studentName,
-        groupCode:   currentUser.groupCode,
-        subjectId:   currentCourseView.subjectId,
-        subjectName: currentCourseView.subjectName,
-        teacherId:   currentCourseView.teacherId,
-        teacherName: currentCourseView.teacherName,
-        classTime:   currentCourseView.classTime || (existingCourse ? existingCourse.classTime : ""),
-        weekDays:    existingCourse ? existingCourse.weekDays : [],
-        createdBy:   currentUser.login,
-        createdAt:   new Date().toISOString().split("T")[0]
-      };
+        const select = document.getElementById("csmAddStudentSelect");
+        const studentId = select.value;
+        if (!studentId) {
+          showToast("O'quvchi tanlang!", "error");
+          return;
+        }
 
-      setButtonLoading("btnCsmAdd", true);
-      try {
-        await db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment);
-        assignments.push(newAssignment);
-        localStorage.setItem("courseAssignments", JSON.stringify(assignments));
-        renderCourseStudentsList(currentCourseView.subjectId, currentCourseView.teacherId, currentCourseView.classTime);
-        loadAddStudentOptions(currentCourseView.subjectId, currentCourseView.teacherId, currentCourseView.classTime);
-        loadCourseCards();
-        showToast(`${studentName} kursga qo'shildi!`, "success");
-      } catch (err) {
-        showToast("Qo'shishda xatolik: " + err.message, "error");
-      } finally {
-        setButtonLoading("btnCsmAdd", false);
+        const studentName = select.options[select.selectedIndex].dataset.name;
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+
+        const inOtherTeacher = assignments.find(
+          (a) =>
+            String(a.studentId) === String(studentId) &&
+            String(a.subjectId) === String(currentCourseView.subjectId) &&
+            String(a.teacherId) !== String(currentCourseView.teacherId),
+        );
+        if (inOtherTeacher) {
+          showToast(
+            `Bu o'quvchi ${currentCourseView.subjectName} faniga ${inOtherTeacher.teacherName} ga yozilgan!`,
+            "error",
+          );
+          return;
+        }
+
+        const existingCourse = assignments.find(
+          (a) =>
+            String(a.subjectId) === String(currentCourseView.subjectId) &&
+            String(a.teacherId) === String(currentCourseView.teacherId) &&
+            (a.classTime || "") === (currentCourseView.classTime || ""),
+        );
+
+        const newAssignment = {
+          id: generateId("ca"),
+          studentId: studentId,
+          studentName: studentName,
+          groupCode: currentUser.groupCode,
+          subjectId: currentCourseView.subjectId,
+          subjectName: currentCourseView.subjectName,
+          teacherId: currentCourseView.teacherId,
+          teacherName: currentCourseView.teacherName,
+          classTime:
+            currentCourseView.classTime ||
+            (existingCourse ? existingCourse.classTime : ""),
+          weekDays: existingCourse ? existingCourse.weekDays : [],
+          createdBy: currentUser.login,
+          createdAt: new Date().toISOString().split("T")[0],
+        };
+
+        setButtonLoading("btnCsmAdd", true);
+        try {
+          await db
+            .collection("courseAssignments")
+            .doc(newAssignment.id)
+            .set(newAssignment);
+          assignments.push(newAssignment);
+          localStorage.setItem(
+            "courseAssignments",
+            JSON.stringify(assignments),
+          );
+          renderCourseStudentsList(
+            currentCourseView.subjectId,
+            currentCourseView.teacherId,
+            currentCourseView.classTime,
+          );
+          loadAddStudentOptions(
+            currentCourseView.subjectId,
+            currentCourseView.teacherId,
+            currentCourseView.classTime,
+          );
+          loadCourseCards();
+          showToast(`${studentName} kursga qo'shildi!`, "success");
+        } catch (err) {
+          showToast("Qo'shishda xatolik: " + err.message, "error");
+        } finally {
+          setButtonLoading("btnCsmAdd", false);
+        }
       }
-    }
 
-    /* ============================================================
+      /* ============================================================
        KURSGA YOZISH MODAL
        ============================================================ */
-    function openEnrollModal() {
-      if (currentUser.role !== "sinf_rahbari") return;
+      function openEnrollModal() {
+        if (currentUser.role !== "sinf_rahbari") return;
 
-      document.getElementById("enrollGroup").value          = currentUser.groupCode + "-guruh";
-      document.getElementById("enrollGroupName").textContent = `Guruh: ${currentUser.groupCode}`;
+        document.getElementById("enrollGroup").value =
+          currentUser.groupCode + "-guruh";
+        document.getElementById("enrollGroupName").textContent =
+          `Guruh: ${currentUser.groupCode}`;
 
-      loadSubjectOptions();
-      loadStudentsList();
+        loadSubjectOptions();
+        loadStudentsList();
 
-      selectedWeekdays = [];
-      document.querySelectorAll(".weekday-btn").forEach(b => b.classList.remove("selected"));
-      document.getElementById("enrollTeacher").innerHTML = '<option value="">— Avval fan tanlang —</option>';
-      document.getElementById("enrollTime").value        = "";
-      document.getElementById("enrollSubject").value     = "";
+        selectedWeekdays = [];
+        document
+          .querySelectorAll(".weekday-btn")
+          .forEach((b) => b.classList.remove("selected"));
+        document.getElementById("enrollTeacher").innerHTML =
+          '<option value="">— Avval fan tanlang —</option>';
+        document.getElementById("enrollTime").value = "";
+        document.getElementById("enrollSubject").value = "";
 
-      openModal("enrollModal");
-    }
+        openModal("enrollModal");
+      }
 
-    function loadSubjectOptions() {
-      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const select   = document.getElementById("enrollSubject");
-      select.innerHTML = '<option value="">— Fan tanlang —</option>';
-      subjects.forEach(s => {
-        select.innerHTML += `<option value="${s.id}">${s.name}</option>`;
-      });
-    }
+      function loadSubjectOptions() {
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const select = document.getElementById("enrollSubject");
 
-    function onSubjectChange() {
-      const subjectId      = document.getElementById("enrollSubject").value;
-      const teacherSelect  = document.getElementById("enrollTeacher");
-      teacherSelect.innerHTML = '<option value="">— O\'qituvchi tanlang —</option>';
-      if (!subjectId) return;
+        select.innerHTML = '<option value="">— Fan tanlang —</option>';
 
-      const subjects         = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const selectedSubject  = subjects.find(s => String(s.id) === String(subjectId));
-      if (!selectedSubject) return;
+        subjects
+          .sort((a, b) =>
+            String(a.name || "").localeCompare(String(b.name || ""), "uz"),
+          )
+          .forEach((s) => {
+            const subjectId = getSubjectId(s);
+            select.innerHTML += `<option value="${subjectId}">${s.name || subjectId}</option>`;
+          });
+      }
 
-      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
-      teachers.filter(t => t.subject === selectedSubject.name).forEach(t => {
-        teacherSelect.innerHTML += `<option value="${t.id}">${t.fullName} (${t.badgeLabel})</option>`;
-      });
-    }
+      function onSubjectChange() {
+        const subjectId = document.getElementById("enrollSubject").value;
+        const teacherSelect = document.getElementById("enrollTeacher");
 
-    function loadStudentsList() {
-      const students     = JSON.parse(localStorage.getItem("students") || "[]");
-      const groupStudents = students
-        .filter(s => s.groupCode === currentUser.groupCode)
-        .sort((a, b) => a.fullName.localeCompare(b.fullName));
-      const listEl = document.getElementById("enrollStudentList");
+        teacherSelect.innerHTML = `<option value="">— O\'qituvchi tanlang —</option>`;
 
-      let html = `
+        if (!subjectId) {
+          teacherSelect.innerHTML =
+            '<option value="">— Avval fan tanlang —</option>';
+          return;
+        }
+
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+
+        const selectedSubject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+
+        if (!selectedSubject) {
+          teacherSelect.innerHTML = `<option value="">Fan ma\'lumoti topilmadi</option>`;
+          return;
+        }
+
+        const matchedTeachers = teachers.filter((t) =>
+          teacherMatchesSubject(t, subjectId, selectedSubject),
+        );
+
+        if (!matchedTeachers.length) {
+          teacherSelect.innerHTML = `<option value="">Bu fan bo'yicha o\'qituvchi topilmadi</option>`;
+          return;
+        }
+
+        matchedTeachers.forEach((t) => {
+          const option = document.createElement("option");
+          option.value = getTeacherId(t);
+          option.textContent = `${t.fullName || t.login || getTeacherId(t)} (${t.badgeLabel || t.login || "o‘qituvchi"})`;
+          teacherSelect.appendChild(option);
+        });
+      }
+
+      function loadStudentsList() {
+        const students = JSON.parse(localStorage.getItem("students") || "[]");
+        const groupStudents = students
+          .filter((s) => String(s.groupCode) === String(currentUser.groupCode))
+          .sort((a, b) => a.fullName.localeCompare(b.fullName));
+        const listEl = document.getElementById("enrollStudentList");
+
+        let html = `
         <div class="select-all-row">
           <label>
             <input type="checkbox" id="selectAllStudents" onchange="toggleSelectAll(this)" />
@@ -905,335 +1252,339 @@
           <span class="count" id="selectedCount">0 / ${groupStudents.length}</span>
         </div>`;
 
-      groupStudents.forEach(s => {
-        html += `
+        groupStudents.forEach((s) => {
+          html += `
           <div class="student-select-item">
             <input type="checkbox" class="student-checkbox" value="${s.id}" data-name="${s.fullName}" onchange="updateSelectedCount()" />
             <div class="student-info"><div class="s-name">${s.fullName}</div></div>
           </div>`;
-      });
-      listEl.innerHTML = html;
-    }
+        });
+        listEl.innerHTML = html;
+      }
 
-    function toggleSelectAll(checkbox) {
-      document.querySelectorAll(".student-checkbox").forEach(cb => cb.checked = checkbox.checked);
-      updateSelectedCount();
-    }
+      function toggleSelectAll(checkbox) {
+        document
+          .querySelectorAll(".student-checkbox")
+          .forEach((cb) => (cb.checked = checkbox.checked));
+        updateSelectedCount();
+      }
 
-    function updateSelectedCount() {
-      const all     = document.querySelectorAll(".student-checkbox").length;
-      const checked = document.querySelectorAll(".student-checkbox:checked").length;
-      document.getElementById("selectedCount").textContent = `${checked} / ${all}`;
-    }
+      function updateSelectedCount() {
+        const all = document.querySelectorAll(".student-checkbox").length;
+        const checked = document.querySelectorAll(
+          ".student-checkbox:checked",
+        ).length;
+        document.getElementById("selectedCount").textContent =
+          `${checked} / ${all}`;
+      }
 
-    function toggleAddSubject() {
-      const row = document.getElementById("addSubjectRow");
-      row.style.display = row.style.display === "none" ? "flex" : "none";
-    }
+      function toggleAddSubject() {
+        showToast("Yangi fan faqat admin panel orqali qo'shiladi.", "warning");
+      }
 
-    function toggleAddTeacher() {
-      const row = document.getElementById("addTeacherRow");
-      row.style.display = row.style.display === "none" ? "flex" : "none";
-    }
+      function toggleAddTeacher() {
+        showToast(
+          "Yangi o‘qituvchi faqat admin panel orqali qo'shiladi.",
+          "warning",
+        );
+      }
 
-    async function addNewSubject() {
-      const name      = document.getElementById("newSubjectName").value.trim();
-      const shortName = document.getElementById("newSubjectShort").value.trim().toUpperCase();
-      if (!name) { showToast("Fan nomini kiriting!", "error"); return; }
+      async function addNewSubject() {
+        showToast("Yangi fan faqat admin panel orqali qo'shiladi.", "warning");
+        return;
+      }
 
-      const btn     = document.querySelector("#addSubjectRow button");
-      const oldText = btn.textContent;
-      btn.textContent = "Kuting..."; btn.disabled = true;
+      // FIX #3a — Yangi o'qituvchi paroli hash qilinib saqlanadi
+      async function addNewTeacher() {
+        showToast(
+          "Yangi o‘qituvchi faqat admin panel orqali qo'shiladi.",
+          "warning",
+        );
+        return;
+      }
 
-      try {
-        const newRef    = db.collection("subjects").doc();
-        const newSubject = {
-          id:        newRef.id,
-          name:      name,
-          shortName: shortName || name.substring(0, 3).toUpperCase()
-        };
-        await newRef.set(newSubject);
+      function onTimeSelectChange() {
+        const select = document.getElementById("enrollTime");
+        const customInput = document.getElementById("enrollTimeCustom");
+        if (select.value === "__custom__") {
+          customInput.style.display = "block";
+          customInput.focus();
+        } else {
+          customInput.style.display = "none";
+          customInput.value = "";
+        }
+      }
 
+      function getSelectedTime() {
+        const select = document.getElementById("enrollTime");
+        return select.value === "__custom__"
+          ? document.getElementById("enrollTimeCustom").value.trim()
+          : select.value;
+      }
+
+      // FIX #6 — async + try/catch + tugma bloklash qo'shildi
+      async function saveEnrollment() {
+        if (!currentUser || currentUser.role !== "sinf_rahbari") {
+          showToast("Faqat sinf rahbari kursga yozishi mumkin.", "error");
+          return;
+        }
+
+        const subjectId = document.getElementById("enrollSubject").value;
+        const teacherId = document.getElementById("enrollTeacher").value;
+        const classTime = getSelectedTime();
+
+        if (!subjectId) {
+          showToast("Iltimos, fan tanlang!", "error");
+          return;
+        }
+        if (!teacherId) {
+          showToast("Iltimos, o'qituvchi tanlang!", "error");
+          return;
+        }
+        if (!classTime) {
+          showToast("Iltimos, dars vaqtini tanlang!", "error");
+          return;
+        }
+        if (!selectedWeekdays || selectedWeekdays.length === 0) {
+          showToast("Kamida bitta hafta kunini tanlang!", "error");
+          return;
+        }
+
+        const checkedBoxes = document.querySelectorAll(
+          ".student-checkbox:checked",
+        );
+        if (checkedBoxes.length === 0) {
+          showToast("Kamida bitta o‘quvchi tanlang!", "error");
+          return;
+        }
+
+        const students = JSON.parse(localStorage.getItem("students") || "[]");
         const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
-        subjects.push(newSubject);
-        localStorage.setItem("subjects", JSON.stringify(subjects));
-
-        loadSubjectOptions();
-        document.getElementById("enrollSubject").value = newRef.id;
-        onSubjectChange();
-        document.getElementById("newSubjectName").value  = "";
-        document.getElementById("newSubjectShort").value = "";
-        document.getElementById("addSubjectRow").style.display = "none";
-        showToast(`"${name}" fani saqlandi!`, "success");
-      } catch (err) {
-        showToast("Xatolik: " + err.message, "error");
-      } finally {
-        btn.textContent = oldText; btn.disabled = false;
-      }
-    }
-
-    // FIX #3a — Yangi o'qituvchi paroli hash qilinib saqlanadi
-    async function addNewTeacher() {
-      const name     = document.getElementById("newTeacherName").value.trim();
-      const type     = document.getElementById("newTeacherType").value;
-      const login    = document.getElementById("newTeacherLogin").value.trim();
-      const password = document.getElementById("newTeacherPassword").value.trim();
-
-      if (!name)                       { showToast("O'qituvchi nomini kiriting!", "error"); return; }
-      if (!login || login.length < 3)  { showToast("Login kamida 3 harfdan iborat bo'lishi kerak!", "error"); return; }
-      if (!password || password.length !== 4) { showToast("Parol aniq 4 ta son bo'lishi kerak!", "error"); return; }
-
-      const subjectId = document.getElementById("enrollSubject").value;
-      if (!subjectId) { showToast("Avval fan tanlang!", "error"); return; }
-
-      const subjects        = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const selectedSubject = subjects.find(s => String(s.id) === String(subjectId));
-      if (!selectedSubject) return;
-
-      setButtonLoading("btnAddTeacher", true);
-
-      try {
-        const snap = await db.collection("teachers").where("login", "==", login).get();
-        if (!snap.empty) { showToast("Bu login o'qituvchilar bazasida band!", "error"); return; }
-
-        // FIX #3a — parol hash qilinadi, ochiq matn saqlanmaydi
-        const passwordHash = await hashPassword(password);
-        const badgeLabel   = type === "ichki" ? "Ichki o'qituvchi" : "Tashqi o'qituvchi";
-        const newRef       = db.collection("teachers").doc();
-
-        const newTeacher = {
-          id:          newRef.id,
-          fullName:    name,
-          subject:     selectedSubject.name,
-          type:        type,
-          role:        "oqituvchi",
-          badgeLabel:  badgeLabel,
-          login:       login,
-          password:    passwordHash   // Ochiq matn emas, hash saqlanadi
-        };
-        await newRef.set(newTeacher);
-
         const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
-        teachers.push(newTeacher);
-        localStorage.setItem("teachers", JSON.stringify(teachers));
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
 
-        onSubjectChange();
-        document.getElementById("enrollTeacher").value        = newRef.id;
-        document.getElementById("newTeacherName").value       = "";
-        document.getElementById("newTeacherLogin").value      = "";
-        document.getElementById("newTeacherPassword").value   = "";
-        document.getElementById("addTeacherRow").style.display = "none";
+        const subject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+        const teacher = teachers.find(
+          (t) => String(getTeacherId(t)) === String(teacherId),
+        );
 
-        showToast(`"${name}" bazaga saqlandi!`, "success");
-      } catch (err) {
-        showToast("Xatolik: " + err.message, "error");
-      } finally {
-        setButtonLoading("btnAddTeacher", false);
-      }
-    }
+        if (!subject) {
+          showToast("Fan ma’lumoti topilmadi.", "error");
+          return;
+        }
+        if (!teacher) {
+          showToast("O‘qituvchi ma’lumoti topilmadi.", "error");
+          return;
+        }
 
-    function onTimeSelectChange() {
-      const select      = document.getElementById("enrollTime");
-      const customInput = document.getElementById("enrollTimeCustom");
-      if (select.value === "__custom__") {
-        customInput.style.display = "block";
-        customInput.focus();
-      } else {
-        customInput.style.display = "none";
-        customInput.value = "";
-      }
-    }
+        setButtonLoading("btnSaveEnroll", true);
 
-    function getSelectedTime() {
-      const select = document.getElementById("enrollTime");
-      return select.value === "__custom__"
-        ? document.getElementById("enrollTimeCustom").value.trim()
-        : select.value;
-    }
+        try {
+          const batch = db.batch();
+          let newCount = 0;
+          let skipCount = 0;
 
-    // FIX #6 — async + try/catch + tugma bloklash qo'shildi
-    async function saveEnrollment() {
-      const subjectId = document.getElementById("enrollSubject").value;
-      const teacherId = document.getElementById("enrollTeacher").value;
-      const classTime = getSelectedTime();
+          checkedBoxes.forEach((cb) => {
+            const studentId = cb.value;
+            const student = students.find(
+              (s) => String(s.id) === String(studentId),
+            );
 
-      if (!subjectId)                  { showToast("Iltimos, fan tanlang!", "error"); return; }
-      if (!teacherId)                  { showToast("Iltimos, o'qituvchi tanlang!", "error"); return; }
-      if (!classTime)                  { showToast("Iltimos, dars vaqtini tanlang!", "error"); return; }
-      if (selectedWeekdays.length === 0){ showToast("Kamida bitta hafta kunini tanlang!", "error"); return; }
+            if (!student) {
+              skipCount++;
+              return;
+            }
 
-      const checkedBoxes = document.querySelectorAll(".student-checkbox:checked");
-      if (checkedBoxes.length === 0)   { showToast("Kamida bitta o'quvchi tanlang!", "error"); return; }
+            // Mentor faqat o‘z guruhidagi o‘quvchini yozishi mumkin.
+            if (String(student.groupCode) !== String(currentUser.groupCode)) {
+              skipCount++;
+              return;
+            }
 
-      const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
-      const subject  = subjects.find(s => String(s.id) === String(subjectId));
-      const teacher  = teachers.find(t => String(t.id) === String(teacherId));
+            // Duplicate: o‘quvchi + fan + o‘qituvchi + vaqt.
+            const alreadyExists = assignments.some(
+              (a) =>
+                String(a.studentId) === String(student.id) &&
+                String(a.subjectId) === String(subjectId) &&
+                String(a.teacherId) === String(teacherId) &&
+                String(a.classTime) === String(classTime),
+            );
 
-      setButtonLoading("btnSaveEnroll", true);
+            // Agar sizda bir o‘quvchi bitta fandan faqat bitta o‘qituvchida bo‘lishi shart bo‘lsa, bu blok qoladi.
+            const inOtherTeacher = assignments.find(
+              (a) =>
+                String(a.studentId) === String(student.id) &&
+                String(a.subjectId) === String(subjectId) &&
+                String(a.teacherId) !== String(teacherId),
+            );
 
-      try {
-        const assignments = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-        const writes      = [];
-        let newCount  = 0;
-        let skipCount = 0;
+            if (alreadyExists || inOtherTeacher) {
+              skipCount++;
+              return;
+            }
 
-        checkedBoxes.forEach(cb => {
-          const studentId   = cb.value;
-          const studentName = cb.dataset.name;
+            const docId = `ca_${makeSafeDocId(student.id)}_${makeSafeDocId(subjectId)}_${makeSafeDocId(teacherId)}_${makeSafeDocId(classTime)}`;
 
-          const alreadyExists = assignments.some(a =>
-            String(a.studentId) === String(studentId) &&
-            String(a.subjectId) === String(subjectId) &&
-            String(a.teacherId) === String(teacherId)
-          );
-
-          const inOtherTeacher = assignments.find(a =>
-            String(a.studentId) === String(studentId) &&
-            String(a.subjectId) === String(subjectId) &&
-            String(a.teacherId) !== String(teacherId)
-          );
-
-          if (inOtherTeacher || alreadyExists) {
-            skipCount++;
-          } else {
-            // FIX #4 — generateId() ishlatildi
             const newAssignment = {
-              id:          generateId("ca"),
-              studentId:   studentId,
-              studentName: studentName,
-              groupCode:   currentUser.groupCode,
-              subjectId:   subjectId,
-              subjectName: subject.name,
-              teacherId:   teacherId,
-              teacherName: teacher.fullName,
-              classTime:   classTime,
-              weekDays:    [...selectedWeekdays],
-              createdBy:   currentUser.login,
-              createdAt:   new Date().toISOString().split("T")[0]
+              id: docId,
+
+              studentId: String(student.id),
+              studentName: student.fullName || cb.dataset.name || "",
+              studentNumber: student.studentNumber || "",
+              groupCode: String(student.groupCode),
+
+              subjectId: String(subjectId),
+              subjectName:
+                subject.name || subject.shortName || String(subjectId),
+
+              teacherId: String(teacherId),
+              teacherName:
+                teacher.fullName || teacher.login || String(teacherId),
+              teacherLogin: teacher.login || "",
+
+              classTime: classTime,
+
+              // Eski/yangi kodlar bir xil ishlashi uchun ikkalasi ham yoziladi.
+              weekDays: [...selectedWeekdays],
+              weekdays: [...selectedWeekdays],
+
+              createdBy: currentUser.login,
+              createdByUid: currentUser.uid || "",
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              active: true,
             };
-            assignments.push(newAssignment);
-            // Barcha write'lar to'plamda bajariladi
-            writes.push(db.collection("courseAssignments").doc(newAssignment.id).set(newAssignment));
+
+            assignments.push({
+              ...newAssignment,
+              createdAt: new Date().toISOString(),
+            });
+
+            batch.set(
+              db.collection("courseAssignments").doc(docId),
+              newAssignment,
+              { merge: true },
+            );
+
             newCount++;
+          });
+
+          if (newCount === 0) {
+            showToast(
+              "Yangi yozuv yaratilmadi. Tanlangan o‘quvchilar avval yozilgan bo‘lishi mumkin.",
+              "warning",
+            );
+            return;
           }
-        });
 
-        // FIX #6 — Barcha Firebase write'lar await bilan kutiladi
-        await Promise.all(writes);
-        localStorage.setItem("courseAssignments", JSON.stringify(assignments));
+          await batch.commit();
+          localStorage.setItem(
+            "courseAssignments",
+            JSON.stringify(assignments),
+          );
 
-        closeModal("enrollModal");
-        loadCourseCards();
+          closeModal("enrollModal");
+          loadCourseCards();
 
-        let msg = `${newCount} ta o'quvchi "${subject.name}" kursiga yozildi!`;
-        if (skipCount > 0) msg += ` (${skipCount} ta allaqachon yozilgan edi)`;
-        showToast(msg, "success");
-      } catch (err) {
-        showToast("Saqlashda xatolik: " + err.message, "error");
-      } finally {
-        setButtonLoading("btnSaveEnroll", false);
+          let msg = `${newCount} ta o‘quvchi "${subject.name || subjectId}" kursiga yozildi!`;
+          if (skipCount > 0)
+            msg += ` (${skipCount} ta yozuv o‘tkazib yuborildi)`;
+          showToast(msg, "success");
+        } catch (err) {
+          console.error(err);
+          showToast("Saqlashda xatolik: " + err.message, "error");
+        } finally {
+          setButtonLoading("btnSaveEnroll", false);
+        }
       }
-    }
 
-    function setupWeekdayButtons() {
-      document.querySelectorAll(".weekday-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const day = btn.dataset.day;
-          btn.classList.toggle("selected");
-          if (btn.classList.contains("selected")) {
-            selectedWeekdays.push(day);
-          } else {
-            selectedWeekdays = selectedWeekdays.filter(d => d !== day);
-          }
+      function setupWeekdayButtons() {
+        document.querySelectorAll(".weekday-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const day = btn.dataset.day;
+            btn.classList.toggle("selected");
+            if (btn.classList.contains("selected")) {
+              selectedWeekdays.push(day);
+            } else {
+              selectedWeekdays = selectedWeekdays.filter((d) => d !== day);
+            }
+          });
         });
-      });
-    }
+      }
 
-    /* ============================================================
+      /* ============================================================
        DAVOMAT OLISH MODAL
        ============================================================ */
-    function openAttendanceModal(subjectId, teacherId, classTime) {
-      if (currentUser.role !== "oqituvchi" || String(currentUser.id) !== String(teacherId)) {
-        showToast("Sizda bu kursga davomat olish huquqi yo'q!", "error");
-        return;
+      function openAttendanceModal(subjectId, teacherId, classTime) {
+        if (
+          currentUser.role !== "oqituvchi" ||
+          String(currentUser.id) !== String(teacherId)
+        ) {
+          showToast("Sizda bu kursga davomat olish huquqi yo'q!", "error");
+          return;
+        }
+
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const subject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+        const courseStudents = assignments.filter(
+          (a) =>
+            String(a.subjectId) === String(subjectId) &&
+            String(a.teacherId) === String(teacherId) &&
+            (a.classTime || "") === (classTime || ""),
+        );
+
+        if (courseStudents.length === 0) {
+          showToast("Bu kursda hali o'quvchilar yo'q!", "error");
+          return;
+        }
+
+        currentAttendanceCourse = {
+          subjectId,
+          teacherId,
+          classTime,
+          subjectName: subject ? subject.name : "",
+          students: courseStudents,
+        };
+
+        document.getElementById("attendanceSubTitle").textContent =
+          `${currentAttendanceCourse.subjectName} (${currentUser.fullName}) uchun davomat`;
+        document.getElementById("attendanceReason").value =
+          currentAttendanceCourse.subjectName;
+
+        const paraSelect = document.getElementById("attendancePara");
+        paraSelect.innerHTML = '<option value="">— Tanlang —</option>';
+        if (classTime) {
+          paraSelect.innerHTML += `<option value="${classTime}">${classTime}</option>`;
+          paraSelect.value = classTime;
+        }
+
+        renderAttendanceStudents(courseStudents);
+        openModal("attendanceModal");
       }
 
-      const subjects       = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const subject        = subjects.find(s => String(s.id) === String(subjectId));
-      const assignments    = JSON.parse(localStorage.getItem("courseAssignments") || "[]");
-      const courseStudents = assignments.filter(a =>
-        String(a.subjectId) === String(subjectId) &&
-        String(a.teacherId) === String(teacherId) &&
-        (a.classTime || "") === (classTime || "")
-      );
-
-      if (courseStudents.length === 0) {
-        showToast("Bu kursda hali o'quvchilar yo'q!", "error");
-        return;
-      }
-
-      currentAttendanceCourse = {
-        subjectId,
-        teacherId,
-        classTime,
-        subjectName: subject ? subject.name : "",
-        students:    courseStudents
-      };
-
-      document.getElementById("attendanceSubTitle").textContent =
-        `${currentAttendanceCourse.subjectName} (${currentUser.fullName}) uchun davomat`;
-      document.getElementById("attendanceReason").value = currentAttendanceCourse.subjectName;
-
-      const paraSelect = document.getElementById("attendancePara");
-      paraSelect.innerHTML = '<option value="">— Tanlang —</option>';
-      if (classTime) {
-        paraSelect.innerHTML += `<option value="${classTime}">${classTime}</option>`;
-        paraSelect.value = classTime;
-      }
-
-      const pwdInput = document.getElementById("attendancePassword");
-      const confirmEl = document.getElementById("confirmMessage");
-      pwdInput.value = "";
-      confirmEl.classList.remove("show");
-      confirmEl.style.color = "";
-
-      // FIX #3b — comparePassword() bilan tekshiriladi
-      pwdInput.oninput = async function () {
-        if (this.value.length === 4) {
-          const isValid = await comparePassword(this.value, currentUser.password);
-          if (isValid) {
-            confirmEl.textContent = `✓ Tasdiqlandi: ${currentUser.fullName} (${currentUser.subject})`;
-            confirmEl.style.color = "";
-          } else {
-            confirmEl.textContent = "✕ Parol noto'g'ri!";
-            confirmEl.style.color = "var(--accent-red)";
+      function renderAttendanceStudents(students) {
+        const listEl = document.getElementById("attendanceList");
+        const uniqueStudents = [];
+        const seenIds = new Set();
+        students.forEach((s) => {
+          if (!seenIds.has(s.studentId)) {
+            seenIds.add(s.studentId);
+            uniqueStudents.push(s);
           }
-          confirmEl.classList.add("show");
-        } else {
-          confirmEl.classList.remove("show");
-          confirmEl.style.color = "";
-        }
-      };
+        });
 
-      renderAttendanceStudents(courseStudents);
-      openModal("attendanceModal");
-    }
-
-    function renderAttendanceStudents(students) {
-      const listEl       = document.getElementById("attendanceList");
-      const uniqueStudents = [];
-      const seenIds      = new Set();
-      students.forEach(s => {
-        if (!seenIds.has(s.studentId)) {
-          seenIds.add(s.studentId);
-          uniqueStudents.push(s);
-        }
-      });
-
-      let html = '<div class="attendance-list-header">O\'quvchilar ro\'yxati</div>';
-      uniqueStudents.forEach((s, i) => {
-        html += `
+        let html =
+          "<div class=\"attendance-list-header\">O'quvchilar ro'yxati</div>";
+        uniqueStudents.forEach((s, i) => {
+          html += `
           <div class="attendance-item">
             <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
             <div class="attendance-item-info">
@@ -1245,158 +1596,218 @@
               <span class="toggle-slider"></span>
             </label>
           </div>`;
-      });
-      listEl.innerHTML = html;
-      updateAttendanceSummary();
-    }
-
-    function updateAttendanceSummary() {
-      const toggles = document.querySelectorAll('#attendanceList input[type="checkbox"]');
-      let kelgan = 0, kelmagan = 0;
-      toggles.forEach(t => t.checked ? kelgan++ : kelmagan++);
-      document.getElementById("kelganCount").textContent   = kelgan;
-      document.getElementById("kelmaganCount").textContent = kelmagan;
-    }
-
-    // FIX #6 — async + try/catch + tugma bloklash + comparePassword()
-    async function saveAttendance() {
-      if (!currentAttendanceCourse) return;
-
-      const date     = document.getElementById("attendanceDate").value;
-      const para     = document.getElementById("attendancePara").value;
-      const password = document.getElementById("attendancePassword").value;
-      const reason   = document.getElementById("attendanceReason").value;
-
-      if (!date)                      { showToast("Sanani tanlang!", "error"); return; }
-      if (!para)                      { showToast("Para vaqtini tanlang!", "error"); return; }
-      if (!password || password.length !== 4) { showToast("4 xonali parolni kiriting!", "error"); return; }
-
-      // FIX #3b — parol hash bilan taqqoslanadi
-      const isValid = await comparePassword(password, currentUser.password);
-      if (!isValid) { showToast("Parol noto'g'ri!", "error"); return; }
-
-      const toggles = document.querySelectorAll('#attendanceList input[type="checkbox"]');
-      const records = [];
-      toggles.forEach(t => {
-        records.push({
-          studentId:   t.dataset.studentId,
-          studentName: t.dataset.studentName,
-          groupCode:   t.dataset.group,
-          status:      t.checked ? "kelgan" : "kelmagan"
         });
-      });
+        listEl.innerHTML = html;
+        updateAttendanceSummary();
+      }
 
-      // FIX #4 — generateId() ishlatildi
-      const attendanceRecord = {
-        id:          generateId("att"),
-        teacherId:   currentUser.id,
-        teacherLogin: currentUser.login,
-        teacherName: currentUser.fullName,
-        subjectId:   currentAttendanceCourse.subjectId,
-        subjectName: currentAttendanceCourse.subjectName,
-        date:        date,
-        classTime:   para,
-        reason:      reason,
-        records:     records,
-        confirmedBy: currentUser.login,
-        createdAt:   new Date().toISOString()
-      };
+      function updateAttendanceSummary() {
+        const toggles = document.querySelectorAll(
+          '#attendanceList input[type="checkbox"]',
+        );
+        let kelgan = 0,
+          kelmagan = 0;
+        toggles.forEach((t) => (t.checked ? kelgan++ : kelmagan++));
+        document.getElementById("kelganCount").textContent = kelgan;
+        document.getElementById("kelmaganCount").textContent = kelmagan;
+      }
 
-      setButtonLoading("btnSaveAttendance", true);
+      // FIX #6 — async + try/catch + Firebase Auth role tekshiruvi
+      async function saveAttendance() {
+        if (!currentAttendanceCourse) return;
 
-      try {
-        const attendance  = JSON.parse(localStorage.getItem("attendance") || "[]");
-        // FIX #8 — classTime to'liq mos kelganda yangilash
-        const existIndex  = attendance.findIndex(a =>
-          a.date === date &&
-          String(a.subjectId) === String(currentAttendanceCourse.subjectId) &&
-          String(a.teacherId) === String(currentUser.id) &&
-          (a.classTime || "").trim() === (para || "").trim()
+        if (
+          !currentUser ||
+          currentUser.role !== "oqituvchi" ||
+          String(currentUser.id) !== String(currentAttendanceCourse.teacherId)
+        ) {
+          showToast("Sizda bu kursga davomat saqlash huquqi yo‘q!", "error");
+          return;
+        }
+
+        const date = document.getElementById("attendanceDate").value;
+        const para = document.getElementById("attendancePara").value;
+        const reason = document.getElementById("attendanceReason").value;
+
+        if (!date) {
+          showToast("Sanani tanlang!", "error");
+          return;
+        }
+
+        if (!para) {
+          showToast("Para vaqtini tanlang!", "error");
+          return;
+        }
+
+        const toggles = document.querySelectorAll(
+          '#attendanceList input[type="checkbox"]',
         );
 
-        if (existIndex >= 0) {
-          attendanceRecord.id      = attendance[existIndex].id;
-          attendance[existIndex]   = attendanceRecord;
-        } else {
-          attendance.push(attendanceRecord);
+        const records = [];
+
+        toggles.forEach((t) => {
+          records.push({
+            studentId: t.dataset.studentId,
+            studentName: t.dataset.studentName,
+            groupCode: t.dataset.group,
+            status: t.checked ? "kelgan" : "kelmagan",
+          });
+        });
+
+        const attendanceRecord = {
+          id: generateId("att"),
+          teacherId: currentUser.id,
+          teacherLogin: currentUser.login,
+          teacherName: currentUser.fullName,
+          subjectId: currentAttendanceCourse.subjectId,
+          subjectName: currentAttendanceCourse.subjectName,
+          date: date,
+          classTime: para,
+          reason: reason,
+          records: records,
+          confirmedBy: currentUser.login,
+          confirmedByUid: currentUser.uid || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+
+        setButtonLoading("btnSaveAttendance", true);
+
+        try {
+          const attendance = JSON.parse(
+            localStorage.getItem("attendance") || "[]",
+          );
+
+          const existIndex = attendance.findIndex(
+            (a) =>
+              a.date === date &&
+              String(a.subjectId) ===
+                String(currentAttendanceCourse.subjectId) &&
+              String(a.teacherId) === String(currentUser.id) &&
+              (a.classTime || "").trim() === (para || "").trim(),
+          );
+
+          if (existIndex >= 0) {
+            attendanceRecord.id = attendance[existIndex].id;
+            attendance[existIndex] = {
+              ...attendanceRecord,
+              createdAt: new Date().toISOString(),
+            };
+          } else {
+            attendance.push({
+              ...attendanceRecord,
+              createdAt: new Date().toISOString(),
+            });
+          }
+
+          await db
+            .collection("attendance")
+            .doc(attendanceRecord.id)
+            .set(attendanceRecord, { merge: true });
+
+          localStorage.setItem("attendance", JSON.stringify(attendance));
+
+          closeModal("attendanceModal");
+          currentAttendanceCourse = null;
+
+          const kelgan = records.filter((r) => r.status === "kelgan").length;
+          const kelmagan = records.filter(
+            (r) => r.status === "kelmagan",
+          ).length;
+
+          showToast(
+            `Davomat saqlandi! Kelgan: ${kelgan}, Kelmagan: ${kelmagan}`,
+            "success",
+          );
+
+          loadCourseCards();
+        } catch (err) {
+          console.error(err);
+          showToast("Davomat saqlashda xatolik: " + err.message, "error");
+        } finally {
+          setButtonLoading("btnSaveAttendance", false);
         }
-
-        await db.collection("attendance").doc(attendanceRecord.id).set(attendanceRecord);
-        localStorage.setItem("attendance", JSON.stringify(attendance));
-
-        closeModal("attendanceModal");
-        currentAttendanceCourse = null;
-
-        const kelgan   = records.filter(r => r.status === "kelgan").length;
-        const kelmagan = records.filter(r => r.status === "kelmagan").length;
-        showToast(`Davomat saqlandi! Kelgan: ${kelgan}, Kelmagan: ${kelmagan}`, "success");
-        loadCourseCards();
-      } catch (err) {
-        showToast("Davomat saqlashda xatolik: " + err.message, "error");
-      } finally {
-        setButtonLoading("btnSaveAttendance", false);
       }
-    }
-
-    /* ============================================================
+      /* ============================================================
        BAHOLASH (GRADING)
        ============================================================ */
-    function openGradingModal(subjectId, teacherId, classTime) {
-      if (currentUser.role !== "oqituvchi" || String(currentUser.id) !== String(teacherId)) {
-        showToast("Sizda bu kursni baholash huquqi yo'q!", "error");
-        return;
-      }
-
-      const subjects      = JSON.parse(localStorage.getItem("subjects") || "[]");
-      const subject       = subjects.find(s => String(s.id) === String(subjectId));
-      const allAttendance = JSON.parse(localStorage.getItem("attendance") || "[]");
-      const now           = new Date();
-      const todayStr      = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-
-      // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi
-      const courseTime = (classTime || "").trim();
-      const todayAttendance = allAttendance.find(att =>
-        att.date === todayStr &&
-        String(att.subjectId) === String(subjectId) &&
-        String(att.teacherId) === String(teacherId) &&
-        (att.classTime || "").trim() === courseTime
-      );
-
-      if (!todayAttendance) { showToast("Bugun uchun davomat topilmadi!", "error"); return; }
-
-      const kelganStudents = todayAttendance.records.filter(r => r.status === "kelgan");
-      if (kelganStudents.length === 0) { showToast("Bugun kelgan o'quvchi yo'q!", "error"); return; }
-
-      currentGradingCourse = {
-        subjectId,
-        teacherId,
-        classTime,
-        subjectName:  subject ? subject.name : "",
-        date:         todayStr,
-        attendanceId: todayAttendance.id
-      };
-
-      document.getElementById("gradingSubTitle").textContent =
-        `${currentGradingCourse.subjectName} (${currentUser.fullName}) — ${classTime}`;
-
-      const existingGrades = JSON.parse(localStorage.getItem("grades") || "[]");
-      const todayGrade     = existingGrades.find(g =>
-        g.date === todayStr &&
-        String(g.subjectId) === String(subjectId) &&
-        String(g.teacherId) === String(teacherId) &&
-        (g.classTime || "").trim() === courseTime
-      );
-
-      const listEl = document.getElementById("gradingList");
-      let html = '<div class="attendance-list-header">O\'quvchilarni baholash (faqat kelganlar)</div>';
-
-      kelganStudents.forEach((s, i) => {
-        let existingGradeValue = "";
-        if (todayGrade) {
-          const sg = todayGrade.grades.find(g => g.studentId === s.studentId);
-          if (sg) existingGradeValue = sg.grade;
+      function openGradingModal(subjectId, teacherId, classTime) {
+        if (
+          currentUser.role !== "oqituvchi" ||
+          String(currentUser.id) !== String(teacherId)
+        ) {
+          showToast("Sizda bu kursni baholash huquqi yo'q!", "error");
+          return;
         }
-        html += `
+
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const subject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+        const allAttendance = JSON.parse(
+          localStorage.getItem("attendance") || "[]",
+        );
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+        // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi
+        const courseTime = (classTime || "").trim();
+        const todayAttendance = allAttendance.find(
+          (att) =>
+            att.date === todayStr &&
+            String(att.subjectId) === String(subjectId) &&
+            String(att.teacherId) === String(teacherId) &&
+            (att.classTime || "").trim() === courseTime,
+        );
+
+        if (!todayAttendance) {
+          showToast("Bugun uchun davomat topilmadi!", "error");
+          return;
+        }
+
+        const kelganStudents = todayAttendance.records.filter(
+          (r) => r.status === "kelgan",
+        );
+        if (kelganStudents.length === 0) {
+          showToast("Bugun kelgan o'quvchi yo'q!", "error");
+          return;
+        }
+
+        currentGradingCourse = {
+          subjectId,
+          teacherId,
+          classTime,
+          subjectName: subject ? subject.name : "",
+          date: todayStr,
+          attendanceId: todayAttendance.id,
+        };
+
+        document.getElementById("gradingSubTitle").textContent =
+          `${currentGradingCourse.subjectName} (${currentUser.fullName}) — ${classTime}`;
+
+        const existingGrades = JSON.parse(
+          localStorage.getItem("grades") || "[]",
+        );
+        const todayGrade = existingGrades.find(
+          (g) =>
+            g.date === todayStr &&
+            String(g.subjectId) === String(subjectId) &&
+            String(g.teacherId) === String(teacherId) &&
+            (g.classTime || "").trim() === courseTime,
+        );
+
+        const listEl = document.getElementById("gradingList");
+        let html =
+          '<div class="attendance-list-header">O\'quvchilarni baholash (faqat kelganlar)</div>';
+
+        kelganStudents.forEach((s, i) => {
+          let existingGradeValue = "";
+          if (todayGrade) {
+            const sg = todayGrade.grades.find(
+              (g) => g.studentId === s.studentId,
+            );
+            if (sg) existingGradeValue = sg.grade;
+          }
+          html += `
           <div class="attendance-item">
             <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
             <div class="attendance-item-info">
@@ -1406,8 +1817,7 @@
             <select class="form-input grade-select"
               data-student-id="${s.studentId}"
               data-student-name="${s.studentName}"
-              data-group="${s.groupCode}"
-              style="width:80px;flex:none;">
+              data-group="${s.groupCode}">
               <option value="">—</option>
               <option value="5" ${existingGradeValue == 5 ? "selected" : ""}>5</option>
               <option value="4" ${existingGradeValue == 4 ? "selected" : ""}>4</option>
@@ -1415,130 +1825,404 @@
               <option value="2" ${existingGradeValue == 2 ? "selected" : ""}>2</option>
             </select>
           </div>`;
-      });
+        });
 
-      listEl.innerHTML = html;
-      openModal("gradingModal");
-    }
+        listEl.innerHTML = html;
+        openModal("gradingModal");
+      }
 
-    // FIX #6 — async + try/catch + tugma bloklash
-    async function saveGrades() {
-      if (!currentGradingCourse) return;
+      // FIX #6 — async + try/catch + tugma bloklash
+      async function saveGrades() {
+        if (!currentGradingCourse) return;
 
-      const gradeSelects = document.querySelectorAll("#gradingList .grade-select");
-      const gradesArr    = [];
-      gradeSelects.forEach(sel => {
-        if (sel.value) {
-          gradesArr.push({
-            studentId:   sel.dataset.studentId,
-            studentName: sel.dataset.studentName,
-            groupCode:   sel.dataset.group,
-            grade:       parseInt(sel.value)
-          });
+        const gradeSelects = document.querySelectorAll(
+          "#gradingList .grade-select",
+        );
+        const gradesArr = [];
+        gradeSelects.forEach((sel) => {
+          if (sel.value) {
+            gradesArr.push({
+              studentId: sel.dataset.studentId,
+              studentName: sel.dataset.studentName,
+              groupCode: sel.dataset.group,
+              grade: parseInt(sel.value),
+            });
+          }
+        });
+
+        if (gradesArr.length === 0) {
+          showToast("Kamida bitta o'quvchiga baho qo'ying!", "error");
+          return;
         }
-      });
 
-      if (gradesArr.length === 0) { showToast("Kamida bitta o'quvchiga baho qo'ying!", "error"); return; }
+        // FIX #4 — generateId() ishlatildi
+        const gradeRecord = {
+          id: generateId("gr"),
+          subjectId: currentGradingCourse.subjectId,
+          teacherId: currentGradingCourse.teacherId,
+          teacherName: currentUser.fullName,
+          subjectName: currentGradingCourse.subjectName,
+          classTime: currentGradingCourse.classTime,
+          date: currentGradingCourse.date,
+          attendanceId: currentGradingCourse.attendanceId,
+          grades: gradesArr,
+          createdAt: new Date().toISOString(),
+        };
 
-      // FIX #4 — generateId() ishlatildi
-      const gradeRecord = {
-        id:          generateId("gr"),
-        subjectId:   currentGradingCourse.subjectId,
-        teacherId:   currentGradingCourse.teacherId,
-        teacherName: currentUser.fullName,
-        subjectName: currentGradingCourse.subjectName,
-        classTime:   currentGradingCourse.classTime,
-        date:        currentGradingCourse.date,
-        attendanceId: currentGradingCourse.attendanceId,
-        grades:      gradesArr,
-        createdAt:   new Date().toISOString()
-      };
+        setButtonLoading("btnSaveGrades", true);
 
-      setButtonLoading("btnSaveGrades", true);
+        try {
+          const allGrades = JSON.parse(localStorage.getItem("grades") || "[]");
+          const courseTime = (currentGradingCourse.classTime || "").trim();
+          const existIndex = allGrades.findIndex(
+            (g) =>
+              g.date === currentGradingCourse.date &&
+              String(g.subjectId) === String(currentGradingCourse.subjectId) &&
+              String(g.teacherId) === String(currentGradingCourse.teacherId) &&
+              (g.classTime || "").trim() === courseTime,
+          );
 
-      try {
-        const allGrades  = JSON.parse(localStorage.getItem("grades") || "[]");
-        const courseTime = (currentGradingCourse.classTime || "").trim();
-        const existIndex = allGrades.findIndex(g =>
-          g.date === currentGradingCourse.date &&
-          String(g.subjectId) === String(currentGradingCourse.subjectId) &&
-          String(g.teacherId) === String(currentGradingCourse.teacherId) &&
-          (g.classTime || "").trim() === courseTime
+          if (existIndex >= 0) {
+            // FIX #4 — Eski ID saqlanadi, Firebase'da yangi hujjat YARATILMAYDI
+            gradeRecord.id = allGrades[existIndex].id;
+            allGrades[existIndex] = gradeRecord;
+          } else {
+            allGrades.push(gradeRecord);
+          }
+
+          await db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
+          localStorage.setItem("grades", JSON.stringify(allGrades));
+
+          closeModal("gradingModal");
+          currentGradingCourse = null;
+          showToast(
+            `${gradesArr.length} ta o'quvchiga baho qo'yildi!`,
+            "success",
+          );
+        } catch (err) {
+          showToast("Baholarda xatolik: " + err.message, "error");
+        } finally {
+          setButtonLoading("btnSaveGrades", false);
+        }
+      }
+
+      /* ============================================================
+       DAVOMAT STATISTIKASI
+       ============================================================ */
+
+      /** Haftalik yoki oylik sana oralig'ini qaytaradi */
+      function getStatsDateRange(mode) {
+        const now = new Date();
+        const today = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
         );
 
-        if (existIndex >= 0) {
-          allGrades[existIndex] = gradeRecord;
+        if (mode === "weekly") {
+          // To'liq hafta: Dushanba → Yakshanba.
+          // Shunda haftada 3 ta dars bo'lsa, bugun seshanba bo'lsa ham "Jami: 3" chiqadi.
+          const dow = today.getDay(); // 0=Yakshanba ... 6=Shanba
+          const diff = dow === 0 ? -6 : 1 - dow;
+          const monday = new Date(today);
+          monday.setDate(today.getDate() + diff);
+
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+
+          return { start: monday, end: sunday };
         } else {
-          allGrades.push(gradeRecord);
+          // Oylik statistika: oyning 1-kunidan bugungacha.
+          const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+          return { start: firstDay, end: today };
+        }
+      }
+
+      /** Date obyektini "YYYY-MM-DD" formatga o'tkazadi */
+      function dateToStr(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      /** Berilgan oraliqda o'quv kunlari (weekDays ga mos) sonini hisoblaydi */
+      const UZ_DAYS = [
+        "Yakshanba",
+        "Dushanba",
+        "Seshanba",
+        "Chorshanba",
+        "Payshanba",
+        "Juma",
+        "Shanba",
+      ];
+      function countExpectedSessions(weekDays, startDate, endDate) {
+        if (!weekDays || weekDays.length === 0) return 0;
+        let count = 0;
+        const d = new Date(startDate);
+        while (d <= endDate) {
+          if (weekDays.includes(UZ_DAYS[d.getDay()])) count++;
+          d.setDate(d.getDate() + 1);
+        }
+        return count;
+      }
+
+      /** Statistika modalini ochadi */
+      function openStatsModal(subjectId, teacherId, classTime) {
+        const subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+        const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+        const subject = subjects.find(
+          (s) => String(getSubjectId(s)) === String(subjectId),
+        );
+        const teacher = teachers.find(
+          (t) => String(getTeacherId(t)) === String(teacherId),
+        );
+
+        currentStatsCourse = { subjectId, teacherId, classTime };
+        currentStatsMode = "weekly";
+
+        // Sarlavha
+        const color = subjectColors[subject?.name] || "#448aff";
+        const iconEl = document.getElementById("statsIcon");
+        iconEl.style.background = color + "22";
+        iconEl.innerHTML = `<i class="fa-solid fa-chart-bar"></i>`;
+        document.getElementById("statsTitle").textContent =
+          subject?.name || "Kurs statistikasi";
+        document.getElementById("statsSubTitle").textContent =
+          `${teacher?.fullName || ""} | ${classTime || ""}`;
+
+        // Tablarni reset qilish
+        document.getElementById("tabWeekly").classList.add("active");
+        document.getElementById("tabMonthly").classList.remove("active");
+
+        renderStats("weekly");
+        openModal("statsModal");
+      }
+
+      /** Tab almashganda chaqiriladi */
+      function switchStatsTab(mode) {
+        currentStatsMode = mode;
+        document
+          .getElementById("tabWeekly")
+          .classList.toggle("active", mode === "weekly");
+        document
+          .getElementById("tabMonthly")
+          .classList.toggle("active", mode === "monthly");
+        renderStats(mode);
+      }
+
+      /** Haftalik / oylik statistikani hisoblaydi va chiqaradi */
+      function renderStats(mode) {
+        if (!currentStatsCourse) return;
+        const { subjectId, teacherId, classTime } = currentStatsCourse;
+
+        const { start, end } = getStatsDateRange(mode);
+        const startStr = dateToStr(start);
+        const endStr = dateToStr(end);
+
+        const allAttendance = JSON.parse(
+          localStorage.getItem("attendance") || "[]",
+        );
+        const assignments = JSON.parse(
+          localStorage.getItem("courseAssignments") || "[]",
+        );
+
+        // Bu kursga tegishli o'quvchilar
+        const courseStudents = assignments.filter(
+          (a) =>
+            String(a.subjectId) === String(subjectId) &&
+            String(a.teacherId) === String(teacherId) &&
+            (a.classTime || "").trim() === (classTime || "").trim(),
+        );
+
+        // Kurs hafta kunlari (birinchi yozuvdan olinadi)
+        const weekDays =
+          courseStudents[0]?.weekDays || courseStudents[0]?.weekdays || [];
+
+        // Ushbu kursning davomat yozuvlari, sanasi oraliqda
+        const courseAttRecs = allAttendance.filter(
+          (att) =>
+            String(att.subjectId) === String(subjectId) &&
+            String(att.teacherId) === String(teacherId) &&
+            (att.classTime || "").trim() === (classTime || "").trim() &&
+            att.date >= startStr &&
+            att.date <= endStr,
+        );
+
+        // Kutilgan va o'tkazilgan darslar
+        const scheduledSessions = countExpectedSessions(weekDays, start, end);
+        const heldDates = new Set(courseAttRecs.map((a) => a.date));
+        const heldSessions = heldDates.size;
+        const expectedSessions = Math.max(scheduledSessions, heldSessions);
+        const unrecordedSessions = Math.max(expectedSessions - heldSessions, 0);
+
+        // Har o'quvchi uchun statistika
+        const studentStats = {};
+        const seenIds = new Set();
+        courseStudents.forEach((s) => {
+          if (!seenIds.has(s.studentId)) {
+            seenIds.add(s.studentId);
+            studentStats[s.studentId] = {
+              studentId: s.studentId,
+              studentName: s.studentName,
+              groupCode: s.groupCode,
+              attended: 0,
+              missed: 0,
+            };
+          }
+        });
+
+        // Davomat yozuvlaridan hisoblash
+        courseAttRecs.forEach((att) => {
+          (att.records || []).forEach((r) => {
+            if (studentStats[r.studentId]) {
+              if (r.status === "kelgan") studentStats[r.studentId].attended++;
+              else studentStats[r.studentId].missed++;
+            }
+          });
+        });
+
+        // Davomat % bo'yicha saralash (yuqoridan pastga)
+        const statsArr = Object.values(studentStats).sort(
+          (a, b) => b.attended - a.attended,
+        );
+
+        // ---- XULOSA ----
+        const periodLabel = mode === "weekly" ? "Bu hafta" : "Bu oy";
+        const pctHeld =
+          expectedSessions > 0
+            ? Math.round((heldSessions / expectedSessions) * 100)
+            : 0;
+        const heldTone = toneClass(pctHeld);
+        const unrecordedTone =
+          unrecordedSessions > 0 ? "tone-warn" : "tone-good";
+
+        document.getElementById("statsSummary").innerHTML = `
+        <div class="stats-summary-cards stats-summary-cards-4">
+          <div class="stats-summary-card">
+            <div class="stats-summary-num">${expectedSessions}</div>
+            <div class="stats-summary-label">${periodLabel} jami dars</div>
+          </div>
+          <div class="stats-summary-card">
+            <div class="stats-summary-num ${heldTone}">${heldSessions}</div>
+            <div class="stats-summary-label">Davomat olingan</div>
+          </div>
+          <div class="stats-summary-card">
+            <div class="stats-summary-num ${unrecordedTone}">${unrecordedSessions}</div>
+            <div class="stats-summary-label">Olinmagan dars</div>
+          </div>
+          <div class="stats-summary-card">
+            <div class="stats-summary-num">${courseStudents.length}</div>
+            <div class="stats-summary-label">Jami o'quvchi</div>
+          </div>
+        </div>`;
+
+        // ---- JADVAL ----
+        if (heldSessions === 0) {
+          document.getElementById("statsTable").innerHTML = `
+          <div class="table-empty">
+            📭 ${periodLabel} hali davomat qayd qilinmagan.
+          </div>`;
+          return;
         }
 
-        await db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
-        localStorage.setItem("grades", JSON.stringify(allGrades));
+        let rows = "";
+        statsArr.forEach((st, i) => {
+          const unrecorded = Math.max(
+            expectedSessions - st.attended - st.missed,
+            0,
+          );
+          const pct =
+            expectedSessions > 0
+              ? Math.round((st.attended / expectedSessions) * 100)
+              : 0;
+          const tone = toneClass(pct);
+          rows += `
+          <tr>
+            <td>${String(i + 1).padStart(2, "0")}</td>
+            <td class="stats-cell-name">${st.studentName}</td>
+            <td class="stats-cell-group">${st.groupCode}</td>
+            <td class="stats-cell-present">${st.attended}</td>
+            <td class="stats-cell-absent">${st.missed}</td>
+            <td class="stats-cell-unrecorded">${unrecorded}</td>
+            <td>
+              <div class="stats-pct-bar-wrap">
+                <div class="stats-pct-bar-bg">
+                  <div class="stats-pct-bar-fill ${widthClass(pct)} ${tone}"></div>
+                </div>
+                <span class="stats-pct-label ${tone}">${pct}%</span>
+              </div>
+            </td>
+          </tr>`;
+        });
 
-        closeModal("gradingModal");
-        currentGradingCourse = null;
-        showToast(`${gradesArr.length} ta o'quvchiga baho qo'yildi!`, "success");
-      } catch (err) {
-        showToast("Baholarda xatolik: " + err.message, "error");
-      } finally {
-        setButtonLoading("btnSaveGrades", false);
+        document.getElementById("statsTable").innerHTML = `
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>O'quvchi</th>
+              <th>Guruh</th>
+              <th>Keldi</th>
+              <th>Kelmadi</th>
+              <th>Olinmagan</th>
+              <th>Davomat %</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
       }
-    }
 
-    /* ============================================================
+      /* ============================================================
        MODAL BOSHQARUVI
        ============================================================ */
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.add("show");
-      document.body.style.overflow = "hidden";
-    }
+      function openModal(modalId) {
+        document.getElementById(modalId).classList.add("show");
+        document.body.style.overflow = "hidden";
+      }
 
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove("show");
-      document.body.style.overflow = "";
-    }
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove("show");
+        document.body.style.overflow = "";
+      }
 
-    document.querySelectorAll(".modal-overlay").forEach(overlay => {
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove("show");
+      document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove("show");
+            document.body.style.overflow = "";
+          }
+        });
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          document.querySelectorAll(".modal-overlay.show").forEach((m) => {
+            m.classList.remove("show");
+          });
           document.body.style.overflow = "";
         }
       });
-    });
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        document.querySelectorAll(".modal-overlay.show").forEach(m => {
-          m.classList.remove("show");
-        });
-        document.body.style.overflow = "";
-      }
-    });
-
-    /* ============================================================
+      /* ============================================================
        TOAST XABARLARI
        ============================================================ */
-    function showToast(message, type = "info") {
-      const container = document.getElementById("toastContainer");
-      const icons = {
-        success: '<i class="fa-solid fa-circle-check"></i>',
-        error:   '<i class="fa-solid fa-circle-xmark"></i>',
-        info:    '<i class="fa-solid fa-circle-info"></i>'
-      };
-      const toast = document.createElement("div");
-      toast.className = `toast ${type}`;
-      toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${message}</span>`;
-      container.appendChild(toast);
+      function showToast(message, type = "info") {
+        const container = document.getElementById("toastContainer");
+        const icons = {
+          success: '<i class="fa-solid fa-circle-check"></i>',
+          error: '<i class="fa-solid fa-circle-xmark"></i>',
+          info: '<i class="fa-solid fa-circle-info"></i>',
+        };
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${message}</span>`;
+        container.appendChild(toast);
 
-      setTimeout(() => {
-        toast.style.opacity   = "0";
-        toast.style.transform = "translateX(100px)";
-        toast.style.transition = "all 0.3s ease";
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
-    }
-  </script>
-
-</body>
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateX(100px)";
+          toast.style.transition = "all 0.3s ease";
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+    </script>
+  </body>
 </html>

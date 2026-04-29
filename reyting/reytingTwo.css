@@ -329,3 +329,155 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Info Badge (Floating Eslatma Card) ===== */
+.info-badge {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* Toggle tugmasi */
+.info-badge-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--teal-accent), var(--teal-light));
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 15px rgba(13, 148, 136, 0.4),
+    0 0 0 0 rgba(13, 148, 136, 0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: info-pulse 2.5s ease-in-out infinite;
+}
+.info-badge-toggle:hover {
+  transform: scale(1.1);
+  box-shadow:
+    0 6px 20px rgba(13, 148, 136, 0.5),
+    0 0 0 6px rgba(13, 148, 136, 0.15);
+}
+.info-badge-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+@keyframes info-pulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 15px rgba(13, 148, 136, 0.4),
+      0 0 0 0 rgba(13, 148, 136, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 15px rgba(13, 148, 136, 0.4),
+      0 0 0 8px rgba(13, 148, 136, 0);
+  }
+}
+
+/* Info Card */
+.info-badge-card {
+  background: rgba(30, 41, 59, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 16px;
+  padding: 0;
+  min-width: 300px;
+  max-width: 360px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  opacity: 0;
+  transform: translateY(12px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.info-badge-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.info-badge-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.15), rgba(45, 212, 191, 0.08));
+  border-bottom: 1px solid rgba(45, 212, 191, 0.12);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--teal-light);
+}
+.info-badge-header svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.8;
+}
+
+.info-badge-body {
+  padding: 16px 18px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+.info-badge-body strong {
+  color: var(--teal-light);
+  font-weight: 600;
+}
+
+/* Yangilanish vaqti uchun maxsus rang */
+.info-badge-body .meta-update {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+.info-badge-body .meta-update svg {
+  width: 14px;
+  height: 14px;
+  color: var(--gold);
+}
+
+.empty-rating-state {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+}
+
+/* Mobil moslashtirish — info badge */
+@media (max-width: 480px) {
+  .info-badge {
+    bottom: 16px;
+    right: 16px;
+  }
+  .info-badge-card {
+    min-width: 260px;
+    max-width: 290px;
+  }
+  .info-badge-toggle {
+    width: 42px;
+    height: 42px;
+  }
+}

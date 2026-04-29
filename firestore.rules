@@ -1,0 +1,89 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/userProfiles/$(request.auth.uid));
+    }
+
+    function myProfile() {
+      return get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data;
+    }
+
+    function activeUser() {
+      return hasProfile() && myProfile().active == true;
+    }
+
+    function isAdmin() {
+      return activeUser() && myProfile().role == "admin";
+    }
+
+    function isMentor() {
+      return activeUser() && myProfile().role == "sinf_rahbari";
+    }
+
+    function isTeacher() {
+      return activeUser() && myProfile().role == "oqituvchi";
+    }
+
+    // Login qilgan foydalanuvchi faqat o‘z profilini ko‘radi. Admin hammasini boshqaradi.
+    match /userProfiles/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Ota-ona/kuzatuvchi kursgaYozilganlar.html sahifasini login qilmasdan ko‘rishi uchun read ochiq.
+    // Yozish/o‘zgartirish faqat tizim foydalanuvchilariga beriladi.
+    match /groups/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /subjects/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isMentor();
+    }
+
+    match /course_students/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isMentor();
+    }
+
+    match /teachers/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isMentor();
+    }
+
+    match /classMentors/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /courseAssignments/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isMentor();
+    }
+
+    match /attendance/{docId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isTeacher();
+      allow delete: if isAdmin();
+    }
+
+    match /grades/{docId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isTeacher();
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
