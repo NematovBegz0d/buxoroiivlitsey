@@ -230,6 +230,9 @@ function renderStudents(data, isFiltered) {
   renderColumn("list2Kurs", kurs2, isFiltered);
 
   if (window.lucide) lucide.createIcons();
+
+  // Filtrlangan holatda auto-scroll kerak emas
+  if (!isFiltered) initAutoScroll();
 }
 
 function renderColumn(elementId, items, isFiltered) {
@@ -238,7 +241,7 @@ function renderColumn(elementId, items, isFiltered) {
   container.innerHTML = "";
 
   if (items.length === 0) {
-    container.innerHTML = '<div class="empty-rating-state">Ma’lumot topilmadi.</div>';
+    container.innerHTML = '<div class="empty-rating-state">Ma\'lumot topilmadi.</div>';
     return;
   }
 
@@ -312,6 +315,98 @@ function renderGroups(elementId, groups) {
     `;
     container.appendChild(div);
   });
+}
+
+/* ===== AUTO-SCROLL: .scrollable-rest elementlarini avtomatik pastga scroll qilish ===== */
+let autoScrollCleanups = [];
+
+function initAutoScroll() {
+  // Oldingi auto-scroll'larni tozalash
+  autoScrollCleanups.forEach((cleanup) => cleanup());
+  autoScrollCleanups = [];
+
+  const scrollables = document.querySelectorAll(".scrollable-rest");
+  scrollables.forEach((el) => {
+    const cleanup = setupAutoScroll(el, {
+      speed: 0.6,        // piksel/kadr — sekin va silliq
+      pauseDelay: 3000,  // foydalanuvchi to'xtagandan keyin qayta boshlash vaqti (ms)
+      topPause: 2000,    // yuqoriga qaytgandan keyin kutish vaqti (ms)
+    });
+    autoScrollCleanups.push(cleanup);
+  });
+}
+
+function setupAutoScroll(container, opts) {
+  let animId = null;
+  let paused = false;
+  let resumeTimer = null;
+  let userInteracting = false;
+
+  function scrollStep() {
+    if (!paused && !userInteracting) {
+      const maxScroll = container.scrollHeight - container.clientHeight;
+
+      if (maxScroll <= 0) {
+        // Hamma narsa ko'rinib turibdi, scroll kerak emas
+        animId = requestAnimationFrame(scrollStep);
+        return;
+      }
+
+      container.scrollTop += opts.speed;
+
+      // Eng pastga yetdi — yuqoriga qaytish
+      if (container.scrollTop >= maxScroll) {
+        paused = true;
+        setTimeout(() => {
+          container.scrollTo({ top: 0, behavior: "smooth" });
+          setTimeout(() => {
+            paused = false;
+          }, opts.topPause);
+        }, 1000);
+      }
+    }
+
+    animId = requestAnimationFrame(scrollStep);
+  }
+
+  function onUserStart() {
+    userInteracting = true;
+    clearTimeout(resumeTimer);
+  }
+
+  function onUserEnd() {
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(() => {
+      userInteracting = false;
+    }, opts.pauseDelay);
+  }
+
+  // Mouse events
+  container.addEventListener("mouseenter", onUserStart);
+  container.addEventListener("mouseleave", onUserEnd);
+
+  // Touch events (mobil)
+  container.addEventListener("touchstart", onUserStart, { passive: true });
+  container.addEventListener("touchend", onUserEnd);
+
+  // Manual scroll (g'ildirak yoki boshqa)
+  container.addEventListener("wheel", () => {
+    onUserStart();
+    onUserEnd();
+  }, { passive: true });
+
+  // Animatsiyani boshlash
+  animId = requestAnimationFrame(scrollStep);
+
+  // Cleanup funksiya
+  return function cleanup() {
+    cancelAnimationFrame(animId);
+    clearTimeout(resumeTimer);
+    container.removeEventListener("mouseenter", onUserStart);
+    container.removeEventListener("mouseleave", onUserEnd);
+    container.removeEventListener("touchstart", onUserStart);
+    container.removeEventListener("touchend", onUserEnd);
+  };
 }
 
 function escapeHtml(value) {
