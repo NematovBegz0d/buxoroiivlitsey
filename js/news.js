@@ -98,12 +98,19 @@ function createCard(item) {
   card.innerHTML = `
     ${mediaHTML}
     <div class="news-card__body">
+      <span class="news-card__badge">
+        <i class="fas fa-graduation-cap"></i> TA'LIM
+      </span>
       <h3 class="news-card__title">${item.title || ""}</h3>
       ${item.text ? `<p class="news-card__text">${item.text}</p>` : ""}
-      ${dateStr ? `<span class="news-card__date">${dateStr}</span>` : ""}
+      <div class="news-card__footer">
+        ${dateStr ? `<span class="news-card__date">${dateStr}</span>` : ""}
+        <a href="https://t.me/iivbuxorolitsey" target="_blank" rel="noopener noreferrer" class="news-card__tg-btn">
+          <i class="fab fa-telegram-plane"></i> Batafsil o'qish
+        </a>
+      </div>
     </div>
   `;
-  console.log(card);
   return card;
 }
 
