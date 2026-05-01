@@ -112,11 +112,15 @@ function normalizeStudent(data, fallbackId) {
 }
 
 // ─── TUZATISH #4: Xavfsiz kurs aniqlash ─────────────────────────────────────
-// startsWith("1") o'rniga leading raqamni ajratib olamiz:
-//   "1A"  → 1,  "2B"  → 2,  "10A" → 10 (1 yoki 2 ga mos kelmaydi)
+// Guruh kodining BIRINCHI BELGISIGA qarab kursni aniqlaymiz:
+//   "1A" → 1,  "1B" → 1,  "101" → 1,  "102" → 1
+//   "2A" → 2,  "2B" → 2,  "201" → 2,  "202" → 2
+// parseInt ishlatilmaydi — "101" ni parseInt qilsa 101 chiqadi va 1-kursga tushmaydi
 function getKurs(group) {
-  const match = /^(\d+)/.exec(String(group));
-  return match ? parseInt(match[1], 10) : null;
+  const firstChar = String(group).trim().charAt(0);
+  if (firstChar === "1") return 1;
+  if (firstChar === "2") return 2;
+  return null;
 }
 
 // ─── Qidiruv ─────────────────────────────────────────────────────────────────
