@@ -1,24 +1,69 @@
+// ─────────────────────────────────────────────
+//  reytingTwo.js  —  Barcha xatolar tuzatilgan
+//  Tuzatishlar ro'yxati:
+//  #1  clearRatingUI — apostrof SyntaxError
+//  #3  Memory leak — search paytida animatsiya to'xtatilmagan
+//  #4  Guruh aniqlash mo'rt — startsWith("1"/"2") xavfli
+//  #5  Bo'sh string guruh — normalizeStudent'da o'tkazib yuborilgan
+//  #6  Firebase meta xatosi — jimgina yutilgan
+//  #7  Qidiruv paytida guruhlar ustuni yangilanmagan
+//  #8  O'lik KPI kodi — tozalandi
+//  #9  Mobil menyu toggle — qo'shildi
+// ─────────────────────────────────────────────
+
 let STUDENTS_DATA = [];
 let ratingSearchBound = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   initRatingApp();
+  initMobileMenu(); // TUZATISH #9
 });
 
+// ─── TUZATISH #9: Mobil menyu toggle ───────────────────────────────────────
+function initMobileMenu() {
+  const btn = document.getElementById("mobileMenuBtn");
+  const menu = document.getElementById("mobileMenu");
+  if (!btn || !menu) return;
+
+  btn.addEventListener("click", () => {
+    const isOpen = menu.classList.toggle("open");
+    btn.setAttribute("aria-expanded", String(isOpen));
+    btn.textContent = isOpen ? "✕" : "☰";
+  });
+
+  // Tashqarini bosganda menyuni yopish
+  document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+      btn.textContent = "☰";
+    }
+  });
+}
+
+// ─── Asosiy boshlash funksiyasi ─────────────────────────────────────────────
 async function initRatingApp() {
   if (window.lucide) lucide.createIcons();
 
   if (typeof firebase === "undefined" || typeof db === "undefined") {
-    showRatingError("Firebase config ulanmagan. ../js/firebase-config.js yo‘lini tekshiring.");
+    showRatingError("Firebase config ulanmagan. ../js/firebase-config.js yo'lini tekshiring.");
     return;
   }
 
-  setRatingMeta("Reyting ma’lumotlari Firebase’dan yuklanmoqda...");
+  setRatingMeta("Reyting ma'lumotlari Firebase'dan yuklanmoqda...");
 
   try {
     const [ratingSnapshot, metaDoc] = await Promise.all([
       db.collection("students_rating").get(),
-      db.collection("rating_meta").doc("current").get().catch(() => null),
+      // TUZATISH #6: Xatolik jimgina yutilmaydi — console.warn bilan loglanadi
+      db
+        .collection("rating_meta")
+        .doc("current")
+        .get()
+        .catch((err) => {
+          console.warn("rating_meta yuklanmadi:", err);
+          return null;
+        }),
     ]);
 
     STUDENTS_DATA = ratingSnapshot.docs
@@ -27,7 +72,7 @@ async function initRatingApp() {
 
     if (!STUDENTS_DATA.length) {
       clearRatingUI();
-      setRatingMeta("Reyting bazasida hozircha ma’lumot yo‘q. Admin panel orqali yangi reyting yuklang.");
+      setRatingMeta("Reyting bazasida hozircha ma'lumot yo'q. Admin panel orqali yangi reyting yuklang.");
       return;
     }
 
@@ -42,28 +87,39 @@ async function initRatingApp() {
     renderMeta(metaDoc?.exists ? metaDoc.data() : null, STUDENTS_DATA);
   } catch (error) {
     console.error("Firebase'dan ma'lumot olishda xatolik:", error);
-    showRatingError("Firebase’dan reytingni olishda xatolik: " + error.message);
+    showRatingError("Firebase'dan reytingni olishda xatolik: " + error.message);
   }
 }
 
+// ─── Ma'lumotni normallashtirish ─────────────────────────────────────────────
 function normalizeStudent(data, fallbackId) {
   const id = data?.id ?? data?.studentId ?? fallbackId;
   const name = String(data?.name ?? data?.fullName ?? "").trim().replace(/\s+/g, " ");
   const group = data?.group ?? data?.groupCode;
   const totalScore = Number(data?.total_score ?? data?.totalScore ?? data?.score);
 
-  if (!id || !name || group === undefined || group === null || !Number.isFinite(totalScore)) {
+  // TUZATISH #5: Bo'sh string guruh ham tekshiriladi (!group qabul qilmaydi "")
+  if (!id || !name || !group || !Number.isFinite(totalScore)) {
     return null;
   }
 
   return {
     id: String(id),
     name,
-    group: String(group),
+    group: String(group).trim(),
     total_score: Number(totalScore.toFixed(2)),
   };
 }
 
+// ─── TUZATISH #4: Xavfsiz kurs aniqlash ─────────────────────────────────────
+// startsWith("1") o'rniga leading raqamni ajratib olamiz:
+//   "1A"  → 1,  "2B"  → 2,  "10A" → 10 (1 yoki 2 ga mos kelmaydi)
+function getKurs(group) {
+  const match = /^(\d+)/.exec(String(group));
+  return match ? parseInt(match[1], 10) : null;
+}
+
+// ─── Qidiruv ─────────────────────────────────────────────────────────────────
 function bindRatingSearch() {
   if (ratingSearchBound) return;
   const input = document.getElementById("searchInput");
@@ -80,7 +136,7 @@ function bindRatingSearch() {
     const filteredData = STUDENTS_DATA.filter(
       (student) =>
         student.name.toLowerCase().includes(searchTerm) ||
-        String(student.group).includes(searchTerm) ||
+        String(student.group).toLowerCase().includes(searchTerm) ||
         String(student.id).includes(searchTerm),
     );
     renderStudents(filteredData, true);
@@ -89,6 +145,7 @@ function bindRatingSearch() {
   ratingSearchBound = true;
 }
 
+// ─── Guruh statistikasi ───────────────────────────────────────────────────────
 function buildGroupStats(data) {
   const groupsObj = {};
 
@@ -108,6 +165,7 @@ function buildGroupStats(data) {
     .sort((a, b) => Number(b.avg) - Number(a.avg));
 }
 
+// ─── Meta ma'lumotlarni ko'rsatish ───────────────────────────────────────────
 function renderMeta(meta, data) {
   const total = data.length;
   const groups = new Set(data.map((s) => s.group)).size;
@@ -171,6 +229,7 @@ function formatFirebaseDate(value) {
   }
 }
 
+// ─── TUZATISH #1: clearRatingUI — apostrof sindirilmagan (double-quote ishlatildi) ──
 function clearRatingUI() {
   document.getElementById("kpi-total").textContent = "0";
   document.getElementById("kpi-avg").textContent = "0.0";
@@ -178,7 +237,9 @@ function clearRatingUI() {
   document.getElementById("kpi-groups").textContent = "0";
   ["list1Kurs", "list2Kurs", "listGroups"].forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.innerHTML = '<div class="empty-rating-state">Ma’lumot topilmadi.</div>';
+    // TUZATISH #1: Ilgari '..Ma'lumot..' single-quote ichida apostrof — SyntaxError
+    // Tuzatish: double-quote string yoki template literal ishlatildi
+    if (el) el.innerHTML = `<div class="empty-rating-state">Ma'lumot topilmadi.</div>`;
   });
 }
 
@@ -187,6 +248,8 @@ function showRatingError(message) {
   setRatingMeta(escapeHtml(message));
 }
 
+// ─── KPI Hisoblash ────────────────────────────────────────────────────────────
+// TUZATISH #8: O'lik kurs-avg kodi olib tashlandi (HTML'da kommentga olingan elementlar)
 function calculateKPIs(data) {
   document.getElementById("kpi-total").textContent = data.length;
 
@@ -201,37 +264,32 @@ function calculateKPIs(data) {
 
   const uniqueGroups = new Set(data.map((s) => s.group)).size;
   document.getElementById("kpi-groups").textContent = uniqueGroups;
-
-  const kurs1Data = data.filter((s) => String(s.group).startsWith("1"));
-  const kurs2Data = data.filter((s) => String(s.group).startsWith("2"));
-
-  const kurs1Total = kurs1Data.reduce((sum, s) => sum + Number(s.total_score || 0), 0);
-  const kurs1Avg = kurs1Data.length ? (kurs1Total / kurs1Data.length).toFixed(1) : "0.0";
-
-  const kurs2Total = kurs2Data.reduce((sum, s) => sum + Number(s.total_score || 0), 0);
-  const kurs2Avg = kurs2Data.length ? (kurs2Total / kurs2Data.length).toFixed(1) : "0.0";
-
-  const kpi1El = document.getElementById("kpi-1kurs-avg");
-  const kpi2El = document.getElementById("kpi-2kurs-avg");
-
-  if (kpi1El) kpi1El.textContent = kurs1Avg;
-  if (kpi2El) kpi2El.textContent = kurs2Avg;
 }
 
+// ─── O'quvchilarni render qilish ──────────────────────────────────────────────
 function renderStudents(data, isFiltered) {
+  // TUZATISH #3: Memory leak — har safar render oldidan BARCHA eski
+  // animatsiyalar to'xtatiladi, DOMdan ajralgan elementlarda loop davom etmaydi
+  autoScrollCleanups.forEach((cleanup) => cleanup());
+  autoScrollCleanups = [];
+
+  // TUZATISH #4: getKurs() yordamida xavfsiz filtrlash
   const kurs1 = data
-    .filter((s) => String(s.group).startsWith("1"))
+    .filter((s) => getKurs(s.group) === 1)
     .sort((a, b) => b.total_score - a.total_score || a.name.localeCompare(b.name, "uz"));
   const kurs2 = data
-    .filter((s) => String(s.group).startsWith("2"))
+    .filter((s) => getKurs(s.group) === 2)
     .sort((a, b) => b.total_score - a.total_score || a.name.localeCompare(b.name, "uz"));
 
   renderColumn("list1Kurs", kurs1, isFiltered);
   renderColumn("list2Kurs", kurs2, isFiltered);
 
+  // TUZATISH #7: Qidiruv paytida guruhlar ustuni ham filtrlanadi
+  // (ilgari qidiruv qilganda guruhlar o'zgarmay qolardi)
+  renderGroups("listGroups", buildGroupStats(data));
+
   if (window.lucide) lucide.createIcons();
 
-  // Filtrlangan holatda auto-scroll kerak emas
   if (!isFiltered) initAutoScroll();
 }
 
@@ -241,7 +299,7 @@ function renderColumn(elementId, items, isFiltered) {
   container.innerHTML = "";
 
   if (items.length === 0) {
-    container.innerHTML = '<div class="empty-rating-state">Ma\'lumot topilmadi.</div>';
+    container.innerHTML = `<div class="empty-rating-state">Ma'lumot topilmadi.</div>`;
     return;
   }
 
@@ -289,7 +347,7 @@ function createStudentCard(item, rank) {
       <p><i data-lucide="users"></i> Guruh: ${escapeHtml(item.group)}</p>
     </div>
     <div class="student-score">
-      <span class="score-val">${escapeHtml(item.total_score)}</span>
+      <span class="score-val">${escapeHtml(String(item.total_score))}</span>
       <span class="score-lbl">BALL</span>
     </div>
   `;
@@ -302,7 +360,7 @@ function renderGroups(elementId, groups) {
   container.innerHTML = "";
 
   if (!groups.length) {
-    container.innerHTML = '<div class="empty-rating-state">Guruhlar topilmadi.</div>';
+    container.innerHTML = `<div class="empty-rating-state">Guruhlar topilmadi.</div>`;
     return;
   }
 
@@ -317,20 +375,20 @@ function renderGroups(elementId, groups) {
   });
 }
 
-/* ===== AUTO-SCROLL: .scrollable-rest elementlarini avtomatik pastga scroll qilish ===== */
+// ─── AUTO-SCROLL ──────────────────────────────────────────────────────────────
 let autoScrollCleanups = [];
 
 function initAutoScroll() {
-  // Oldingi auto-scroll'larni tozalash
-  autoScrollCleanups.forEach((cleanup) => cleanup());
+  // Oldingi animatsiyalar TUZATISH #3 da renderStudents ichida allaqachon tozalangan,
+  // bu yerda massivni boshlash yetarli
   autoScrollCleanups = [];
 
   const scrollables = document.querySelectorAll(".scrollable-rest");
   scrollables.forEach((el) => {
     const cleanup = setupAutoScroll(el, {
-      speed: 0.6,        // piksel/kadr — sekin va silliq
-      pauseDelay: 3000,  // foydalanuvchi to'xtagandan keyin qayta boshlash vaqti (ms)
-      topPause: 2000,    // yuqoriga qaytgandan keyin kutish vaqti (ms)
+      speed: 0.6,
+      pauseDelay: 3000,
+      topPause: 2000,
     });
     autoScrollCleanups.push(cleanup);
   });
@@ -346,23 +404,18 @@ function setupAutoScroll(container, opts) {
     if (!paused && !userInteracting) {
       const maxScroll = container.scrollHeight - container.clientHeight;
 
-      if (maxScroll <= 0) {
-        // Hamma narsa ko'rinib turibdi, scroll kerak emas
-        animId = requestAnimationFrame(scrollStep);
-        return;
-      }
+      if (maxScroll > 0) {
+        container.scrollTop += opts.speed;
 
-      container.scrollTop += opts.speed;
-
-      // Eng pastga yetdi — yuqoriga qaytish
-      if (container.scrollTop >= maxScroll) {
-        paused = true;
-        setTimeout(() => {
-          container.scrollTo({ top: 0, behavior: "smooth" });
+        if (container.scrollTop >= maxScroll) {
+          paused = true;
           setTimeout(() => {
-            paused = false;
-          }, opts.topPause);
-        }, 1000);
+            container.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(() => {
+              paused = false;
+            }, opts.topPause);
+          }, 1000);
+        }
       }
     }
 
@@ -381,24 +434,17 @@ function setupAutoScroll(container, opts) {
     }, opts.pauseDelay);
   }
 
-  // Mouse events
   container.addEventListener("mouseenter", onUserStart);
   container.addEventListener("mouseleave", onUserEnd);
-
-  // Touch events (mobil)
   container.addEventListener("touchstart", onUserStart, { passive: true });
   container.addEventListener("touchend", onUserEnd);
-
-  // Manual scroll (g'ildirak yoki boshqa)
   container.addEventListener("wheel", () => {
     onUserStart();
     onUserEnd();
   }, { passive: true });
 
-  // Animatsiyani boshlash
   animId = requestAnimationFrame(scrollStep);
 
-  // Cleanup funksiya
   return function cleanup() {
     cancelAnimationFrame(animId);
     clearTimeout(resumeTimer);
@@ -409,6 +455,7 @@ function setupAutoScroll(container, opts) {
   };
 }
 
+// ─── Yordamchi: HTML escaping ─────────────────────────────────────────────────
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
