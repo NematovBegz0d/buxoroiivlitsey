@@ -137,12 +137,16 @@ function bindRatingSearch() {
       return;
     }
 
-    const filteredData = STUDENTS_DATA.filter(
-      (student) =>
-        student.name.toLowerCase().includes(searchTerm) ||
-        String(student.group).toLowerCase().includes(searchTerm) ||
-        String(student.id).includes(searchTerm),
-    );
+    const filteredData = STUDENTS_DATA.filter((student) => {
+      const name  = student.name.toLowerCase();
+      const group = String(student.group).toLowerCase();
+      // Guruh: ANIQ moslik — "105" faqat 105-guruhni topadi
+      if (group === searchTerm) return true;
+      // Ism: qisman moslik — "sanoqulov" → Sanoqulova ham topiladi
+      if (name.includes(searchTerm)) return true;
+      // ID bo'yicha qidiruv olib tashlandi: raqamli ID chalkashtirib yuborardi
+      return false;
+    });
     renderStudents(filteredData, true);
   });
 
