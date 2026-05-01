@@ -387,10 +387,6 @@ function renderGroups(elementId, groups) {
 let autoScrollCleanups = [];
 
 function initAutoScroll() {
-  // Oldingi animatsiyalar TUZATISH #3 da renderStudents ichida allaqachon tozalangan,
-  // bu yerda massivni boshlash yetarli
-  autoScrollCleanups = [];
-
   const scrollables = document.querySelectorAll(".scrollable-rest");
   scrollables.forEach((el) => {
     const cleanup = setupAutoScroll(el, {
@@ -442,14 +438,17 @@ function setupAutoScroll(container, opts) {
     }, opts.pauseDelay);
   }
 
+  // wheel handleri referans sifatida saqlanadi — cleanup'da olib tashlash uchun
+  function onWheel() {
+    onUserStart();
+    onUserEnd();
+  }
+
   container.addEventListener("mouseenter", onUserStart);
   container.addEventListener("mouseleave", onUserEnd);
   container.addEventListener("touchstart", onUserStart, { passive: true });
   container.addEventListener("touchend", onUserEnd);
-  container.addEventListener("wheel", () => {
-    onUserStart();
-    onUserEnd();
-  }, { passive: true });
+  container.addEventListener("wheel", onWheel, { passive: true });
 
   animId = requestAnimationFrame(scrollStep);
 
@@ -460,6 +459,7 @@ function setupAutoScroll(container, opts) {
     container.removeEventListener("mouseleave", onUserEnd);
     container.removeEventListener("touchstart", onUserStart);
     container.removeEventListener("touchend", onUserEnd);
+    container.removeEventListener("wheel", onWheel);
   };
 }
 
