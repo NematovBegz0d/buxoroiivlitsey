@@ -82,6 +82,18 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // O'quvchilar ro'yxati: admin va sinf rahbari yoza oladi, barchasi o'qiy oladi
+    match /students/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isMentor();
+    }
+
+    // O'quvchilar reytingi: admin yoza oladi, barchasi o'qiy oladi
+    match /students_rating/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
