@@ -8,7 +8,22 @@ const firebaseConfig = {
   measurementId: "G-0LV7CJ9V5J"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (typeof firebase === "undefined") {
+  console.error("Firebase SDK yuklanmadi! Script tartibini tekshiring.");
+} else {
+  firebase.initializeApp(firebaseConfig);
+}
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth = typeof firebase !== "undefined" ? firebase.auth() : undefined;
+const db = typeof firebase !== "undefined" ? firebase.firestore() : undefined;
+
+/* Firestore offline persistence — internet uzilsa ham sahifa ishlaydi */
+if (db) {
+  db.enablePersistence({ synchronizeTabs: true }).catch(function (err) {
+    if (err.code === "failed-precondition") {
+      console.warn("Firestore persistence: bir nechta tab ochiq, faqat bittasida ishlaydi.");
+    } else if (err.code === "unimplemented") {
+      console.warn("Firestore persistence: bu brauzer qo'llab-quvvatlamaydi.");
+    }
+  });
+}

@@ -145,20 +145,6 @@
           active: profile.active === true,
         };
       }
-      // function redirectByRole(currentUser) {
-      //   if (currentUser.role === "admin") {
-      //     window.location.href = "admin.html";
-      //     return;
-      //   }
-      //   if (
-      //     currentUser.role === "observer" ||
-      //     currentUser.role === "kuzatuvchi"
-      //   ) {
-      //     window.location.href = "kursgaYozilganlar.html";
-      //     return;
-      //   }
-      //   showError("Bu foydalanuvchiga role biriktirilmagan.");
-      // }
       async function getUserProfile(uid) {
         const profileDoc = await db.collection("userProfiles").doc(uid).get();
         return profileDoc.exists ? profileDoc.data() : null;

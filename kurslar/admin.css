@@ -94,7 +94,7 @@
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.045);
         color: var(--text);
-        font-weight: 650;
+        font-weight: 600;
         font-size: 0.86rem;
         cursor: pointer;
         transition: 0.18s;
@@ -514,6 +514,7 @@
 .card.embedded-card { box-shadow: none; margin-top: 18px; }
 .subject-check-list { max-height: 300px; }
 .loading-denied-actions { display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+#teacherCredentialBox { display: none; }
 
 /* Rating upload panel */
 .rating-upload-box {

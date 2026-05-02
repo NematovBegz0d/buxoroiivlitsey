@@ -1010,8 +1010,9 @@
 
         if (target) {
           try {
-            await db.collection("courseAssignments").doc(target.id).delete();
-            assignments = assignments.filter((a) => a.id !== target.id);
+            const deleteDocId = target.docId || target.id;
+            await db.collection("courseAssignments").doc(deleteDocId).delete();
+            assignments = assignments.filter((a) => (a.docId || a.id) !== deleteDocId);
             localStorage.setItem(
               "courseAssignments",
               JSON.stringify(assignments),
@@ -1656,7 +1657,7 @@
 
         const attendanceRecord = {
           id: generateId("att"),
-          teacherId: currentUser.id,
+          teacherId: String(currentUser.id),
           teacherLogin: currentUser.login,
           teacherName: currentUser.fullName,
           subjectId: currentAttendanceCourse.subjectId,
@@ -2209,6 +2210,7 @@
         const icons = {
           success: '<i class="fa-solid fa-circle-check"></i>',
           error: '<i class="fa-solid fa-circle-xmark"></i>',
+          warning: '<i class="fa-solid fa-triangle-exclamation"></i>',
           info: '<i class="fa-solid fa-circle-info"></i>',
         };
         const toast = document.createElement("div");

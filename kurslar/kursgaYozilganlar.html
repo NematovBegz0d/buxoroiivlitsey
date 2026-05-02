@@ -439,15 +439,19 @@
           } else {
             searchResults.innerHTML = filtered
               .map(
-                (s) => `
+                (s) => {
+                  const safeName = (s.fullName || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+                  const safeGroup = String(s.groupCode || "").replace(/'/g,"\\'");
+                  return `
               <div class="search-result-item" onclick="
                 document.getElementById('searchResults').classList.remove('show');
                 document.getElementById('searchInput').value='';
-                openStudentDetail(${s.id}, '${s.groupCode}')
+                openStudentDetail('${String(s.id).replace(/'/g,"\\'")}', '${safeGroup}')
               ">
-                <span class="student-name">${s.fullName}</span>
-                <span class="student-group">${s.groupCode}-guruh</span>
-              </div>`,
+                <span class="student-name">${safeName}</span>
+                <span class="student-group">${safeGroup}-guruh</span>
+              </div>`;
+                },
               )
               .join("");
           }
@@ -1254,7 +1258,7 @@
         // Har o'quvchi statistikasi
         const statsMap = {};
         courseStudents.forEach((s) => {
-          statsMap[s.studentId] = { ...s, attended: 0, missed: 0, unrecorded };
+          statsMap[s.studentId] = { ...s, attended: 0, missed: 0 };
         });
         recs.forEach((att) => {
           (att.records || []).forEach((r) => {
@@ -1263,6 +1267,10 @@
               else if (r.status === "kelmagan") statsMap[r.studentId].missed++;
             }
           });
+        });
+        // Har o'quvchi uchun individual unrecorded hisoblash
+        Object.values(statsMap).forEach((s) => {
+          s.unrecorded = Math.max(expected - s.attended - s.missed, 0);
         });
 
         const statsArr = Object.values(statsMap).sort(
