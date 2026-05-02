@@ -8,6 +8,10 @@
       name="description"
       content="Kurs Nazorat Tizimi admin boshqaruv paneli"
     />
+    <meta property="og:title" content="Admin Panel — Kurs Nazorat Tizimi" />
+    <meta property="og:description" content="IIV Buxoro Akademik Litseyi kurs nazorati admin paneli." />
+    <meta property="og:image" content="../imgs/logo.png" />
+    <meta property="og:type" content="website" />
 
     <link rel="icon" type="image/png" href="../imgs/logo.png" />
     <link rel="stylesheet" href="style.css" />
@@ -538,7 +542,7 @@
                   ><input
                     class="input"
                     id="newTeacherPasswordAdmin"
-                    placeholder="Teacher048@2026"
+                    placeholder="Teacher048@2025"
                     autocomplete="new-password"
                   />
                 </div>
@@ -753,7 +757,7 @@
           try {
             res.push(`${i.name}: ${await loadCollection(i)}`);
           } catch (e) {
-            console.error(i.name, e);
+            // console.error(i.name, e);
             res.push(`${i.name}: ERROR — ${e.message}`);
           }
         }
@@ -999,9 +1003,9 @@
         }
 
         try {
-          return Function('"use strict"; return (' + match[1] + ');')();
+          return JSON.parse(match[1]);
         } catch (e) {
-          throw new Error("Fayldagi STUDENTS_DATA array o‘qilmadi: " + e.message);
+          throw new Error("Fayldagi STUDENTS_DATA array o’qilmadi: " + e.message);
         }
       }
       function normalizeRatingRow(row, index) {
@@ -1138,7 +1142,13 @@
           updatedByLogin: state.currentUser.login || state.currentUser.email || "admin",
         }, { merge: true });
         ops++;
-        if (ops > 0) await batch.commit();
+        if (ops > 0) {
+          try {
+            await batch.commit();
+          } catch (err) {
+            throw new Error("Rating_meta Firebase'ga yuklashda xatolik: " + err.message);
+          }
+        }
       }
       async function uploadRatingToFirestore() {
         const month = ratingMonthInput.value || currentMonthValue();
@@ -1153,7 +1163,7 @@
           toast("Reyting Firebase’ga yuklandi. Endi hamma foydalanuvchida ko‘rinadi.", "success");
           log(`Reyting Firebase’ga yuklandi:\nOy: ${month}\n${ratingStatsText(state.parsedRating)}`);
         } catch (e) {
-          console.error(e);
+          // console.error(e);
           toast("Reyting yuklashda xatolik: " + e.message, "error");
           log("Reyting yuklash xatosi: " + e.message);
         } finally {
@@ -1257,7 +1267,7 @@
           state.selectedStudents.clear();
           renderStudents();
         } catch (e) {
-          console.error(e);
+          // console.error(e);
           toast("Kursga yozishda xatolik: " + e.message, "error");
         } finally {
           btnSaveEnroll.disabled = false;
@@ -1271,7 +1281,7 @@
           toast("Kurs yozuvi o‘chirildi.");
           await loadAll();
         } catch (e) {
-          console.error(e);
+          // console.error(e);
           toast("O‘chirishda xatolik: " + e.message, "error");
         }
       }
@@ -1320,7 +1330,7 @@
         newTeacherIdAdmin.value = n;
         newTeacherLoginAdmin.value = login;
         newTeacherEmail.value = `${login}@litsey.uz`;
-        newTeacherPasswordAdmin.value = `Teacher${pad}@2026`;
+        newTeacherPasswordAdmin.value = `Teacher${pad}@${new Date().getFullYear()}`;
         teacherCredentialBox.style.display = "none";
       }
       function selectedTeacherSubjects() {
@@ -1416,7 +1426,7 @@
           createdTeacherPassword.textContent = password;
           teacherCredentialBox.style.display = "block";
         } catch (e) {
-          console.error(e);
+          // console.error(e);
           if (createdUser && secondaryAuth) {
             try {
               await createdUser.delete();
@@ -1577,7 +1587,7 @@
             await loadAll();
             generateTeacherLoginPassword();
           } catch (e) {
-            console.error(e);
+            // console.error(e);
             accessError(e.message);
           }
         });

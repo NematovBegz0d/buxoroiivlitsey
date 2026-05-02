@@ -8,6 +8,10 @@
       name="description"
       content="Guruhlar bo'yicha kurslarga yozilgan o'quvchilar ro'yxati"
     />
+    <meta property="og:title" content="Kurslarga Yozilganlar — Kurs Nazorat Tizimi" />
+    <meta property="og:description" content="IIV Buxoro Akademik Litseyi — guruhlar bo'yicha kurslarga yozilgan o'quvchilar." />
+    <meta property="og:image" content="../imgs/logo.png" />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="../imgs/logo.png" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="kursgaYozilganlar.css" />
@@ -271,7 +275,7 @@
             }),
           );
         } catch (err) {
-          console.error("Firebase sync xatosi:", err);
+          // console.error("Firebase sync xatosi:", err);
           showToast("Ma'lumotlar yuklanishida xatolik yuz berdi.", "error");
         }
 
@@ -393,7 +397,7 @@
 
           window.location.replace("login.html");
         } catch (error) {
-          console.error("Logout xatosi:", error);
+          // console.error("Logout xatosi:", error);
           sessionStorage.clear();
           window.location.replace("login.html");
         }
@@ -441,12 +445,13 @@
               .map(
                 (s) => {
                   const safeName = (s.fullName || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-                  const safeGroup = String(s.groupCode || "").replace(/'/g,"\\'");
+                  const safeGroup = String(s.groupCode || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+                  const safeId    = String(s.id        || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
                   return `
               <div class="search-result-item" onclick="
                 document.getElementById('searchResults').classList.remove('show');
                 document.getElementById('searchInput').value='';
-                openStudentDetail('${String(s.id).replace(/'/g,"\\'")}', '${safeGroup}')
+                openStudentDetail('${safeId}', '${safeGroup}')
               ">
                 <span class="student-name">${safeName}</span>
                 <span class="student-group">${safeGroup}-guruh</span>
@@ -630,7 +635,8 @@
         if (gcList.length > 0) {
           const btns = gcList
             .map((c) => {
-              const safeArgs = `'${c.subjectId}','${c.teacherId}','${(c.classTime || "").replace(/'/g, "\\'")}','${groupCode}'`;
+              const _esc = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+              const safeArgs = `'${_esc(c.subjectId)}','${_esc(c.teacherId)}','${_esc(c.classTime)}','${_esc(groupCode)}'`;
               const timeLabel = c.classTime ? ` — ${c.classTime}` : "";
               return `<button class="btn-course-stat" onclick="openGcStatsModal(${safeArgs})">
                 <i class="fa-solid fa-chart-bar"></i> ${c.subjectName}${timeLabel}

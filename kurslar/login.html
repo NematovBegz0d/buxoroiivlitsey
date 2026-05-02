@@ -8,6 +8,10 @@
       name="description"
       content="IIV Buxoro Akademik Litseyi kurs nazorati va davomat boshqaruvi tizimiga kirish"
     />
+    <meta property="og:title" content="Kirish — Kurs Nazorat Tizimi" />
+    <meta property="og:description" content="IIV Buxoro Akademik Litseyi kurs nazorati va davomat boshqaruvi tizimi." />
+    <meta property="og:image" content="../imgs/logo.png" />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="../imgs/logo.png" />
     <link rel="stylesheet" href="style.css" />
     <link
@@ -223,7 +227,7 @@
           sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
           redirectByRole(currentUser);
         } catch (error) {
-          console.error("Login error:", error);
+          // console.error("Login error:", error);
           if (error.code === "auth/invalid-credential")
             showError("Email yoki parol noto'g'ri.");
           else if (error.code === "auth/user-not-found")
@@ -248,14 +252,11 @@
           try {
             if (auth.currentUser) await auth.signOut();
           } catch (error) {
-            console.warn(
-              "Observer rejimga o‘tishda auth signOut xatosi:",
-              error,
-            );
+            // console.warn("Observer rejimga o’tishda auth signOut xatosi:", error);
           }
         }
         const observerUser = {
-          uid: "public_observer",
+          uid: "observer_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9),
           email: "",
           role: "observer",
           login: "observer",
@@ -282,7 +283,7 @@
             sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
             redirectByRole(currentUser);
           } catch (error) {
-            console.error("Session check error:", error);
+            // console.error("Session check error:", error);
             await auth.signOut();
             sessionStorage.removeItem("currentUser");
           }

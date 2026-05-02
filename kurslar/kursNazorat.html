@@ -8,6 +8,10 @@
       name="description"
       content="Kurs nazorati va davomat boshqaruvi asosiy paneli"
     />
+    <meta property="og:title" content="Kurs Nazorat — Dashboard" />
+    <meta property="og:description" content="IIV Buxoro Akademik Litseyi kurs nazorati va davomat boshqaruvi." />
+    <meta property="og:image" content="../imgs/logo.png" />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="../imgs/logo.png" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="kursNazorat.css" />
@@ -594,7 +598,7 @@
             }),
           );
         } catch (err) {
-          console.error("Baza sync xatosi:", err);
+          // console.error("Baza sync xatosi:", err);
           showToast("Ma'lumotlar yuklanishida xatolik", "error");
         }
 
@@ -688,7 +692,7 @@
 
           window.location.replace("login.html");
         } catch (error) {
-          console.error("Logout xatosi:", error);
+          // console.error("Logout xatosi:", error);
           sessionStorage.clear();
           window.location.replace("login.html");
         }
@@ -840,7 +844,9 @@
         const totalStudents = course.students.length;
         const groupsArr = [...course.groups];
 
-        const safeClassTime = (course.classTime || "").replace(/'/g, "\\'");
+        const safeSubjectId  = String(course.subjectId  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const safeTeacherId  = String(course.teacherId  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const safeClassTime  = String(course.classTime  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         const courseTime = (course.classTime || "").trim();
 
         // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi ta'minlandi
@@ -852,7 +858,7 @@
             (att.classTime || "").trim() === courseTime,
         );
 
-        const isTodayClass = (course.weekDays || []).includes(todayWeekDay);
+        const isTodayClass = (course.weekdays || course.weekDays || []).includes(todayWeekDay);
         let attendanceBtnHtml = "";
 
         if (
@@ -862,9 +868,9 @@
           if (!isTodayClass) {
             attendanceBtnHtml = `<button class="btn-attendance" disabled title="Bugun bu fandan dars yo'q">📅 Bugun dars yo'q</button>`;
           } else if (todayAttendance) {
-            attendanceBtnHtml = `<button class="btn-attendance btn-grade" onclick="event.stopPropagation();openGradingModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')"><i class="fa-solid fa-star"></i> Baholash</button>`;
+            attendanceBtnHtml = `<button class="btn-attendance btn-grade" onclick="event.stopPropagation();openGradingModal('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')"><i class="fa-solid fa-star"></i> Baholash</button>`;
           } else {
-            attendanceBtnHtml = `<button class="btn-attendance" onclick="event.stopPropagation();openAttendanceModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')">Davomat olish</button>`;
+            attendanceBtnHtml = `<button class="btn-attendance" onclick="event.stopPropagation();openAttendanceModal('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')">Davomat olish</button>`;
           }
         } else if (currentUser.role === "oqituvchi") {
           attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
@@ -876,7 +882,7 @@
 
         return `
         <div class="course-card"
-             onclick="openCourseStudents('${course.subjectId}','${course.teacherId}','${safeClassTime}')">
+             onclick="openCourseStudents('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')">
           <div class="course-card-header">
             <div class="course-card-info">
               <div class="subject-badge">${shortName}</div>
@@ -889,7 +895,7 @@
           </div>
           <div class="course-card-details">
             ${course.classTime ? `<span class="detail-chip"><span class="chip-icon">🕐</span> ${course.classTime}</span>` : ""}
-            ${(course.weekDays || []).map((d) => `<span class="detail-chip">${d}</span>`).join("")}
+            ${(course.weekdays || course.weekDays || []).map((d) => `<span class="detail-chip">${d}</span>`).join("")}
             <span class="detail-chip">${groupsArr.length} ta guruh</span>
           </div>
           <div class="course-card-footer">
@@ -897,7 +903,7 @@
               ${groupsArr.map((g) => `<span class="group-mini-badge">${g}</span>`).join("")}
             </div>
             <div class="course-card-actions">
-              <button class="btn-stats" onclick="event.stopPropagation();openStatsModal('${course.subjectId}','${course.teacherId}','${safeClassTime}')">
+              <button class="btn-stats" onclick="event.stopPropagation();openStatsModal('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')">
                 <i class="fa-solid fa-chart-bar"></i> Statistika
               </button>
               ${attendanceBtnHtml}
@@ -1119,7 +1125,7 @@
           classTime:
             currentCourseView.classTime ||
             (existingCourse ? existingCourse.classTime : ""),
-          weekDays: existingCourse ? existingCourse.weekDays : [],
+          weekdays: existingCourse ? (existingCourse.weekdays || existingCourse.weekDays || []) : [],
           createdBy: currentUser.login,
           createdAt: new Date().toISOString().split("T")[0],
         };
@@ -1449,8 +1455,6 @@
 
               classTime: classTime,
 
-              // Eski/yangi kodlar bir xil ishlashi uchun ikkalasi ham yoziladi.
-              weekDays: [...selectedWeekdays],
               weekdays: [...selectedWeekdays],
 
               createdBy: currentUser.login,
@@ -1495,7 +1499,7 @@
             msg += ` (${skipCount} ta yozuv o‘tkazib yuborildi)`;
           showToast(msg, "success");
         } catch (err) {
-          console.error(err);
+          // console.error(err);
           showToast("Saqlashda xatolik: " + err.message, "error");
         } finally {
           setButtonLoading("btnSaveEnroll", false);
@@ -1722,7 +1726,7 @@
 
           loadCourseCards();
         } catch (err) {
-          console.error(err);
+          // console.error(err);
           showToast("Davomat saqlashda xatolik: " + err.message, "error");
         } finally {
           setButtonLoading("btnSaveAttendance", false);
@@ -2035,7 +2039,7 @@
 
         // Kurs hafta kunlari (birinchi yozuvdan olinadi)
         const weekDays =
-          courseStudents[0]?.weekDays || courseStudents[0]?.weekdays || [];
+          courseStudents[0]?.weekdays || courseStudents[0]?.weekDays || [];
 
         // Ushbu kursning davomat yozuvlari, sanasi oraliqda
         const courseAttRecs = allAttendance.filter(

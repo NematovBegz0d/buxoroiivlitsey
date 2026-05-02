@@ -60,10 +60,7 @@ async function initRatingApp() {
         .collection("rating_meta")
         .doc("current")
         .get()
-        .catch((err) => {
-          console.warn("rating_meta yuklanmadi:", err);
-          return null;
-        }),
+        .catch(() => null),
     ]);
 
     STUDENTS_DATA = ratingSnapshot.docs
@@ -86,7 +83,7 @@ async function initRatingApp() {
     bindRatingSearch();
     renderMeta(metaDoc?.exists ? metaDoc.data() : null, STUDENTS_DATA);
   } catch (error) {
-    console.error("Firebase'dan ma'lumot olishda xatolik:", error);
+    // console.error("Firebase'dan ma'lumot olishda xatolik:", error);
     showRatingError("Firebase'dan reytingni olishda xatolik: " + error.message);
   }
 }

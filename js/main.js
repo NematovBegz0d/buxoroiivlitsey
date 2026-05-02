@@ -158,7 +158,7 @@ async function loadNews() {
     requestAnimationFrame(() => applyNewsCardAnimation(newCards));
 
   } catch (err) {
-    console.error('News load error:', err);
+    // console.error('News load error:', err);
     grid.innerHTML = '<p class="news-error">Yangiliklar yuklanmadi. Keyinroq urinib ko\'ring.</p>';
   }
 }
