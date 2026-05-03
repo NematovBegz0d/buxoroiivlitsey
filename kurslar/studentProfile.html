@@ -656,7 +656,7 @@
       }
 
       function attBarHtml(label, stats) {
-        const tone = stats.pct >= 80 ? "good" : stats.pct >= 50 ? "warn" : "bad";
+        const tone = stats.total === 0 ? "none" : (stats.pct >= 80 ? "good" : stats.pct >= 50 ? "warn" : "bad");
         return `<div class="att-row">
           <span class="att-label">${esc(label)}</span>
           <div class="att-bar-bg">
