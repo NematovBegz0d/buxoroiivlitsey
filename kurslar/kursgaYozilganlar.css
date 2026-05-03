@@ -200,14 +200,24 @@
 #studentDetailModal .modal-body { padding: 20px 24px 28px; }
 #gcStatsModal .modal-container { max-width: 680px; }
 #sdmTodayDate + .modal-close { margin-left: 10px; }
-#gcStatsIcon { background: rgba(68, 138, 255, 0.15); }
-#gcStatsIcon i { color: #64b5f6; }
+
+/* Header right group that previously had inline style="display:flex;align-items:center;gap:10px" */
+.modal-header-right-group { display: flex; align-items: center; gap: 10px; }
+
+/* Subject-color via CSS custom property, no inline `style="color:..."` needed.
+   JS just sets `--subject-color`, fallbacks to accent-blue. */
+.sdm-course-card { border-left: 3px solid var(--subject-color, var(--accent-blue)); }
+.sdm-card-subject { color: var(--subject-color, var(--accent-blue)); }
+#gcStatsIcon { background: var(--subject-color-soft, rgba(68, 138, 255, 0.15)); }
+#gcStatsIcon i { color: var(--subject-color, #64b5f6); }
 .group-course-stats-bar-label i { margin-right: 4px; }
-.sdm-course-card { border-left: 3px solid var(--accent-blue); }
-.sdm-card-subject { color: var(--accent-blue); }
 .sdm-label { color: var(--text-white); }
 .gcs-summary-card:nth-child(2) .gcs-summary-num { color: var(--accent-green); }
 .gcs-summary-card:nth-child(3) .gcs-summary-num { color: var(--accent-yellow); }
+
+/* Loading indicator while we sync data on first load */
+.fb-load { text-align: center; padding: 20px; color: var(--text-secondary); }
+
 @media (max-width: 650px) {
   .search-wrapper { width: 100%; margin-right: 0; }
 }

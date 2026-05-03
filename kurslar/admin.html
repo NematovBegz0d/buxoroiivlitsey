@@ -94,27 +94,21 @@
               <div class="stat-label">Guruhlar</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-users"></i>
               </div>
               <div class="stat-num" id="statStudents">0</div>
               <div class="stat-label">O‘quvchilar</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-chalkboard-user"></i>
               </div>
               <div class="stat-num" id="statTeachers">0</div>
               <div class="stat-label">O‘qituvchilar</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-file-signature"></i>
               </div>
               <div class="stat-num" id="statAssignments">0</div>
@@ -242,8 +236,7 @@
                   <div class="student-list" id="studentsList">
                     <div class="empty">Guruh tanlang.</div>
                   </div>
-                  <div
-                  >
+                  <div class="action-row">
                     <button class="btn" id="btnResetEnroll">
                       <i class="fa-solid fa-eraser"></i> Formani tozalash</button
                     ><button class="btn primary" id="btnSaveEnroll">
@@ -327,27 +320,21 @@
               <div class="stat-label">Fanlar</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-chalkboard-user"></i>
               </div>
               <div class="stat-num" id="refTeachersCount">0</div>
               <div class="stat-label">O‘qituvchilar</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-user-tie"></i>
               </div>
               <div class="stat-num" id="refMentorsCount">0</div>
               <div class="stat-label">Sinf rahbarlari</div>
             </div>
             <div class="stat">
-              <div
-                class="stat-icon"
-              >
+              <div class="stat-icon">
                 <i class="fa-solid fa-database"></i>
               </div>
               <div class="stat-num" id="refCollectionsCount">0</div>
@@ -569,8 +556,7 @@
                   o‘qituvchiga yuboring.
                 </p>
               </div>
-              <div
-              >
+              <div class="action-row">
                 <button class="btn" id="btnResetTeacherForm">
                   <i class="fa-solid fa-eraser"></i> Tozalash
                 </button>
@@ -1096,20 +1082,23 @@
       }
       async function replaceRatingCollection(rows, month) {
         const col = db.collection("students_rating");
+        const newIds = new Set(rows.map((r) => String(r.id)));
         const oldSnapshot = await col.get();
+        const staleDocs = oldSnapshot.docs.filter((d) => !newIds.has(d.id));
+
         let batch = db.batch();
         let ops = 0;
-
-        for (const doc of oldSnapshot.docs) {
-          batch.delete(doc.ref);
-          ops++;
-          if (ops >= 450) {
+        const flush = async () => {
+          if (ops > 0) {
             await batch.commit();
             batch = db.batch();
             ops = 0;
           }
-        }
+        };
 
+        // 1) Yangi reyting yozuvlarini avval yozamiz (set + merge=false). Shu bosqich
+        //    muvaffaqiyatsiz tugasa, eski reyting baribir hech qachon o‘chirilmagan
+        //    holatda qoladi — foydalanuvchilar uchun davomiylik buzilmaydi.
         for (let index = 0; index < rows.length; index++) {
           const row = rows[index];
           const ref = col.doc(String(row.id));
@@ -1119,36 +1108,51 @@
             ratingMonth: month,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedByUid: state.currentUser.uid,
-            updatedByLogin: state.currentUser.login || state.currentUser.email || "admin",
+            updatedByLogin:
+              state.currentUser.login || state.currentUser.email || "admin",
           });
           ops++;
-          if (ops >= 450) {
-            await batch.commit();
-            batch = db.batch();
-            ops = 0;
-          }
+          if (ops >= 450) await flush();
         }
+        await flush();
 
-        batch.set(db.collection("rating_meta").doc("current"), {
-          month,
-          count: rows.length,
-          groupsCount: new Set(rows.map((s) => s.group)).size,
-          avgScore: rows.length
-            ? Number((rows.reduce((sum, s) => sum + Number(s.total_score || 0), 0) / rows.length).toFixed(1))
-            : 0,
-          maxScore: rows.length ? Math.max(...rows.map((s) => Number(s.total_score || 0))) : 0,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          updatedByUid: state.currentUser.uid,
-          updatedByLogin: state.currentUser.login || state.currentUser.email || "admin",
-        }, { merge: true });
-        ops++;
-        if (ops > 0) {
-          try {
-            await batch.commit();
-          } catch (err) {
-            throw new Error("Rating_meta Firebase'ga yuklashda xatolik: " + err.message);
-          }
+        // 2) Endi yangi reytingda yo‘q bo‘lgan eski yozuvlarni tozalaymiz.
+        for (const doc of staleDocs) {
+          batch.delete(doc.ref);
+          ops++;
+          if (ops >= 450) await flush();
         }
+        await flush();
+
+        // 3) Meta-yozuv: faqat yuqoridagi ikkala bosqich tugaganidan keyin yoziladi.
+        await db
+          .collection("rating_meta")
+          .doc("current")
+          .set(
+            {
+              month,
+              count: rows.length,
+              groupsCount: new Set(rows.map((s) => s.group)).size,
+              avgScore: rows.length
+                ? Number(
+                    (
+                      rows.reduce((sum, s) => sum + Number(s.total_score || 0), 0) /
+                      rows.length
+                    ).toFixed(1),
+                  )
+                : 0,
+              maxScore: rows.length
+                ? Math.max(...rows.map((s) => Number(s.total_score || 0)))
+                : 0,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedByUid: state.currentUser.uid,
+              updatedByLogin:
+                state.currentUser.login ||
+                state.currentUser.email ||
+                "admin",
+            },
+            { merge: true },
+          );
       }
       async function uploadRatingToFirestore() {
         const month = ratingMonthInput.value || currentMonthValue();
@@ -1416,15 +1420,24 @@
           createdTeacherPassword.textContent = password;
           teacherCredentialBox.style.display = "block";
           toast("Yangi o‘qituvchi yaratildi.", "success");
+          // SECURITY: parol log'da saqlanmaydi — faqat ekranda ko‘rsatiladi.
           log(
-            `Yangi o‘qituvchi yaratildi:\nF.I.Sh: ${fullName}\nID: ${id}\nLogin: ${login}\nEmail: ${email}\nParol: ${password}\nFanlar: ${subjectNames.join(", ")}`,
+            `Yangi o‘qituvchi yaratildi:\nF.I.Sh: ${fullName}\nID: ${id}\nLogin: ${login}\nEmail: ${email}\nFanlar: ${subjectNames.join(", ")}`,
           );
           await loadAll();
           renderTeacherSubjects();
-          generateTeacherLoginPassword();
-          createdTeacherEmail.textContent = email;
-          createdTeacherPassword.textContent = password;
-          teacherCredentialBox.style.display = "block";
+          // Forma yangi yozuv uchun tayyorlanadi, lekin credentialBox yopilmaydi —
+          // admin paroldan nusxa olishga ulgursin.
+          newTeacherFullName.value = "";
+          document
+            .querySelectorAll(".new-teacher-subject-check")
+            .forEach((x) => (x.checked = false));
+          const nextN = nextTeacherNumber();
+          const nextPad = String(nextN).padStart(3, "0");
+          newTeacherIdAdmin.value = nextN;
+          newTeacherLoginAdmin.value = `teacher${nextPad}`;
+          newTeacherEmail.value = `teacher${nextPad}@litsey.uz`;
+          newTeacherPasswordAdmin.value = `Teacher${nextPad}@${new Date().getFullYear()}`;
         } catch (e) {
           // console.error(e);
           if (createdUser && secondaryAuth) {

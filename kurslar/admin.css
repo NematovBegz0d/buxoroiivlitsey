@@ -510,11 +510,14 @@
 /* PRO layout fixes after moving inline styles to external CSS */
 #adminContent { display: none; }
 .form-grid.two { margin-top: 14px; }
-#subjectCustomName, #classTimeCustom { display: none; margin-top: 8px; }
+/* customTimeInput is the actual id used in admin.html for the "custom class time" input.
+   It must be hidden by default and shown only when the user picks "Boshqa vaqt". */
+#customTimeInput { display: none; margin-top: 8px; }
 .card.embedded-card { box-shadow: none; margin-top: 18px; }
-.subject-check-list { max-height: 300px; }
 .loading-denied-actions { display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
 #teacherCredentialBox { display: none; }
+/* The two action button rows that previously had inline styling */
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; justify-content: flex-end; }
 
 /* Rating upload panel */
 .rating-upload-box {

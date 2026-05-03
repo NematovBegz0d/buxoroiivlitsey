@@ -122,7 +122,7 @@
               <p id="sdmStudentGroup">Guruh: —</p>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 10px">
+          <div class="modal-header-right-group">
             <span class="date-badge" id="sdmTodayDate"></span>
             <button
               class="modal-close"
@@ -216,7 +216,7 @@
         return String(value || "")
           .toLowerCase()
           .trim()
-          .replace(/[ʼ'''ʻ`]/g, "")
+          .replace(/[ʼ'‘’ʻ`]/g, "")
           .replace(/-/g, "_")
           .replace(/\s+/g, "_")
           .replace(/[^\w_]/g, "");
@@ -239,6 +239,35 @@
         );
       }
 
+      /** Slug-dan xavfsiz Firestore docId yasaydi (admin.html bilan bir xil). */
+      function makeSafeDocId(value) {
+        return makeSlug(String(value || "x")).slice(0, 90) || "x";
+      }
+
+      /**
+       * HTML escape — Firestore dan kelgan har qanday qiymat (ism, fan nomi,
+       * izoh) innerHTML orqali DOMga yozilishidan oldin escape qilinishi kerak.
+       * Bu XSS hujumlarini oldini oladi.
+       */
+      function esc(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      /** onclick="f('${jsAttr(x)}')" kabi JS string ichida xavfsiz ishlatish uchun. */
+      function jsAttr(value) {
+        return String(value ?? "")
+          .replaceAll("\\", "\\\\")
+          .replaceAll("'", "\\'")
+          .replaceAll('"', '\\"')
+          .replaceAll("\n", "\\n")
+          .replaceAll("\r", "\\r");
+      }
+
       // ===== SAHIFA YUKLANGANDA =====
       document.addEventListener("DOMContentLoaded", async () => {
         checkAuth();
@@ -249,7 +278,7 @@
         if (container) {
           container.insertAdjacentHTML(
             "afterbegin",
-            '<div id="fbLoad" style="text-align:center;padding:20px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Ma\'lumotlar yuklanmoqda...</div>',
+            '<div id="fbLoad" class="fb-load"><i class="fa-solid fa-spinner fa-spin"></i> Ma\'lumotlar yuklanmoqda...</div>',
           );
         }
 
@@ -352,6 +381,9 @@
         // Tugmalarni rol bo'yicha ko'rsatish/yashirish
         const isObserver =
           currentUser.role === "observer" || currentUser.role === "kuzatuvchi";
+        const isTeacherOrMentor = ["sinf_rahbari", "oqituvchi"].includes(
+          currentUser.role,
+        );
         const btnEnroll = document.getElementById("btnEnrollFromHere");
         const btnNazorat = document.getElementById("btnGoToNazorat");
         const btnAdmin = document.querySelector(".btn-admin-action");
@@ -365,13 +397,10 @@
             btnEnroll.style.display =
               currentUser.role === "sinf_rahbari" ? "" : "none";
           if (btnNazorat)
-            btnNazorat.style.display = ["sinf_rahbari", "oqituvchi"].includes(
-              currentUser.role,
-            )
-              ? ""
-              : "none";
+            btnNazorat.style.display = isTeacherOrMentor ? "" : "none";
           if (btnAdmin)
-            btnAdmin.style.display = currentUser.role === "admin" ? "" : "none";
+            btnAdmin.style.display =
+              currentUser.role === "admin" ? "" : "none";
         }
       }
 
@@ -380,7 +409,6 @@
           sessionStorage.removeItem("currentUser");
           [
             "students",
-            "groups",
             "courseAssignments",
             "attendance",
             "grades",
@@ -444,9 +472,9 @@
             searchResults.innerHTML = filtered
               .map(
                 (s) => {
-                  const safeName = (s.fullName || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-                  const safeGroup = String(s.groupCode || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-                  const safeId    = String(s.id        || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+                  const safeName  = esc(s.fullName || "");
+                  const safeGroup = jsAttr(s.groupCode || "");
+                  const safeId    = jsAttr(String(s.id || ""));
                   return `
               <div class="search-result-item" onclick="
                 document.getElementById('searchResults').classList.remove('show');
@@ -454,7 +482,7 @@
                 openStudentDetail('${safeId}', '${safeGroup}')
               ">
                 <span class="student-name">${safeName}</span>
-                <span class="student-group">${safeGroup}-guruh</span>
+                <span class="student-group">${esc(s.groupCode || "")}-guruh</span>
               </div>`;
                 },
               )
@@ -540,12 +568,13 @@
 
       function renderGroupCard(code, enrolledCount) {
         const isActive = activeTableGroup === code;
+        const safeCode = jsAttr(code);
         return `
         <div class="group-card ${isActive ? "active" : ""}"
-             onclick="toggleGroupTable('${code}')"
-             id="groupCard_${code}">
-          <div class="group-card-code">${code}</div>
-          <div class="group-card-label">${code}-guruh</div>
+             onclick="toggleGroupTable('${safeCode}')"
+             id="groupCard_${esc(code)}">
+          <div class="group-card-code">${esc(code)}</div>
+          <div class="group-card-label">${esc(code)}-guruh</div>
           <div class="group-card-count">${enrolledCount > 0 ? enrolledCount + " ta yozilgan" : "hali yo'q"}</div>
         </div>`;
       }
@@ -609,8 +638,8 @@
 
         let tableHtml = `
         <div class="group-table-header">
-          <h3>${groupCode}-guruh o'quvchilari (jami: ${groupStudents.length})</h3>
-          <span class="close-table" onclick="toggleGroupTable('${groupCode}')">✕</span>
+          <h3>${esc(groupCode)}-guruh o'quvchilari (jami: ${groupStudents.length})</h3>
+          <span class="close-table" onclick="toggleGroupTable('${jsAttr(groupCode)}')">✕</span>
         </div>`;
 
         // Kurs statistika tugmalari
@@ -635,11 +664,10 @@
         if (gcList.length > 0) {
           const btns = gcList
             .map((c) => {
-              const _esc = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-              const safeArgs = `'${_esc(c.subjectId)}','${_esc(c.teacherId)}','${_esc(c.classTime)}','${_esc(groupCode)}'`;
-              const timeLabel = c.classTime ? ` — ${c.classTime}` : "";
+              const safeArgs = `'${jsAttr(c.subjectId)}','${jsAttr(c.teacherId)}','${jsAttr(c.classTime)}','${jsAttr(groupCode)}'`;
+              const timeLabel = c.classTime ? ` — ${esc(c.classTime)}` : "";
               return `<button class="btn-course-stat" onclick="openGcStatsModal(${safeArgs})">
-                <i class="fa-solid fa-chart-bar"></i> ${c.subjectName}${timeLabel}
+                <i class="fa-solid fa-chart-bar"></i> ${esc(c.subjectName)}${timeLabel}
               </button>`;
             })
             .join("");
@@ -687,21 +715,23 @@
               coursesHtml = courseNames
                 .map((name) => {
                   const count = courseCounts[name];
-                  return `<span class="course-name-badge">${name}${count > 1 ? " ×" + count : ""}</span>`;
+                  return `<span class="course-name-badge">${esc(name)}${count > 1 ? " ×" + count : ""}</span>`;
                 })
                 .join("");
             }
 
+            // BUG 1.2 FIX: student.id tirnoq ichida yoziladi —
+            // String ID lar uchun JS ReferenceError bo'lmasligini ta'minlaydi.
             const rowAttrs =
               studentCourses.length > 0
-                ? `onclick="openStudentDetail(${student.id}, '${groupCode}')" class="clickable-row"`
+                ? `onclick="openStudentDetail('${jsAttr(student.id)}', '${jsAttr(groupCode)}')" class="clickable-row"`
                 : "";
 
             tableHtml += `
             <tr ${rowAttrs}>
               <td>${i + 1}</td>
-              <td>${student.fullName}</td>
-              <td>${student.groupCode}</td>
+              <td>${esc(student.fullName)}</td>
+              <td>${esc(student.groupCode)}</td>
               <td><div class="course-name-badges-wrap">${coursesHtml}</div></td>
             </tr>`;
           });
@@ -879,19 +909,21 @@
             }
           }
 
+          // CSS custom property orqali rang beriladi — inline style="color:..." emas.
+          // kursgaYozilganlar.css da: .sdm-course-card { border-left: 3px solid var(--subject-color, var(--accent-blue)); }
           html += `
-          <div class="sdm-course-card" style="border-left:3px solid ${color};">
+          <div class="sdm-course-card" style="--subject-color:${color};">
             <div class="sdm-card-top">
-              <div class="sdm-card-subject" style="color:${color};">${course.subjectName}</div>
+              <div class="sdm-card-subject">${esc(course.subjectName)}</div>
               ${davomatHtml}
             </div>
             <div class="sdm-card-row">
               <span class="sdm-label"><i class="fa-solid fa-user-graduate"></i> O'qituvchi:</span>
-              <span class="sdm-value">${course.teacherName}</span>
+              <span class="sdm-value">${esc(course.teacherName)}</span>
             </div>
             <div class="sdm-card-row">
               <span class="sdm-label"><i class="fa-solid fa-clock"></i> Dars vaqti:</span>
-              <span class="sdm-value">${course.classTime || "—"}</span>
+              <span class="sdm-value">${esc(course.classTime || "—")}</span>
             </div>
             <div class="sdm-card-row">
               <span class="sdm-label"><i class="fa-solid fa-calendar-days"></i> Hafta kunlari:</span>
@@ -899,7 +931,7 @@
                 ${courseWeekDays
                   .map(
                     (d) =>
-                      `<span class="weekday-small-badge${d === todayWeekDay ? " weekday-today" : ""}">${d.substring(0, 3)}</span>`,
+                      `<span class="weekday-small-badge${d === todayWeekDay ? " weekday-today" : ""}">${esc(d.substring(0, 3))}</span>`,
                   )
                   .join("")}
               </div>
@@ -1048,7 +1080,9 @@
             return entries
               .map(
                 (g) =>
-                  `<span class="grade-badge grade-${g.grade}" title="${gradeDateLabel(g.date)} | ${g.classTime}">${g.grade}</span>`,
+                  // grade qiymati integer (2–5), classTime va date — Firestore dan
+                  // kelgan string. esc() bilan tozalanadi.
+                  `<span class="grade-badge grade-${Number(g.grade)}" title="${esc(gradeDateLabel(g.date))} | ${esc(g.classTime)}">${Number(g.grade)}</span>`,
               )
               .join(" ");
           }
@@ -1080,7 +1114,7 @@
                 <div class="grade-line-title">Bu oy</div>
                 <div class="grade-line-body">
                   ${gradeBadges(monthGrades.slice(0, 8))}
-                  <div class="grade-meta grade-meta-success">O'rtacha: ${avgGrade(monthGrades)}</div>
+                  <div class="grade-meta grade-meta-success">O'rtacha: ${esc(avgGrade(monthGrades))}</div>
                   <div class="grade-meta">Soni: ${monthGrades.length} ta</div>
                 </div>
               </div>
@@ -1092,7 +1126,7 @@
                       .slice(0, 8)
                       .map(
                         (g) =>
-                          `<span>${gradeDateLabel(g.date)}: <b class="grade-history-value">${g.grade}</b></span>`,
+                          `<span>${esc(gradeDateLabel(g.date))}: <b class="grade-history-value">${Number(g.grade)}</b></span>`,
                       )
                       .join('<span class="grade-dot">•</span>')}
                   </div>`
@@ -1111,52 +1145,9 @@
        GURUH KURSI STATISTIKASI
        ============================================================ */
 
-      const _UZ_DAYS = [
-        "Yakshanba",
-        "Dushanba",
-        "Seshanba",
-        "Chorshanba",
-        "Payshanba",
-        "Juma",
-        "Shanba",
-      ];
-
-      function _dateToStr(d) {
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      }
-
-      function _countExpected(days, start, end) {
-        if (!days || !days.length) return 0;
-        let n = 0;
-        const d = new Date(start);
-        while (d <= end) {
-          if (days.includes(_UZ_DAYS[d.getDay()])) n++;
-          d.setDate(d.getDate() + 1);
-        }
-        return n;
-      }
-
-      function _getDateRange(mode) {
-        const now = new Date();
-        const today = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-        );
-        if (mode === "weekly") {
-          const dow = today.getDay();
-          const diff = dow === 0 ? -6 : 1 - dow;
-          const mon = new Date(today);
-          mon.setDate(today.getDate() + diff);
-          const sun = new Date(mon);
-          sun.setDate(mon.getDate() + 6);
-          return { start: mon, end: sun };
-        }
-        return {
-          start: new Date(today.getFullYear(), today.getMonth(), 1),
-          end: today,
-        };
-      }
+      // _UZ_DAYS, _dateToStr, _countExpected, _getDateRange funksiyalari
+      // UZ_WEEKDAYS, dateObjToStr, countExpectedSessions, calcPeriod bilan
+      // bir xil — yuqorida allaqachon aniqlangan. Dublikatlar olib tashlandi.
 
       function openGcStatsModal(subjectId, teacherId, classTime, groupCode) {
         const assignments = JSON.parse(
@@ -1181,8 +1172,10 @@
 
         const color = SUBJECT_COLORS[course?.subjectName] || "#448aff";
         const icon = document.getElementById("gcStatsIcon");
-        icon.style.background = color + "22";
-        icon.innerHTML = `<i class="fa-solid fa-chart-bar" style="color:${color};"></i>`;
+        // CSS custom property orqali rang — inline style="color:..." emas.
+        icon.style.setProperty("--subject-color", color);
+        icon.style.setProperty("--subject-color-soft", color + "22");
+        icon.innerHTML = `<i class="fa-solid fa-chart-bar"></i>`;
 
         document.getElementById("gcStatsTitle").textContent =
           (course?.subjectName || "Kurs") + " — " + groupCode + "-guruh";
@@ -1212,9 +1205,11 @@
         const { subjectId, teacherId, classTime, groupCode, weekDays } =
           currentGcCourse;
 
-        const { start, end } = _getDateRange(mode);
-        const startStr = _dateToStr(start);
-        const endStr = _dateToStr(end);
+        // Dublikat funksiyalar o'chirildi — canonical nomlar ishlatiladi:
+        // _getDateRange → calcPeriod, _dateToStr → dateObjToStr, _countExpected → countExpectedSessions
+        const { start, end } = calcPeriod(mode);
+        const startStr = dateObjToStr(start);
+        const endStr = dateObjToStr(end);
 
         const allAttendance = JSON.parse(
           localStorage.getItem("attendance") || "[]",
@@ -1254,7 +1249,7 @@
             att.date <= endStr,
         );
 
-        const expectedBySchedule = _countExpected(weekDays, start, end);
+        const expectedBySchedule = countExpectedSessions(weekDays, start, end);
         const held = new Set(recs.map((a) => a.date)).size;
         const expected = Math.max(expectedBySchedule, held);
         const unrecorded = Math.max(expected - held, 0);
@@ -1313,7 +1308,7 @@
           rows += `
           <tr>
             <td>${String(i + 1).padStart(2, "0")}</td>
-            <td class="stats-cell-name">${s.studentName}</td>
+            <td class="stats-cell-name">${esc(s.studentName)}</td>
             <td class="stats-cell-present">${s.attended}</td>
             <td class="stats-cell-absent">${s.missed}</td>
             <td class="stats-cell-unrecorded">${s.unrecorded}</td>

@@ -174,10 +174,7 @@
           return;
         }
 
-        if (
-          currentUser.role === "observer" ||
-          currentUser.role === "kuzatuvchi"
-        ) {
+        if (currentUser.role === "observer") {
           window.location.href = "kursgaYozilganlar.html";
           return;
         }

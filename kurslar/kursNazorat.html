@@ -548,6 +548,30 @@
       }
 
       /**
+       * HTML escape — har qanday Firestore yozuvi (o‘quvchi ismi, fan nomi, izoh)
+       * ichida `<`, `>`, `&`, `"`, `'` belgilari bo‘lsa, ular DOMga zararsiz
+       * tarzda kiritiladi. Bu XSS oldini oladi.
+       */
+      function esc(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      /** JS string literal ichida ishlatish uchun (onclick="foo('${jsAttr(x)}')") */
+      function jsAttr(value) {
+        return String(value ?? "")
+          .replaceAll("\\", "\\\\")
+          .replaceAll("'", "\\'")
+          .replaceAll('"', '\\"')
+          .replaceAll("\n", "\\n")
+          .replaceAll("\r", "\\r");
+      }
+
+      /**
        * FIX #5 — Tugmani yuklash holati (ikki marta bosishni oldini olish)
        */
       function setButtonLoading(btnId, isLoading, originalText) {
@@ -675,7 +699,6 @@
           sessionStorage.removeItem("currentUser");
           [
             "students",
-            "groups",
             "courseAssignments",
             "attendance",
             "grades",
@@ -840,13 +863,13 @@
         );
         const shortName = subj
           ? subj.shortName
-          : course.subjectName.substring(0, 3).toUpperCase();
+          : (course.subjectName || "").substring(0, 3).toUpperCase();
         const totalStudents = course.students.length;
         const groupsArr = [...course.groups];
 
-        const safeSubjectId  = String(course.subjectId  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-        const safeTeacherId  = String(course.teacherId  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-        const safeClassTime  = String(course.classTime  || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const safeSubjectId = jsAttr(course.subjectId);
+        const safeTeacherId = jsAttr(course.teacherId);
+        const safeClassTime = jsAttr(course.classTime);
         const courseTime = (course.classTime || "").trim();
 
         // FIX #8 — classTime bo'sh bo'lganda noto'g'ri davomat topilmasligi ta'minlandi
@@ -858,7 +881,9 @@
             (att.classTime || "").trim() === courseTime,
         );
 
-        const isTodayClass = (course.weekdays || course.weekDays || []).includes(todayWeekDay);
+        const isTodayClass = (course.weekdays || course.weekDays || []).includes(
+          todayWeekDay,
+        );
         let attendanceBtnHtml = "";
 
         if (
@@ -874,7 +899,10 @@
           }
         } else if (currentUser.role === "oqituvchi") {
           attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
-        } else if (currentUser.role === "kuzatuvchi") {
+        } else if (
+          currentUser.role === "observer" ||
+          currentUser.role === "kuzatuvchi"
+        ) {
           attendanceBtnHtml = `<button class="btn-attendance" disabled title="Kuzatuvchi davomat ola olmaydi">Davomat olish</button>`;
         } else {
           attendanceBtnHtml = `<button class="btn-attendance" disabled>Davomat olish</button>`;
@@ -885,22 +913,22 @@
              onclick="openCourseStudents('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')">
           <div class="course-card-header">
             <div class="course-card-info">
-              <div class="subject-badge">${shortName}</div>
+              <div class="subject-badge">${esc(shortName)}</div>
               <div>
-                <div class="course-card-name">${course.subjectName} (${course.teacherName})</div>
-                <div class="course-card-teacher">${course.classTime || ""}</div>
+                <div class="course-card-name">${esc(course.subjectName)} (${esc(course.teacherName)})</div>
+                <div class="course-card-teacher">${esc(course.classTime || "")}</div>
               </div>
             </div>
             <div class="course-card-count">jami: ${totalStudents}</div>
           </div>
           <div class="course-card-details">
-            ${course.classTime ? `<span class="detail-chip"><span class="chip-icon">🕐</span> ${course.classTime}</span>` : ""}
-            ${(course.weekdays || course.weekDays || []).map((d) => `<span class="detail-chip">${d}</span>`).join("")}
+            ${course.classTime ? `<span class="detail-chip"><span class="chip-icon">🕐</span> ${esc(course.classTime)}</span>` : ""}
+            ${(course.weekdays || course.weekDays || []).map((d) => `<span class="detail-chip">${esc(d)}</span>`).join("")}
             <span class="detail-chip">${groupsArr.length} ta guruh</span>
           </div>
           <div class="course-card-footer">
             <div class="groups-enrolled">
-              ${groupsArr.map((g) => `<span class="group-mini-badge">${g}</span>`).join("")}
+              ${groupsArr.map((g) => `<span class="group-mini-badge">${esc(g)}</span>`).join("")}
             </div>
             <div class="course-card-actions">
               <button class="btn-stats" onclick="event.stopPropagation();openStatsModal('${safeSubjectId}','${safeTeacherId}','${safeClassTime}')">
@@ -971,19 +999,22 @@
           return;
         }
 
-        const safeTime = (classTime || "").replace(/'/g, "\\'");
+        const safeTime = jsAttr(classTime);
+        const safeSubjectId = jsAttr(subjectId);
+        const safeTeacherId = jsAttr(teacherId);
         let html = "";
         courseStudents.forEach((s, i) => {
+          const safeStudentId = jsAttr(s.studentId);
           const deleteBtn =
             currentUser.role === "sinf_rahbari"
-              ? `<button class="btn-remove-student" onclick="event.stopPropagation();removeStudentFromCourse('${s.studentId}','${subjectId}','${teacherId}','${safeTime}')" title="O'chirish">✕</button>`
+              ? `<button class="btn-remove-student" onclick="event.stopPropagation();removeStudentFromCourse('${safeStudentId}','${safeSubjectId}','${safeTeacherId}','${safeTime}')" title="O'chirish">✕</button>`
               : "";
           html += `
           <div class="csm-student-item">
             <div class="csm-student-num">${String(i + 1).padStart(2, "0")}</div>
             <div class="csm-student-info">
-              <div class="csm-student-name">${s.studentName}</div>
-              <div class="csm-student-group">${s.groupCode}-guruh</div>
+              <div class="csm-student-name">${esc(s.studentName)}</div>
+              <div class="csm-student-group">${esc(s.groupCode)}-guruh</div>
             </div>
             ${deleteBtn}
           </div>`;
@@ -1044,7 +1075,9 @@
         );
         const groupStudents = allStudents
           .filter((s) => String(s.groupCode) === String(currentUser.groupCode))
-          .sort((a, b) => a.fullName.localeCompare(b.fullName));
+          .sort((a, b) =>
+            (a.fullName || "").localeCompare(b.fullName || "", "uz"),
+          );
 
         const enrolledIds = assignments
           .filter(
@@ -1072,7 +1105,7 @@
         const select = document.getElementById("csmAddStudentSelect");
         select.innerHTML = '<option value="">— O\'quvchi tanlang —</option>';
         available.forEach((s) => {
-          select.innerHTML += `<option value="${s.id}" data-name="${s.fullName}">${s.fullName}</option>`;
+          select.innerHTML += `<option value="${esc(s.id)}" data-name="${esc(s.fullName)}">${esc(s.fullName)}</option>`;
         });
       }
 
@@ -1113,30 +1146,49 @@
             (a.classTime || "") === (currentCourseView.classTime || ""),
         );
 
+        const courseClassTime =
+          currentCourseView.classTime ||
+          (existingCourse ? existingCourse.classTime : "");
+        const days = existingCourse
+          ? existingCourse.weekdays || existingCourse.weekDays || []
+          : [];
+
+        // Deterministik docId — bir xil o'quvchi+fan+o'qituvchi+vaqt kombinatsiyasi
+        // hech qachon takrorlanmaydi (Firestore unique-ID kafolati).
+        const docId = `ca_${makeSafeDocId(studentId)}_${makeSafeDocId(currentCourseView.subjectId)}_${makeSafeDocId(currentCourseView.teacherId)}_${makeSafeDocId(courseClassTime)}`;
+
         const newAssignment = {
-          id: generateId("ca"),
-          studentId: studentId,
+          id: docId,
+          studentId: String(studentId),
           studentName: studentName,
           groupCode: currentUser.groupCode,
           subjectId: currentCourseView.subjectId,
           subjectName: currentCourseView.subjectName,
           teacherId: currentCourseView.teacherId,
           teacherName: currentCourseView.teacherName,
-          classTime:
-            currentCourseView.classTime ||
-            (existingCourse ? existingCourse.classTime : ""),
-          weekdays: existingCourse ? (existingCourse.weekdays || existingCourse.weekDays || []) : [],
+          classTime: courseClassTime,
+          // Ikkala maydon ham saqlanadi — admin.html va boshqa sahifalar
+          // moslashuvi uchun.
+          weekdays: days,
+          weekDays: days,
           createdBy: currentUser.login,
-          createdAt: new Date().toISOString().split("T")[0],
+          createdByUid: currentUser.uid || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          active: true,
         };
 
         setButtonLoading("btnCsmAdd", true);
         try {
           await db
             .collection("courseAssignments")
-            .doc(newAssignment.id)
-            .set(newAssignment);
-          assignments.push(newAssignment);
+            .doc(docId)
+            .set(newAssignment, { merge: true });
+          // localStorage uchun serverTimestamp() o'rniga ISO sana qo'yamiz
+          assignments.push({
+            ...newAssignment,
+            docId,
+            createdAt: new Date().toISOString(),
+          });
           localStorage.setItem(
             "courseAssignments",
             JSON.stringify(assignments),
@@ -1198,7 +1250,7 @@
           )
           .forEach((s) => {
             const subjectId = getSubjectId(s);
-            select.innerHTML += `<option value="${subjectId}">${s.name || subjectId}</option>`;
+            select.innerHTML += `<option value="${esc(subjectId)}">${esc(s.name || subjectId)}</option>`;
           });
       }
 
@@ -1237,6 +1289,7 @@
 
         matchedTeachers.forEach((t) => {
           const option = document.createElement("option");
+          // textContent va value bevosita DOMga qo'yiladi — innerHTML emas, demak xavfsiz.
           option.value = getTeacherId(t);
           option.textContent = `${t.fullName || t.login || getTeacherId(t)} (${t.badgeLabel || t.login || "o‘qituvchi"})`;
           teacherSelect.appendChild(option);
@@ -1247,7 +1300,9 @@
         const students = JSON.parse(localStorage.getItem("students") || "[]");
         const groupStudents = students
           .filter((s) => String(s.groupCode) === String(currentUser.groupCode))
-          .sort((a, b) => a.fullName.localeCompare(b.fullName));
+          .sort((a, b) =>
+            (a.fullName || "").localeCompare(b.fullName || "", "uz"),
+          );
         const listEl = document.getElementById("enrollStudentList");
 
         let html = `
@@ -1262,8 +1317,8 @@
         groupStudents.forEach((s) => {
           html += `
           <div class="student-select-item">
-            <input type="checkbox" class="student-checkbox" value="${s.id}" data-name="${s.fullName}" onchange="updateSelectedCount()" />
-            <div class="student-info"><div class="s-name">${s.fullName}</div></div>
+            <input type="checkbox" class="student-checkbox" value="${esc(s.id)}" data-name="${esc(s.fullName)}" onchange="updateSelectedCount()" />
+            <div class="student-info"><div class="s-name">${esc(s.fullName)}</div></div>
           </div>`;
         });
         listEl.innerHTML = html;
@@ -1283,31 +1338,6 @@
         ).length;
         document.getElementById("selectedCount").textContent =
           `${checked} / ${all}`;
-      }
-
-      function toggleAddSubject() {
-        showToast("Yangi fan faqat admin panel orqali qo'shiladi.", "warning");
-      }
-
-      function toggleAddTeacher() {
-        showToast(
-          "Yangi o‘qituvchi faqat admin panel orqali qo'shiladi.",
-          "warning",
-        );
-      }
-
-      async function addNewSubject() {
-        showToast("Yangi fan faqat admin panel orqali qo'shiladi.", "warning");
-        return;
-      }
-
-      // FIX #3a — Yangi o'qituvchi paroli hash qilinib saqlanadi
-      async function addNewTeacher() {
-        showToast(
-          "Yangi o‘qituvchi faqat admin panel orqali qo'shiladi.",
-          "warning",
-        );
-        return;
       }
 
       function onTimeSelectChange() {
@@ -1455,7 +1485,10 @@
 
               classTime: classTime,
 
+              // Ikkala maydon ham saqlanadi — admin.html va kursgaYozilganlar.html
+              // ikkalasini ham qo'llaydi (legacy qoldiq).
               weekdays: [...selectedWeekdays],
+              weekDays: [...selectedWeekdays],
 
               createdBy: currentUser.login,
               createdByUid: currentUser.uid || "",
@@ -1593,11 +1626,11 @@
           <div class="attendance-item">
             <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
             <div class="attendance-item-info">
-              <div class="attendance-item-name">${s.studentName}</div>
-              <div class="attendance-item-group">${s.groupCode}-guruh</div>
+              <div class="attendance-item-name">${esc(s.studentName)}</div>
+              <div class="attendance-item-group">${esc(s.groupCode)}-guruh</div>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" data-student-id="${s.studentId}" data-student-name="${s.studentName}" data-group="${s.groupCode}" onchange="updateAttendanceSummary()" />
+              <input type="checkbox" data-student-id="${esc(s.studentId)}" data-student-name="${esc(s.studentName)}" data-group="${esc(s.groupCode)}" onchange="updateAttendanceSummary()" />
               <span class="toggle-slider"></span>
             </label>
           </div>`;
@@ -1659,8 +1692,11 @@
           });
         });
 
+        // Determinik docId: bir xil sana+fan+o'qituvchi+vaqt → har doim bir xil hujjat.
+        const attDocId = `att_${date}_${makeSafeDocId(currentAttendanceCourse.subjectId)}_${makeSafeDocId(currentUser.id)}_${makeSafeDocId(para)}`;
+
         const attendanceRecord = {
-          id: generateId("att"),
+          id: attDocId,
           teacherId: String(currentUser.id),
           teacherLogin: currentUser.login,
           teacherName: currentUser.fullName,
@@ -1672,10 +1708,7 @@
           records: records,
           confirmedBy: currentUser.login,
           confirmedByUid: currentUser.uid || "",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         };
-
-        setButtonLoading("btnSaveAttendance", true);
 
         try {
           const attendance = JSON.parse(
@@ -1691,13 +1724,43 @@
               (a.classTime || "").trim() === (para || "").trim(),
           );
 
+          // Mavjud davomatni qayta yozishdan oldin tasdiqlash so'raymiz.
           if (existIndex >= 0) {
-            attendanceRecord.id = attendance[existIndex].id;
-            attendance[existIndex] = {
+            const ok = confirm(
+              `Bu kurs uchun ${date} sanasidagi davomat allaqachon olingan.\n` +
+                "Uni qayta yozasizmi? Eski qiymatlar yo'qoladi.",
+            );
+            if (!ok) return;
+          }
+
+          setButtonLoading("btnSaveAttendance", true);
+
+          let firestorePayload;
+          if (existIndex >= 0) {
+            const oldRec = attendance[existIndex];
+            attendanceRecord.id = oldRec.id || attDocId;
+            // Audit: createdAt va createdBy saqlanadi.
+            firestorePayload = {
               ...attendanceRecord,
-              createdAt: new Date().toISOString(),
+              createdAt:
+                oldRec.createdAt instanceof Object
+                  ? oldRec.createdAt
+                  : oldRec.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedBy: currentUser.login,
+              updatedByUid: currentUser.uid || "",
+            };
+            attendance[existIndex] = {
+              ...oldRec,
+              ...attendanceRecord,
+              updatedAt: new Date().toISOString(),
+              updatedBy: currentUser.login,
             };
           } else {
+            firestorePayload = {
+              ...attendanceRecord,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            };
             attendance.push({
               ...attendanceRecord,
               createdAt: new Date().toISOString(),
@@ -1707,7 +1770,7 @@
           await db
             .collection("attendance")
             .doc(attendanceRecord.id)
-            .set(attendanceRecord, { merge: true });
+            .set(firestorePayload, { merge: true });
 
           localStorage.setItem("attendance", JSON.stringify(attendance));
 
@@ -1816,13 +1879,13 @@
           <div class="attendance-item">
             <div class="attendance-item-number">${String(i + 1).padStart(2, "0")}</div>
             <div class="attendance-item-info">
-              <div class="attendance-item-name">${s.studentName}</div>
-              <div class="attendance-item-group">${s.groupCode}-guruh</div>
+              <div class="attendance-item-name">${esc(s.studentName)}</div>
+              <div class="attendance-item-group">${esc(s.groupCode)}-guruh</div>
             </div>
             <select class="form-input grade-select"
-              data-student-id="${s.studentId}"
-              data-student-name="${s.studentName}"
-              data-group="${s.groupCode}">
+              data-student-id="${esc(s.studentId)}"
+              data-student-name="${esc(s.studentName)}"
+              data-group="${esc(s.groupCode)}">
               <option value="">—</option>
               <option value="5" ${existingGradeValue == 5 ? "selected" : ""}>5</option>
               <option value="4" ${existingGradeValue == 4 ? "selected" : ""}>4</option>
@@ -1860,9 +1923,11 @@
           return;
         }
 
-        // FIX #4 — generateId() ishlatildi
+        // Determinik docId: bir xil sana+fan+o'qituvchi+vaqt → har doim bir xil hujjat.
+        const grDocId = `gr_${currentGradingCourse.date}_${makeSafeDocId(currentGradingCourse.subjectId)}_${makeSafeDocId(currentGradingCourse.teacherId)}_${makeSafeDocId(currentGradingCourse.classTime)}`;
+
         const gradeRecord = {
-          id: generateId("gr"),
+          id: grDocId,
           subjectId: currentGradingCourse.subjectId,
           teacherId: currentGradingCourse.teacherId,
           teacherName: currentUser.fullName,
@@ -1871,10 +1936,7 @@
           date: currentGradingCourse.date,
           attendanceId: currentGradingCourse.attendanceId,
           grades: gradesArr,
-          createdAt: new Date().toISOString(),
         };
-
-        setButtonLoading("btnSaveGrades", true);
 
         try {
           const allGrades = JSON.parse(localStorage.getItem("grades") || "[]");
@@ -1888,14 +1950,53 @@
           );
 
           if (existIndex >= 0) {
-            // FIX #4 — Eski ID saqlanadi, Firebase'da yangi hujjat YARATILMAYDI
-            gradeRecord.id = allGrades[existIndex].id;
-            allGrades[existIndex] = gradeRecord;
-          } else {
-            allGrades.push(gradeRecord);
+            const ok = confirm(
+              `Bu kurs uchun ${currentGradingCourse.date} sanasidagi baholar allaqachon qo'yilgan.\n` +
+                "Ularni qayta yozasizmi?",
+            );
+            if (!ok) return;
           }
 
-          await db.collection("grades").doc(gradeRecord.id).set(gradeRecord);
+          setButtonLoading("btnSaveGrades", true);
+
+          let firestorePayload;
+          if (existIndex >= 0) {
+            const oldRec = allGrades[existIndex];
+            gradeRecord.id = oldRec.id || grDocId;
+            firestorePayload = {
+              ...gradeRecord,
+              createdAt:
+                oldRec.createdAt instanceof Object
+                  ? oldRec.createdAt
+                  : oldRec.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedBy: currentUser.login,
+              updatedByUid: currentUser.uid || "",
+            };
+            allGrades[existIndex] = {
+              ...oldRec,
+              ...gradeRecord,
+              updatedAt: new Date().toISOString(),
+              updatedBy: currentUser.login,
+            };
+          } else {
+            firestorePayload = {
+              ...gradeRecord,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: currentUser.login,
+              createdByUid: currentUser.uid || "",
+            };
+            allGrades.push({
+              ...gradeRecord,
+              createdAt: new Date().toISOString(),
+              createdBy: currentUser.login,
+            });
+          }
+
+          await db
+            .collection("grades")
+            .doc(gradeRecord.id)
+            .set(firestorePayload, { merge: true });
           localStorage.setItem("grades", JSON.stringify(allGrades));
 
           closeModal("gradingModal");
@@ -2142,8 +2243,8 @@
           rows += `
           <tr>
             <td>${String(i + 1).padStart(2, "0")}</td>
-            <td class="stats-cell-name">${st.studentName}</td>
-            <td class="stats-cell-group">${st.groupCode}</td>
+            <td class="stats-cell-name">${esc(st.studentName)}</td>
+            <td class="stats-cell-group">${esc(st.groupCode)}</td>
             <td class="stats-cell-present">${st.attended}</td>
             <td class="stats-cell-absent">${st.missed}</td>
             <td class="stats-cell-unrecorded">${unrecorded}</td>
