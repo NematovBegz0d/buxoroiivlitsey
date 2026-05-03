@@ -291,6 +291,7 @@
             { name: "subjects", ls: "subjects" },
             { name: "teachers", ls: "teachers" },
             { name: "classMentors", ls: "classMentors" },
+            { name: "students_rating", ls: "students_rating" },
           ];
           await Promise.all(
             collections.map(async (c) => {
@@ -415,6 +416,7 @@
             "subjects",
             "teachers",
             "classMentors",
+            "students_rating",
           ].forEach((key) => localStorage.removeItem(key));
 
           if (typeof auth !== "undefined" && auth.currentUser) {
@@ -580,17 +582,9 @@
       }
 
       function toggleGroupTable(groupCode) {
-        const course1 = [
-          "101",
-          "102",
-          "103",
-          "104",
-          "105",
-          "106",
-          "107",
-          "108",
-        ];
-        const wrapperId = course1.includes(groupCode)
+        // Guruh kodini dinamik aniqlash: "1" bilan boshlanadigan kodlar (101-199)
+        // 1-kurs, qolganlari 2-kurs. Yangi guruhlar (109, 301...) avtomatik to'g'ri joylashadi.
+        const wrapperId = String(groupCode).startsWith("1")
           ? "tableWrapper1"
           : "tableWrapper2";
         const wrapper = document.getElementById(wrapperId);
@@ -720,12 +714,8 @@
                 .join("");
             }
 
-            // BUG 1.2 FIX: student.id tirnoq ichida yoziladi —
-            // String ID lar uchun JS ReferenceError bo'lmasligini ta'minlaydi.
-            const rowAttrs =
-              studentCourses.length > 0
-                ? `onclick="openStudentDetail('${jsAttr(student.id)}', '${jsAttr(groupCode)}')" class="clickable-row"`
-                : "";
+            // Barcha o'quvchilar profiliga o'tish imkoniyati (kursi yo'q bo'lsa ham)
+            const rowAttrs = `onclick="openStudentDetail('${jsAttr(student.id)}', '${jsAttr(groupCode)}')" class="clickable-row"`;
 
             tableHtml += `
             <tr ${rowAttrs}>
@@ -821,6 +811,13 @@
       }
 
       function openStudentDetail(studentId, groupCode) {
+        // Alohida profil sahifasiga yo'naltirish (modal o'rniga)
+        window.location.href = `studentProfile.html?id=${encodeURIComponent(studentId)}&group=${encodeURIComponent(groupCode)}`;
+      }
+
+      // Quyidagi eski modal kodi saqlab qolinyapti — agar kerak bo'lsa
+      // fallback sifatida ishlatish mumkin.
+      function _openStudentDetail_LEGACY(studentId, groupCode) {
         const allStudents = JSON.parse(
           localStorage.getItem("students") || "[]",
         );

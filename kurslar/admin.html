@@ -690,6 +690,11 @@
             ),
           );
       }
+      /**
+       * Dublikat tekshirish: bir o'quvchi + fan + o'qituvchi + vaqt
+       * kombinatsiyasi allaqachon mavjudligini aniqlaydi.
+       * classTime undefined/null bo'lganda "undefined" ga emas, "" ga solishtiradi.
+       */
       function duplicate(st, su, te, ti) {
         return state.assignments.some(
           (a) =>
@@ -697,7 +702,7 @@
             String(a.studentId) === String(st) &&
             String(a.subjectId) === String(su) &&
             String(a.teacherId) === String(te) &&
-            String(a.classTime) === String(ti),
+            (a.classTime || "") === (ti || ""),
         );
       }
       function buildUser(u, p) {
@@ -738,14 +743,29 @@
         return r.length;
       }
       async function loadAll() {
+        // Barcha kolleksiyalarni parallel yuklash (8 ta)
+        const results = await Promise.allSettled(
+          collectionMap.map(async (i) => {
+            const count = await loadCollection(i);
+            return `${i.name}: ${count}`;
+          }),
+        );
         const res = [];
-        for (const i of collectionMap) {
-          try {
-            res.push(`${i.name}: ${await loadCollection(i)}`);
-          } catch (e) {
-            // console.error(i.name, e);
-            res.push(`${i.name}: ERROR — ${e.message}`);
+        const errors = [];
+        results.forEach((r, idx) => {
+          if (r.status === "fulfilled") {
+            res.push(r.value);
+          } else {
+            const name = collectionMap[idx].name;
+            res.push(`${name}: XATO`);
+            errors.push(name);
           }
+        });
+        if (errors.length) {
+          toast(
+            `${errors.length} ta kolleksiya yuklanmadi: ${errors.join(", ")}`,
+            "error",
+          );
         }
         log("Ma’lumotlar yuklandi:\n" + res.join("\n"));
         state.groups.sort((a, b) =>
@@ -778,7 +798,10 @@
         statGroups.textContent = state.groups.length;
         statStudents.textContent = state.students.length;
         statTeachers.textContent = state.teachers.length;
-        statAssignments.textContent = state.assignments.length;
+        // Faqat faol (active !== false) yozuvlarni sanash — o'chirilgan yozuvlar hisobga kiritilmaydi
+        statAssignments.textContent = state.assignments.filter(
+          (a) => a.active !== false,
+        ).length;
         refSubjectsCount.textContent = state.subjects.length;
         refTeachersCount.textContent = state.teachers.length;
         refMentorsCount.textContent = state.classMentors.length;
@@ -1206,72 +1229,74 @@
           time = selectedTime();
         if (!g) return toast("Guruh tanlang.", "error");
         if (!s) return toast("Fan tanlang.", "error");
-        if (!t) return toast("O‘qituvchi tanlang.", "error");
+        if (!t) return toast("O'qituvchi tanlang.", "error");
         if (!time) return toast("Dars vaqtini tanlang.", "error");
         if (!state.selectedWeekdays.size)
           return toast("Hafta kunlarini tanlang.", "error");
         if (!state.selectedStudents.size)
-          return toast("Kamida bitta o‘quvchi tanlang.", "error");
+          return toast("Kamida bitta o'quvchi tanlang.", "error");
         const sub = state.subjects.find((x) => subId(x) === String(s));
         const teach = state.teachers.find((x) => teacherId(x) === String(t));
         const students = state.students.filter((x) =>
           state.selectedStudents.has(String(x.id)),
         );
-        if (!teach) return toast("O‘qituvchi topilmadi.", "error");
+        if (!teach) return toast("O'qituvchi topilmadi.", "error");
         if (!sub) return toast("Fan topilmadi.", "error");
-        const days = Array.from(state.selectedWeekdays),
-          batch = db.batch();
-        let created = 0,
-          skipped = 0;
-        students.forEach((st) => {
-          if (duplicate(st.id, s, t, time)) {
-            skipped++;
+
+        // Darhol disable — ikki marta bosishni oldini olish
+        btnSaveEnroll.disabled = true;
+
+        try {
+          const days = Array.from(state.selectedWeekdays),
+            batch = db.batch();
+          let created = 0,
+            skipped = 0;
+          students.forEach((st) => {
+            if (duplicate(st.id, s, t, time)) {
+              skipped++;
+              return;
+            }
+            const id = `ca_${safe(st.id)}_${safe(s)}_${safe(t)}_${safe(time)}`;
+            batch.set(
+              db.collection("courseAssignments").doc(id),
+              {
+                id,
+                studentId: String(st.id),
+                studentName: st.fullName || "",
+                groupCode: String(st.groupCode || g),
+                subjectId: String(s),
+                subjectName: sub.name || String(s),
+                teacherId: String(t),
+                teacherName: teach.fullName || teach.login || String(t),
+                teacherLogin: teach.login || "",
+                classTime: time,
+                weekdays: days,
+                weekDays: days,
+                createdBy: state.currentUser.login || "admin",
+                createdByUid: state.currentUser.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                active: true,
+              },
+              { merge: true },
+            );
+            created++;
+          });
+          if (!created) {
+            toast(
+              `Yangi yozuv yo'q. ${skipped} ta yozuv avval mavjud.`,
+              "warning",
+            );
             return;
           }
-          const id = `ca_${safe(st.id)}_${safe(s)}_${safe(t)}_${safe(time)}`;
-          batch.set(
-            db.collection("courseAssignments").doc(id),
-            {
-              id,
-              studentId: String(st.id),
-              studentName: st.fullName || "",
-              groupCode: String(st.groupCode || g),
-              subjectId: String(s),
-              subjectName: sub.name || String(s),
-              teacherId: String(t),
-              teacherName: teach.fullName || teach.login || String(t),
-              teacherLogin: teach.login || "",
-              classTime: time,
-              weekdays: days,
-              weekDays: days,
-              createdBy: state.currentUser.login || "admin",
-              createdByUid: state.currentUser.uid,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-              active: true,
-            },
-            { merge: true },
-          );
-          created++;
-        });
-        if (!created) {
-          toast(
-            `Yangi yozuv yo‘q. ${skipped} ta yozuv avval mavjud.`,
-            "warning",
-          );
-          return;
-        }
-        try {
-          btnSaveEnroll.disabled = true;
           await batch.commit();
-          toast(`${created} ta o‘quvchi kursga yozildi.`, "success");
+          toast(`${created} ta o'quvchi kursga yozildi.`, "success");
           log(
-            `Kursga yozildi: ${created} ta\nGuruh: ${g}\nFan: ${sub.name}\nO‘qituvchi: ${teach.fullName}\nVaqt: ${time}\nKunlar: ${days.join(", ")}\nDuplicate: ${skipped}`,
+            `Kursga yozildi: ${created} ta\nGuruh: ${g}\nFan: ${sub.name}\nO'qituvchi: ${teach.fullName}\nVaqt: ${time}\nKunlar: ${days.join(", ")}\nDuplicate: ${skipped}`,
           );
           await loadAll();
           state.selectedStudents.clear();
           renderStudents();
         } catch (e) {
-          // console.error(e);
           toast("Kursga yozishda xatolik: " + e.message, "error");
         } finally {
           btnSaveEnroll.disabled = false;
@@ -1394,6 +1419,7 @@
             .set({
               active: true,
               fullName,
+              email,
               id: String(id),
               login,
               role: "oqituvchi",

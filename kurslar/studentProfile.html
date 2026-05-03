@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="O'quvchi profili — davomat, baholar va reyting nazorati" />
+    <meta property="og:title" content="O'quvchi Profili — IIV Buxoro Akademik Litseyi" />
+    <meta property="og:description" content="O'quvchining kurs davomat, baholar va reyting ma'lumotlari" />
+    <meta property="og:image" content="../imgs/logo.png" />
+    <title>O'quvchi Profili</title>
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="studentProfile.css" />
+
+    <!-- Font Awesome 6.5.2 — integrity olib tashlandi (CDN hash noto'g'ri edi) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <!-- JS o'chirilgan bo'lsa ko'rinadigan xabar -->
+    <noscript>
+      <div class="noscript-banner" style="margin:20px;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Ushbu sahifa ishlashi uchun JavaScript yoqilgan bo'lishi shart. Brauzer sozlamalarini tekshiring.
+      </div>
+    </noscript>
+
+    <div class="profile-page">
+      <div class="profile-container">
+
+        <!-- ===== LOADING ===== -->
+        <div id="profileLoading" class="profile-loading">
+          <i class="fa-solid fa-spinner"></i>
+          <span>Ma'lumotlar yuklanmoqda...</span>
+        </div>
+
+        <!-- ===== ERROR ===== -->
+        <div id="profileError" class="profile-error" style="display:none">
+          <i class="fa-solid fa-user-slash"></i>
+          <div class="profile-error-title">O'quvchi topilmadi</div>
+          <p id="profileErrorMsg">Iltimos, orqaga qaytib qayta urinib ko'ring.</p>
+          <a href="kursgaYozilganlar.html" class="back-btn" style="margin-top:16px">
+            <i class="fa-solid fa-arrow-left"></i> Orqaga
+          </a>
+        </div>
+
+        <!-- ===== ASOSIY KONTENT ===== -->
+        <div id="profileContent" style="display:none">
+
+          <!-- ──────── 1. HEADER ──────── -->
+          <header class="profile-header">
+            <a href="kursgaYozilganlar.html" class="back-btn" id="backBtn">
+              <i class="fa-solid fa-arrow-left"></i> Orqaga
+            </a>
+            <div class="profile-info">
+              <div class="profile-name" id="studentName">—</div>
+              <div class="profile-meta">
+                <span class="profile-group-badge" id="studentGroup">
+                  <i class="fa-solid fa-users"></i> —
+                </span>
+                <span style="color:var(--text-muted)">•</span>
+                <span class="profile-date" id="todayDate"></span>
+              </div>
+            </div>
+          </header>
+
+          <!-- ──────── 2. DASHBOARD KARTALAR ──────── -->
+          <section class="dashboard-grid" id="dashboardCards">
+            <div class="dash-card">
+              <div class="dash-card-icon"><i class="fa-solid fa-layer-group"></i></div>
+              <div class="dash-card-num" id="dashCourses">0</div>
+              <div class="dash-card-label">Jami kurslar</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-icon"><i class="fa-solid fa-chart-pie"></i></div>
+              <div class="dash-card-num" id="dashAttendance">0%</div>
+              <div class="dash-card-label">Umumiy davomat</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-icon"><i class="fa-solid fa-star"></i></div>
+              <div class="dash-card-num" id="dashAvgGrade">—</div>
+              <div class="dash-card-label">O'rtacha baho</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-icon"><i class="fa-solid fa-calendar-day"></i></div>
+              <div class="dash-card-num" id="dashTodayLessons">0</div>
+              <div class="dash-card-label">Bugungi darslar</div>
+            </div>
+          </section>
+
+          <!-- O'RTA QATOR -->
+          <div class="two-col-grid middle-row">
+            <!-- ──────── 3. BUGUNGI HOLAT ──────── -->
+            <section class="card-section" id="todaySection">
+              <div class="section-title-row">
+                <div class="section-icon" style="background:transparent;color:var(--text-white);width:auto;">
+                  <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <div class="section-title-text">Bugungi holat</div>
+              </div>
+              <div class="today-list" id="todayList"></div>
+            </section>
+
+            <!-- ──────── 4. KURS KARTALARI ──────── -->
+            <section class="card-section" id="coursesSection">
+              <div class="section-title-row">
+                <div class="section-icon" style="background:transparent;color:var(--accent-green);width:auto;">
+                  <i class="fa-solid fa-thumbtack"></i>
+                </div>
+                <div class="section-title-text">Kurslar bo'yicha batafsil</div>
+              </div>
+              <div id="courseAccordions"></div>
+            </section>
+          </div>
+
+          <!-- PASTKI QATOR -->
+          <div class="two-col-grid bottom-row">
+            <!-- ──────── 5. OYLIK DAVOMAT KALENDARI ──────── -->
+            <section class="card-section" id="calendarSection">
+              <div class="section-title-row">
+                <div class="section-icon" style="background:transparent;color:var(--accent-blue);width:auto;">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <div class="section-title-text">Davomat kalendari</div>
+              </div>
+
+              <select class="calendar-course-select" id="calendarCourseSelect">
+                <option value="">— Kurs tanlang —</option>
+              </select>
+
+              <div class="calendar-nav-controls">
+                <div class="cal-month-title" id="calMonthLabel">—</div>
+                <div class="cal-btn-group">
+                  <!-- onclick ishlatildi — duplicate listener muammosi yo'q -->
+                  <button class="cal-nav-btn" id="calPrev" onclick="calNav(-1)" aria-label="Oldingi oy">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <button class="cal-nav-btn" id="calNext" onclick="calNav(1)" aria-label="Keyingi oy">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div id="calCompare" class="cal-compare" style="display:none"></div>
+
+              <div class="calendar-grid" id="calendarGrid"></div>
+
+              <div class="cal-legend">
+                <div class="cal-legend-item">
+                  <div class="cal-legend-dot" style="background:var(--accent-green)"></div> Keldi
+                </div>
+                <div class="cal-legend-item">
+                  <div class="cal-legend-dot" style="background:var(--accent-red)"></div> Kelmadi
+                </div>
+                <div class="cal-legend-item">
+                  <div class="cal-legend-dot" style="background:var(--accent-yellow)"></div> Olinmagan
+                </div>
+                <div class="cal-legend-item">
+                  <div class="cal-legend-dot" style="background:rgba(255,255,255,0.15)"></div> Dars yo'q
+                </div>
+              </div>
+            </section>
+
+            <!-- ──────── 6. BAHOLAR ──────── -->
+            <section class="card-section" id="gradesSection">
+              <div class="section-title-row">
+                <div class="section-icon" style="background:transparent;color:var(--accent-yellow);width:auto;">
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="section-title-text">Baholar</div>
+              </div>
+
+              <div class="grades-top-cards">
+                <div class="g-card">
+                  <div class="g-card-title">Bugun</div>
+                  <div class="g-card-val" id="gValToday">—</div>
+                  <div class="g-card-sub" id="gSubToday">baho yo'q</div>
+                </div>
+                <div class="g-card">
+                  <div class="g-card-title">Bu hafta</div>
+                  <div class="g-card-val" id="gValWeek">—</div>
+                  <div class="g-card-sub" id="gSubWeek">baho yo'q</div>
+                </div>
+                <div class="g-card">
+                  <div class="g-card-title">Bu oy</div>
+                  <div class="g-card-val" id="gValMonth">—</div>
+                  <div class="g-card-sub" id="gSubMonth">baho yo'q</div>
+                </div>
+              </div>
+
+              <div class="g-avg-banner">
+                <div class="g-avg-circle" id="gAvgCircle">—</div>
+                <div class="g-avg-info">
+                  <div class="g-avg-title">O'rtacha ball</div>
+                  <div class="g-avg-desc" id="gAvgDesc">Bu oy • 0 ta baho asosida</div>
+                  <div class="g-avg-stars" id="gAvgStars"></div>
+                </div>
+                <div class="g-avg-badge" id="gAvgBadge">—</div>
+              </div>
+
+              <div class="grade-history-title">BAHO TARIXI</div>
+              <div class="grade-history-list" id="gradeHistoryList"></div>
+            </section>
+          </div>
+
+          <!-- ──────── 7. REYTING POZITSIYASI ──────── -->
+          <section class="card-section" id="ratingSection">
+            <div class="section-title-row">
+              <!-- FIX: --accent-orange endi CSS da aniqlangan -->
+              <div class="section-icon" style="background:transparent;color:var(--accent-orange);width:auto;">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div class="section-title-text">Reyting pozitsiyasi</div>
+            </div>
+            <div class="rating-card" id="ratingCard"></div>
+          </section>
+
+        </div><!-- /profileContent -->
+      </div><!-- /profile-container -->
+    </div><!-- /profile-page -->
+
+    <!-- ===== TOAST ===== -->
+    <div class="sp-toast-container" id="toastContainer"></div>
+
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      /* ============================================================
+         STUDENT PROFILE — Asosiy JavaScript (Tuzatilgan v2.0)
+         ============================================================ */
+
+      // ===== YORDAMCHI FUNKSIYALAR =====
+
+      /** HTML escape — XSS himoyasi */
+      function esc(value) {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(String(value ?? "")));
+        return div.innerHTML;
+      }
+
+      /** O'zbek hafta kunlari */
+      const UZ_WEEKDAYS = [
+        "Yakshanba", "Dushanba", "Seshanba",
+        "Chorshanba", "Payshanba", "Juma", "Shanba",
+      ];
+
+      /** Toast xabar ko'rsatish */
+      function showToast(msg, type = "info") {
+        const c = document.getElementById("toastContainer");
+        if (!c) return;
+        const t = document.createElement("div");
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        c.appendChild(t);
+        // Animatsiyali o'chirish
+        setTimeout(() => {
+          t.classList.add("removing");
+          t.addEventListener("animationend", () => t.remove(), { once: true });
+        }, 3700);
+      }
+
+      /** Sana formatlash: Date → "YYYY-MM-DD" */
+      function dateToStr(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      /** Bugungi sanani ko'rsatish */
+      function setTodayDate() {
+        const now = new Date();
+        const months = [
+          "Yanvar","Fevral","Mart","Aprel","May","Iyun",
+          "Iyul","Avgust","Sentyabr","Oktyabr","Noyabr","Dekabr",
+        ];
+        const el = document.getElementById("todayDate");
+        if (el) el.textContent =
+          `${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} — ${UZ_WEEKDAYS[now.getDay()]}`;
+      }
+
+      /** URL parametrlarini o'qish */
+      function getUrlParams() {
+        const p = new URLSearchParams(window.location.search);
+        return {
+          studentId: p.get("id") || "",
+          groupCode: p.get("group") || "",
+        };
+      }
+
+      /** UI holatini o'zgartirish */
+      function showSection(section) {
+        document.getElementById("profileLoading").style.display =
+          section === "loading" ? "flex" : "none";
+        document.getElementById("profileError").style.display =
+          section === "error" ? "flex" : "none";
+        document.getElementById("profileContent").style.display =
+          section === "content" ? "block" : "none";
+      }
+
+      // ===== GLOBAL STATE =====
+      const state = {
+        student:          null,
+        courses:          [],
+        allAttendance:    [],
+        allGrades:        [],
+        subjects:         [],
+        teachers:         [],
+        ratingData:       [],
+        calendarMonth:    null,
+        calendarCourseIdx: 0,
+      };
+
+      // ===== FIREBASE / CACHE YUKLASH =====
+
+      /** Slug yasash */
+      function makeSlug(value) {
+        return String(value || "")
+          .toLowerCase().trim()
+          .replace(/['\u2018\u2019\u02BB\u02BC`]/g, "")
+          .replace(/-/g, "_").replace(/\s+/g, "_")
+          .replace(/[^\w_]/g, "");
+      }
+
+      /**
+       * Ma'lumotlarni yuklash:
+       *  1. Avval localStorage (tezkor cache) dan o'qiladi.
+       *  2. Agar biron muhim maydon bo'sh bo'lsa, Firebase dan to'g'ridan yuklash uriniladi.
+       *
+       * FIX: Funksiya nomi aniqroq qilindi va Firebase fallback qo'shildi.
+       */
+      async function loadData() {
+        // --- 1. Cache dan o'qish ---
+        const cached = {
+          allStudents:   JSON.parse(localStorage.getItem("students")          || "[]"),
+          allAssignments:JSON.parse(localStorage.getItem("courseAssignments") || "[]"),
+          allAttendance: JSON.parse(localStorage.getItem("attendance")        || "[]"),
+          allGrades:     JSON.parse(localStorage.getItem("grades")            || "[]"),
+          subjects:      JSON.parse(localStorage.getItem("subjects")          || "[]"),
+          teachers:      JSON.parse(localStorage.getItem("teachers")          || "[]"),
+          ratingData:    JSON.parse(localStorage.getItem("students_rating")   || "[]"),
+        };
+
+        // Asosiy ma'lumotlar yo'q bo'lsa barchasini yuklash
+        if (cached.allStudents.length === 0) {
+          if (typeof db === "undefined") return cached;
+          try {
+            showToast("Ma'lumotlar bazadan yuklanmoqda...", "info");
+            const [studSnap, assignSnap, attSnap, gradesSnap, subjSnap, teachSnap, ratingSnap] =
+              await Promise.all([
+                db.collection("students").get(),
+                db.collection("courseAssignments").get(),
+                db.collection("attendance").get(),
+                db.collection("grades").get(),
+                db.collection("subjects").get(),
+                db.collection("teachers").get(),
+                db.collection("students_rating").get(),
+              ]);
+
+            const snap2arr = (snap) => snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+
+            const fresh = {
+              allStudents:    snap2arr(studSnap),
+              allAssignments: snap2arr(assignSnap),
+              allAttendance:  snap2arr(attSnap),
+              allGrades:      snap2arr(gradesSnap),
+              subjects:       snap2arr(subjSnap),
+              teachers:       snap2arr(teachSnap),
+              ratingData:     snap2arr(ratingSnap),
+            };
+
+            localStorage.setItem("students",          JSON.stringify(fresh.allStudents));
+            localStorage.setItem("courseAssignments", JSON.stringify(fresh.allAssignments));
+            localStorage.setItem("attendance",        JSON.stringify(fresh.allAttendance));
+            localStorage.setItem("grades",            JSON.stringify(fresh.allGrades));
+            localStorage.setItem("subjects",          JSON.stringify(fresh.subjects));
+            localStorage.setItem("teachers",          JSON.stringify(fresh.teachers));
+            localStorage.setItem("students_rating",   JSON.stringify(fresh.ratingData));
+
+            return fresh;
+          } catch (fbErr) {
+            console.error("Firebase yuklashda xatolik:", fbErr);
+            showToast("Firebase xatoligi: " + fbErr.message, "error");
+            return cached;
+          }
+        }
+
+        // Asosiy ma'lumot bor, lekin reytingData keshda yo'q bo'lsa uni o'zini yuklaymiz
+        if (cached.ratingData.length === 0 && typeof db !== "undefined") {
+          try {
+            const ratingSnap = await db.collection("students_rating").get();
+            const ratingData = ratingSnap.docs.map(d => ({ docId: d.id, ...d.data() }));
+            cached.ratingData = ratingData;
+            localStorage.setItem("students_rating", JSON.stringify(ratingData));
+          } catch (e) {
+            console.error("Reyting yuklash xatosi:", e);
+          }
+        }
+
+        return cached;
+      }
+
+      /** O'quvchini ID bo'yicha topish */
+      function findStudent(allStudents, studentId) {
+        return allStudents.find(
+          (s) =>
+            String(s.id)        === String(studentId) ||
+            String(s.studentId) === String(studentId) ||
+            String(s.docId)     === String(studentId),
+        );
+      }
+
+      /** Shu o'quvchiga tegishli kurs yozuvlarini filtrlash */
+      function buildStudentCourses(allAssignments, studentId) {
+        const matched = allAssignments.filter(
+          (a) => a.active !== false && String(a.studentId) === String(studentId),
+        );
+        const seen = new Map();
+        matched.forEach((a) => {
+          const key = `${a.subjectId}__${a.teacherId}__${a.classTime || ""}`;
+          if (!seen.has(key)) {
+            seen.set(key, {
+              subjectId:    a.subjectId,
+              subjectName:  a.subjectName  || "",
+              teacherId:    a.teacherId,
+              teacherName:  a.teacherName  || "",
+              teacherLogin: a.teacherLogin || "",
+              classTime:    a.classTime    || "",
+              weekdays:     a.weekdays || a.weekDays || [],
+              groupCode:    a.groupCode    || "",
+            });
+          }
+        });
+        return Array.from(seen.values());
+      }
+
+      // ===== RENDER FUNKSIYALARI =====
+
+      function getStudentAttendanceStats() {
+        let attended = 0, missed = 0;
+        state.courses.forEach((course) => {
+          const recs = state.allAttendance.filter(
+            (a) =>
+              String(a.subjectId) === String(course.subjectId) &&
+              String(a.teacherId) === String(course.teacherId) &&
+              (a.classTime || "").trim() === (course.classTime || "").trim(),
+          );
+          recs.forEach((att) => {
+            (att.records || []).forEach((r) => {
+              if (String(r.studentId) === state.student.id) {
+                if (r.status === "kelgan") attended++; else missed++;
+              }
+            });
+          });
+        });
+        const total = attended + missed;
+        const percent = total > 0 ? Math.round((attended / total) * 100) : 0;
+        return { attended, missed, total, percent };
+      }
+
+      function getStudentGradeStats() {
+        const grades = [];
+        state.courses.forEach((course) => {
+          const recs = state.allGrades.filter(
+            (g) =>
+              String(g.subjectId) === String(course.subjectId) &&
+              String(g.teacherId) === String(course.teacherId),
+          );
+          recs.forEach((gr) => {
+            (gr.grades || []).forEach((entry) => {
+              if (String(entry.studentId) === state.student.id) {
+                const val = Number(entry.grade);
+                if (val >= 1 && val <= 5) grades.push(val);
+              }
+            });
+          });
+        });
+        const avg = grades.length
+          ? (grades.reduce((s, g) => s + g, 0) / grades.length).toFixed(1) : "—";
+        return { grades, avg, count: grades.length };
+      }
+
+      function renderHeader() {
+        document.getElementById("studentName").textContent = state.student.fullName;
+        document.getElementById("studentGroup").innerHTML =
+          `<i class="fa-solid fa-users"></i> ${esc(state.student.groupCode)}-guruh`;
+      }
+
+      function renderDashboard() {
+        const todayWeekDay = UZ_WEEKDAYS[new Date().getDay()];
+        document.getElementById("dashCourses").textContent = state.courses.length;
+
+        const att = getStudentAttendanceStats();
+        const dashAtt = document.getElementById("dashAttendance");
+        dashAtt.textContent = att.total > 0 ? att.percent + "%" : "—";
+        dashAtt.style.color =
+          att.total === 0       ? ""
+          : att.percent >= 80   ? "var(--accent-green)"
+          : att.percent >= 50   ? "var(--accent-yellow)"
+          :                       "var(--accent-red)";
+
+        const gr = getStudentGradeStats();
+        const dashGrade = document.getElementById("dashAvgGrade");
+        dashGrade.textContent = gr.avg;
+        if (gr.count > 0) {
+          const avgNum = parseFloat(gr.avg);
+          dashGrade.style.color =
+            avgNum >= 4.5 ? "var(--accent-green)"
+            : avgNum >= 3.5 ? "var(--accent-blue)"
+            : "var(--accent-orange)"; /* FIX: --accent-orange endi CSS da bor */
+        }
+
+        const todayCount = state.courses.filter((c) =>
+          (c.weekdays || []).includes(todayWeekDay),
+        ).length;
+        document.getElementById("dashTodayLessons").textContent = todayCount;
+      }
+
+      function renderToday() {
+        const list = document.getElementById("todayList");
+        const now = new Date();
+        const todayStr = dateToStr(now);
+        const todayWeekDay = UZ_WEEKDAYS[now.getDay()];
+
+        const todayCourses = state.courses.filter((c) =>
+          (c.weekdays || []).includes(todayWeekDay),
+        );
+
+        if (!todayCourses.length) {
+          list.innerHTML = `<div class="today-no-class">
+            <i class="fa-solid fa-mug-hot"></i>
+            Bugun (${esc(todayWeekDay)}) dars mavjud emas
+          </div>`;
+          return;
+        }
+
+        let html = "";
+        todayCourses.forEach((course) => {
+          let statusClass = "olinmagan";
+          let statusText = "⏳ Olinmagan";
+
+          const attRec = state.allAttendance.find(
+            (a) =>
+              String(a.subjectId) === String(course.subjectId) &&
+              String(a.teacherId) === String(course.teacherId) &&
+              (a.classTime || "").trim() === (course.classTime || "").trim() &&
+              a.date === todayStr,
+          );
+
+          if (attRec) {
+            const studentRec = (attRec.records || []).find(
+              (r) => String(r.studentId) === state.student.id,
+            );
+            if (studentRec) {
+              if (studentRec.status === "kelgan") {
+                statusClass = "keldi";
+                statusText = "✅ Keldi";
+              } else {
+                statusClass = "kelmadi";
+                statusText = "❌ Kelmadi";
+              }
+            }
+          }
+
+          let gradeHtml = "";
+          const gradeRec = state.allGrades.find(
+            (g) =>
+              String(g.subjectId) === String(course.subjectId) &&
+              String(g.teacherId) === String(course.teacherId) &&
+              g.date === todayStr,
+          );
+          if (gradeRec) {
+            const entry = (gradeRec.grades || []).find(
+              (e) => String(e.studentId) === state.student.id,
+            );
+            if (entry && entry.grade) {
+              const gv = Number(entry.grade);
+              const gc = gv >= 5 ? "g5" : gv >= 4 ? "g4" : gv >= 3 ? "g3" : "g2";
+              /* FIX: today-grade class endi CSS da aniqlangan */
+              gradeHtml = `<span class="today-grade ${gc}">${gv}</span>`;
+            }
+          }
+
+          html += `<div class="today-item">
+            <div class="today-subject">${esc(course.subjectName)}</div>
+            <div class="today-time">${esc(course.classTime || "—")}</div>
+            <div class="today-status ${statusClass}">${statusText}</div>
+            ${gradeHtml}
+          </div>`;
+        });
+
+        list.innerHTML = html;
+      }
+
+      function getCourseAttForStudent(course, startStr, endStr) {
+        let attended = 0, missed = 0;
+        state.allAttendance.forEach((a) => {
+          if (
+            String(a.subjectId) !== String(course.subjectId) ||
+            String(a.teacherId) !== String(course.teacherId) ||
+            (a.classTime || "").trim() !== (course.classTime || "").trim()
+          ) return;
+          if (startStr && a.date < startStr) return;
+          if (endStr   && a.date > endStr)   return;
+          (a.records || []).forEach((r) => {
+            if (String(r.studentId) === state.student.id) {
+              if (r.status === "kelgan") attended++; else missed++;
+            }
+          });
+        });
+        const total = attended + missed;
+        const pct = total > 0 ? Math.round((attended / total) * 100) : 0;
+        return { attended, missed, total, pct };
+      }
+
+      function getCourseGradesForStudent(course, startStr, endStr) {
+        const grades = [];
+        state.allGrades.forEach((g) => {
+          if (
+            String(g.subjectId) !== String(course.subjectId) ||
+            String(g.teacherId) !== String(course.teacherId)
+          ) return;
+          if (startStr && g.date < startStr) return;
+          if (endStr   && g.date > endStr)   return;
+          (g.grades || []).forEach((e) => {
+            if (String(e.studentId) === state.student.id) {
+              const v = Number(e.grade);
+              if (v >= 1 && v <= 5) grades.push(v);
+            }
+          });
+        });
+        const avg = grades.length
+          ? (grades.reduce((s, g) => s + g, 0) / grades.length).toFixed(1) : "—";
+        return { grades, avg };
+      }
+
+      function getWeekRange() {
+        const now = new Date();
+        const day = now.getDay() || 7;
+        const mon = new Date(now); mon.setDate(now.getDate() - day + 1);
+        const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+        return { start: dateToStr(mon), end: dateToStr(sun) };
+      }
+      function getMonthRange() {
+        const now = new Date();
+        const s = new Date(now.getFullYear(), now.getMonth(), 1);
+        const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        return { start: dateToStr(s), end: dateToStr(e) };
+      }
+
+      function attBarHtml(label, stats) {
+        const tone = stats.pct >= 80 ? "good" : stats.pct >= 50 ? "warn" : "bad";
+        return `<div class="att-row">
+          <span class="att-label">${esc(label)}</span>
+          <div class="att-bar-bg">
+            <div class="att-bar-fill ${tone}" style="width:${stats.pct}%"></div>
+          </div>
+          <span class="att-pct ${tone}">${stats.attended}/${stats.total} (${stats.pct}%)</span>
+        </div>`;
+      }
+
+      /* FIX: grade-badge-sp va grade-badges class'lari endi CSS da aniqlangan */
+      function gradeBadgesHtml(grades) {
+        if (!grades.length) return `<span style="color:var(--text-muted);font-size:0.8rem">Baholar yo'q</span>`;
+        return grades.map((g) => {
+          const c = g >= 5 ? "g5" : g >= 4 ? "g4" : g >= 3 ? "g3" : "g2";
+          return `<span class="grade-badge-sp ${c}">${g}</span>`;
+        }).join("");
+      }
+
+      const COURSE_COLORS = [
+        "#448aff","#00e676","#ff9800","#7c4dff",
+        "#00bcd4","#ff5252","#ffc107","#e040fb",
+      ];
+
+      /* FIX: course-sub-title, grade-badges, grade-avg-text — barchasi CSS da */
+      function renderCourseCards() {
+        const container = document.getElementById("courseAccordions");
+        if (!state.courses.length) {
+          container.innerHTML = `<div class="today-no-class">Bu o'quvchi hech qanday kursga yozilmagan</div>`;
+          return;
+        }
+
+        const week = getWeekRange();
+        const month = getMonthRange();
+        let html = "";
+
+        state.courses.forEach((course, idx) => {
+          const color = COURSE_COLORS[idx % COURSE_COLORS.length];
+          const weekAtt  = getCourseAttForStudent(course, week.start, week.end);
+          const monthAtt = getCourseAttForStudent(course, month.start, month.end);
+          const allAtt   = getCourseAttForStudent(course, null, null);
+          const weekGr   = getCourseGradesForStudent(course, week.start, week.end);
+          const monthGr  = getCourseGradesForStudent(course, month.start, month.end);
+          const days     = (course.weekdays || []).join(", ");
+
+          html += `<div class="course-acc" id="courseAcc${idx}">
+            <div class="course-acc-header"
+                 onclick="document.getElementById('courseAcc${idx}').classList.toggle('open')"
+                 role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+              <div class="course-acc-color" style="background:${color}"></div>
+              <div class="course-acc-info">
+                <div class="course-acc-name">${esc(course.subjectName)}</div>
+                <div class="course-acc-meta">${esc(course.teacherName)} · ${esc(course.classTime || "—")} · ${esc(days || "—")}</div>
+              </div>
+              <div class="course-acc-toggle"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="course-acc-body">
+              <div class="course-acc-content">
+                <div class="course-sub-title">Davomat</div>
+                ${attBarHtml("Bu hafta", weekAtt)}
+                ${attBarHtml("Bu oy", monthAtt)}
+                ${attBarHtml("Umumiy", allAtt)}
+
+                <div class="course-sub-title">Baholar — bu hafta</div>
+                <div class="grade-badges">${gradeBadgesHtml(weekGr.grades)}</div>
+                <div class="grade-avg-text">O'rtacha: <strong>${weekGr.avg}</strong></div>
+
+                <div class="course-sub-title">Baholar — bu oy</div>
+                <div class="grade-badges">${gradeBadgesHtml(monthGr.grades)}</div>
+                <div class="grade-avg-text">O'rtacha: <strong>${monthGr.avg}</strong></div>
+              </div>
+            </div>
+          </div>`;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // ===== KALENDAR =====
+
+      const UZ_MONTHS = [
+        "Yanvar","Fevral","Mart","Aprel","May","Iyun",
+        "Iyul","Avgust","Sentyabr","Oktyabr","Noyabr","Dekabr",
+      ];
+      const CAL_DAY_NAMES = ["Du","Se","Cho","Pa","Ju","Sha","Ya"];
+
+      /** FIX: Global funksiya — onclick="calNav(1)" uchun */
+      function calNav(direction) {
+        /* FIX: Yangi Date obyekt yaratiladi — mutation bug yo'q */
+        const d = new Date(state.calendarMonth);
+        d.setMonth(d.getMonth() + direction);
+        state.calendarMonth = d;
+        drawCalendarGrid();
+      }
+
+      function fillCalendarSelect() {
+        const sel = document.getElementById("calendarCourseSelect");
+        sel.innerHTML = state.courses.map((c, i) =>
+          `<option value="${i}">${esc(c.subjectName)} — ${esc(c.teacherName)}</option>`
+        ).join("");
+        sel.value = "0";
+        /* FIX: Listener faqat bir marta qo'shiladi */
+        sel.onchange = () => {
+          state.calendarCourseIdx = Number(sel.value);
+          drawCalendarGrid();
+        };
+      }
+
+      function getMonthAttMap(course, year, month) {
+        const map = {};
+        state.allAttendance.forEach((a) => {
+          if (
+            String(a.subjectId) !== String(course.subjectId) ||
+            String(a.teacherId) !== String(course.teacherId) ||
+            (a.classTime || "").trim() !== (course.classTime || "").trim()
+          ) return;
+          if (!a.date) return;
+          const [y, m] = a.date.split("-").map(Number);
+          if (y !== year || m !== month + 1) return;
+          (a.records || []).forEach((r) => {
+            if (String(r.studentId) === state.student.id) {
+              map[a.date] = r.status;
+            }
+          });
+        });
+        return map;
+      }
+
+      function monthStats(attMap) {
+        let kelgan = 0, jami = 0;
+        Object.values(attMap).forEach((s) => {
+          jami++;
+          if (s === "kelgan") kelgan++;
+        });
+        const pct = jami > 0 ? Math.round((kelgan / jami) * 100) : 0;
+        return { kelgan, jami, pct };
+      }
+
+      function drawCalendarGrid() {
+        const course = state.courses[state.calendarCourseIdx];
+        if (!course) return;
+
+        const dt    = state.calendarMonth;
+        const year  = dt.getFullYear();
+        const month = dt.getMonth();
+        const today = dateToStr(new Date());
+
+        document.getElementById("calMonthLabel").textContent = `${UZ_MONTHS[month]} ${year}`;
+
+        const attMap  = getMonthAttMap(course, year, month);
+        const weekdays = course.weekdays || [];
+
+        const prevMonth = month === 0 ? 11 : month - 1;
+        const prevYear  = month === 0 ? year - 1 : year;
+        const prevMap   = getMonthAttMap(course, prevYear, prevMonth);
+        const curStats  = monthStats(attMap);
+        const prevStats = monthStats(prevMap);
+
+        /* FIX: compare-up / compare-down / compare-same endi CSS da bor */
+        const compareEl = document.getElementById("calCompare");
+        if (prevStats.jami > 0 && curStats.jami > 0) {
+          const diff = curStats.pct - prevStats.pct;
+          const cls  = diff > 0 ? "compare-up" : diff < 0 ? "compare-down" : "compare-same";
+          const sign = diff > 0 ? "+" : "";
+          compareEl.innerHTML = `${UZ_MONTHS[prevMonth]}: <strong>${prevStats.pct}%</strong> → ${UZ_MONTHS[month]}: <strong>${curStats.pct}%</strong> <span class="${cls}">(${sign}${diff}%)</span>`;
+          compareEl.style.display = "";
+        } else {
+          compareEl.style.display = "none";
+        }
+
+        const firstDay    = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let startIdx = firstDay.getDay() - 1;
+        if (startIdx < 0) startIdx = 6;
+
+        let html = CAL_DAY_NAMES.map((d) => `<div class="cal-head">${d}</div>`).join("");
+        for (let i = 0; i < startIdx; i++) html += `<div class="cal-day empty"></div>`;
+
+        const nowDate = new Date(); nowDate.setHours(0,0,0,0);
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dStr    = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          const dateObj = new Date(year, month, d);
+          const dayName = UZ_WEEKDAYS[dateObj.getDay()];
+          const isToday = dStr === today ? " today" : "";
+          const hasCourse = weekdays.includes(dayName);
+
+          /* FIX: no-class CSS da aniqlangan */
+          let cls;
+          if (!hasCourse) {
+            cls = "no-class";
+          } else if (attMap[dStr]) {
+            cls = attMap[dStr] === "kelgan" ? "keldi" : "kelmadi";
+          } else if (dateObj <= nowDate) {
+            cls = "olinmagan";
+          } else {
+            cls = "no-class";
+          }
+
+          html += `<div class="cal-day ${cls}${isToday}" title="${dayName}, ${dStr}">${d}</div>`;
+        }
+
+        document.getElementById("calendarGrid").innerHTML = html;
+      }
+
+      function renderCalendar() {
+        if (!state.courses.length) {
+          document.getElementById("calendarSection").style.display = "none";
+          return;
+        }
+        fillCalendarSelect();
+        state.calendarMonth    = new Date();
+        state.calendarCourseIdx = 0;
+        drawCalendarGrid();
+      }
+
+      // ===== BAHOLAR =====
+
+      function renderGradesSection() {
+        const studentId = state.student.id;
+        const now       = new Date();
+        const todayStr  = dateToStr(now);
+
+        const weekStart = new Date();
+        weekStart.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+        const weekStr  = dateToStr(weekStart);
+        const monthStr = dateToStr(new Date(now.getFullYear(), now.getMonth(), 1));
+
+        let todayGrades = [], weekGrades = [], monthGrades = [], history = [];
+
+        state.allGrades.forEach((g) => {
+          if (!g.date) return;
+          const course = state.courses.find(
+            (c) => String(c.subjectId) === String(g.subjectId) &&
+                   String(c.teacherId) === String(g.teacherId),
+          );
+          if (!course) return;
+
+          const rec = (g.grades || []).find((r) => String(r.studentId) === String(studentId));
+          if (rec && rec.grade && Number(rec.grade) > 0) {
+            const gradeVal = Number(rec.grade);
+            const entry = {
+              date: g.date,
+              subjectName: course.subjectName,
+              desc: g.description || course.subjectName,
+              val: gradeVal,
+            };
+            history.push(entry);
+            if (g.date === todayStr)                           todayGrades.push(gradeVal);
+            if (g.date >= weekStr  && g.date <= todayStr)     weekGrades.push(gradeVal);
+            if (g.date >= monthStr && g.date <= todayStr)     monthGrades.push(gradeVal);
+          }
+        });
+
+        const calcAvg = (arr) =>
+          arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : null;
+
+        document.getElementById("gValToday").textContent   = calcAvg(todayGrades) || "—";
+        document.getElementById("gSubToday").textContent   = todayGrades.length ? `${todayGrades.length} ta` : "baho yo'q";
+        document.getElementById("gValWeek").textContent    = calcAvg(weekGrades)  || "—";
+        document.getElementById("gSubWeek").textContent    = weekGrades.length  ? `${weekGrades.length} ta`  : "baho yo'q";
+        const mAvg = calcAvg(monthGrades);
+        document.getElementById("gValMonth").textContent   = mAvg || "—";
+        document.getElementById("gSubMonth").textContent   = monthGrades.length ? `${monthGrades.length} ta` : "baho yo'q";
+
+        document.getElementById("gAvgCircle").textContent  = mAvg || "—";
+        document.getElementById("gAvgDesc").textContent    = `Bu oy • ${monthGrades.length} ta baho asosida`;
+
+        let starsHtml = "", badgeHtml = "—";
+        if (mAvg) {
+          const numAvg = Number(mAvg);
+          const starCount = Math.round(numAvg);
+          for (let i = 0; i < 5; i++) {
+            starsHtml += i < starCount
+              ? '<i class="fa-solid fa-star"></i>'
+              : '<i class="fa-regular fa-star"></i>';
+          }
+          const daraja = numAvg >= 4.5 ? "A" : numAvg >= 3.5 ? "B" : numAvg >= 2.5 ? "C" : "D";
+          badgeHtml = `${daraja} <span>DARAJA</span>`;
+        }
+        document.getElementById("gAvgStars").innerHTML = starsHtml;
+        document.getElementById("gAvgBadge").innerHTML = badgeHtml;
+
+        history.sort((a, b) => b.date.localeCompare(a.date));
+        const listEl = document.getElementById("gradeHistoryList");
+
+        if (!history.length) {
+          listEl.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.9rem">
+            <i class="fa-regular fa-folder-open" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4"></i>
+            Baho tarixi bo'sh
+          </div>`;
+          return;
+        }
+
+        /* FIX: gh-item, gh-date, gh-subject, gh-grade — barchasi CSS da to'g'ri */
+        listEl.innerHTML = history.slice(0, 5).map((h, i) => {
+          const dStr = h.date.substring(8, 10) + "." + h.date.substring(5, 7);
+          return `<div class="gh-item" style="animation-delay:${i * 0.06}s">
+            <div class="gh-date">${dStr}</div>
+            <div class="gh-subject">${esc(h.desc)}</div>
+            <div class="gh-grade g${h.val}">${h.val}</div>
+          </div>`;
+        }).join("");
+      }
+
+      // ===== REYTING =====
+
+      function renderRating() {
+        const card = document.getElementById("ratingCard");
+        if (!card) return;
+
+        if (!state.ratingData || !state.ratingData.length) {
+          card.innerHTML = `
+            <div class="rating-not-found">
+              <i class="fa-solid fa-chart-simple" style="font-size:1.5rem;color:var(--text-muted)"></i>
+              <div>Reyting ma'lumotlari hozircha mavjud emas</div>
+              <button class="btn-secondary" style="margin-top:10px" onclick="forceSyncRating()">
+                <i class="fa-solid fa-rotate"></i> Ma'lumotni yangilash
+              </button>
+            </div>`;
+          return;
+        }
+
+        const studentId = state.student?.id;
+        const fullName = (state.student?.fullName || "").toLowerCase().trim();
+
+        let studentEntry = state.ratingData.find(
+          (r) =>
+            String(r.id || "")        === String(studentId) ||
+            String(r.studentId || "") === String(studentId) ||
+            String(r.docId || "")     === String(studentId),
+        );
+
+        // ID bo'yicha topilmasa, ism bo'yicha qidirish (Fallback)
+        if (!studentEntry && fullName) {
+          studentEntry = state.ratingData.find(
+            (r) => String(r.name || "").toLowerCase().trim() === fullName
+          );
+        }
+
+        if (!studentEntry) {
+          card.innerHTML = `
+            <div class="rating-not-found">
+              <i class="fa-solid fa-user-xmark" style="font-size:1.5rem;color:var(--text-muted)"></i>
+              <div>Reyting jadvalidan topilmadi</div>
+              <p style="font-size:0.7rem;opacity:0.6;margin-top:4px">
+                Qidirildi: ID [${studentId}] yoki ism [${state.student?.fullName || "noma'lum"}]
+              </p>
+              <button class="btn-secondary" style="margin-top:10px" onclick="forceSyncRating()">
+                <i class="fa-solid fa-rotate"></i> Bazadan qayta yangilash
+              </button>
+            </div>`;
+          return;
+        }
+
+        const score = Number(studentEntry.total_score || studentEntry.totalScore || studentEntry.score || 0);
+        const studentGroup = state.student?.groupCode || studentEntry.group || studentEntry.groupCode || "No Group";
+        // Reyting jadvalidagi o'zining ID raqamini olamiz (o'rinni aniqlash uchun)
+        const ratingId = String(studentEntry.id || studentEntry.studentId || studentEntry.docId || "");
+
+        const sorted = state.ratingData
+          .map((r) => ({
+            id:    String(r.id || r.studentId || r.docId || ""),
+            group: String(r.group || r.groupCode || ""),
+            score: Number(r.total_score || r.totalScore || r.score || 0),
+          }))
+          .filter((r) => r.id && (r.score > 0 || r.id === ratingId))
+          .sort((a, b) => b.score - a.score);
+
+        const overallRankIndex = sorted.findIndex((r) => r.id === ratingId);
+        const overallRank = overallRankIndex >= 0 ? overallRankIndex + 1 : "—";
+        const totalStudents = sorted.length;
+
+        const groupStudents = sorted.filter((r) => r.group === studentGroup);
+        const groupRankIndex = groupStudents.findIndex((r) => r.id === ratingId);
+        const groupRank = groupRankIndex >= 0 ? groupRankIndex + 1 : "—";
+        const groupTotal = groupStudents.length;
+
+        card.innerHTML = `
+          <div class="rating-grid">
+            <div class="rating-stat">
+              <div class="rating-stat-num gold">
+                <i class="fa-solid fa-trophy" style="font-size:0.8em;margin-right:4px"></i>${overallRank}
+              </div>
+              <div class="rating-stat-label">Umumiy o'rni<br><small>${totalStudents} tadan</small></div>
+            </div>
+            <div class="rating-stat">
+              <div class="rating-stat-num">${groupRank}</div>
+              <div class="rating-stat-label">Guruhdagi o'rni<br><small>${studentGroup} (${groupTotal} ta)</small></div>
+            </div>
+            <div class="rating-stat">
+              <div class="rating-stat-num">${score}</div>
+              <div class="rating-stat-label">To'plangan ball</div>
+            </div>
+            <div class="rating-stat rating-stat-refresh" onclick="forceSyncRating()">
+              <i class="fa-solid fa-rotate" style="font-size:1.2rem; color:var(--accent-blue); margin-bottom:4px"></i>
+              <div class="rating-stat-label">Yangilash</div>
+            </div>
+          </div>`;
+      }
+
+      async function forceSyncRating() {
+        if (typeof db === "undefined") {
+          showToast("Firebase ulanmagan", "error");
+          return;
+        }
+        showToast("Reyting yangilanmoqda...", "info");
+        try {
+          const snap = await db.collection("students_rating").get();
+          const data = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+          state.ratingData = data;
+          localStorage.setItem("students_rating", JSON.stringify(data));
+          renderRating();
+          showToast("Reyting muvaffaqiyatli yangilandi", "success");
+        } catch (err) {
+          console.error(err);
+          showToast("Yangilashda xatolik: " + err.message, "error");
+        }
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderDashboard();
+        renderToday();
+        renderCourseCards();
+        renderCalendar();
+        renderGradesSection();
+        renderRating();
+      }
+
+      // ===== SAHIFA YUKLASH =====
+      document.addEventListener("DOMContentLoaded", async () => {
+        setTodayDate();
+
+        const { studentId, groupCode } = getUrlParams();
+        if (!studentId) {
+          showSection("error");
+          const errEl = document.getElementById("profileErrorMsg");
+          if (errEl) errEl.innerHTML = "URL da o'quvchi ID raqami yo'q! Masalan: <code>?id=1</code>";
+          return;
+        }
+
+        /* FIX: sessionStorage tekshiruvi — aniqroq xabar */
+        const userData = sessionStorage.getItem("currentUser");
+        if (!userData) {
+          showSection("error");
+          const errEl = document.getElementById("profileErrorMsg");
+          if (errEl) errEl.innerHTML =
+            `Tizimga kirmagansiz. Iltimos, <a href="login.html" style="color:var(--accent-blue)">Login sahifasiga</a> o'ting.`;
+          return;
+        }
+
+        showSection("loading");
+
+        try {
+          /* FIX: loadData() — localStorage + Firebase fallback */
+          const data = await loadData();
+
+          const student = findStudent(data.allStudents || [], studentId);
+          if (!student) {
+            showSection("error");
+            const errEl = document.getElementById("profileErrorMsg");
+            if (errEl) {
+              const sampleIds = (data.allStudents || []).slice(0, 10)
+                .map((s) => s.id || s.docId).join(", ");
+              errEl.innerHTML = `
+                <div style="text-align:left;background:rgba(0,0,0,0.4);padding:12px;border-radius:8px;font-size:0.8rem;margin-top:10px;line-height:1.7">
+                  <strong>Debug:</strong><br>
+                  Qidirilgan ID: <span style="color:var(--accent-yellow)">${esc(studentId)}</span><br>
+                  Bazadagi o'quvchilar soni: <span style="color:var(--accent-green)">${(data.allStudents || []).length}</span><br>
+                  Namunaviy IDlar: ${sampleIds || "bo'sh"}
+                </div>`;
+            }
+            return;
+          }
+
+          state.student = {
+            id:        String(student.id || student.studentId || student.docId || studentId),
+            fullName:  student.fullName || student.name || "Noma'lum",
+            groupCode: String(student.groupCode || groupCode || ""),
+          };
+          state.courses        = buildStudentCourses(data.allAssignments || [], state.student.id);
+          state.allAttendance  = data.allAttendance || [];
+          state.allGrades      = data.allGrades     || [];
+          state.subjects       = data.subjects      || [];
+          state.teachers       = data.teachers      || [];
+          state.ratingData     = data.ratingData    || [];
+          state.calendarMonth  = new Date();
+
+          document.title = `${state.student.fullName} — Profil`;
+
+          renderAll();
+          showSection("content");
+        } catch (err) {
+          showSection("error");
+          showToast("Ma'lumotlarni yuklashda xatolik: " + err.message, "error");
+          const errEl = document.getElementById("profileErrorMsg");
+          if (errEl) errEl.textContent = "Xatolik: " + err.message;
+        }
+      });
+    </script>
+  </body>
+</html>

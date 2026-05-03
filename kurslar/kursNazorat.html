@@ -608,7 +608,7 @@
             { name: "subjects", ls: "subjects" },
             { name: "teachers", ls: "teachers" },
             { name: "classMentors", ls: "classMentors" },
-            // FIX #2 — "groups" kolleksiyasi olib tashlandi: hech qayerda ishlatilmaydi
+            { name: "students_rating", ls: "students_rating" },
           ];
           await Promise.all(
             collections.map(async (c) => {
@@ -705,6 +705,7 @@
             "subjects",
             "teachers",
             "classMentors",
+            "students_rating",
           ].forEach((key) => localStorage.removeItem(key));
 
           if (typeof auth !== "undefined") {
@@ -952,7 +953,10 @@
         const teacher = teachers.find(
           (t) => String(getTeacherId(t)) === String(teacherId),
         );
-        if (!subject || !teacher) return;
+        if (!subject || !teacher) {
+          showToast("Fan yoki o'qituvchi ma'lumoti topilmadi!", "error");
+          return;
+        }
 
         currentCourseView = {
           subjectId,
@@ -1157,6 +1161,12 @@
         // hech qachon takrorlanmaydi (Firestore unique-ID kafolati).
         const docId = `ca_${makeSafeDocId(studentId)}_${makeSafeDocId(currentCourseView.subjectId)}_${makeSafeDocId(currentCourseView.teacherId)}_${makeSafeDocId(courseClassTime)}`;
 
+        // O'qituvchi loginini topamiz (admin.html bilan izchillik uchun)
+        const teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+        const teacherObj = teachers.find(
+          (t) => String(getTeacherId(t)) === String(currentCourseView.teacherId),
+        );
+
         const newAssignment = {
           id: docId,
           studentId: String(studentId),
@@ -1166,6 +1176,7 @@
           subjectName: currentCourseView.subjectName,
           teacherId: currentCourseView.teacherId,
           teacherName: currentCourseView.teacherName,
+          teacherLogin: teacherObj?.login || "",
           classTime: courseClassTime,
           // Ikkala maydon ham saqlanadi — admin.html va boshqa sahifalar
           // moslashuvi uchun.
@@ -2215,7 +2226,7 @@
             <div class="stats-summary-label">Olinmagan dars</div>
           </div>
           <div class="stats-summary-card">
-            <div class="stats-summary-num">${courseStudents.length}</div>
+            <div class="stats-summary-num">${seenIds.size}</div>
             <div class="stats-summary-label">Jami o'quvchi</div>
           </div>
         </div>`;

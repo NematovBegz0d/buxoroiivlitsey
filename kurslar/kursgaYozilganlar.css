@@ -208,15 +208,40 @@
    JS just sets `--subject-color`, fallbacks to accent-blue. */
 .sdm-course-card { border-left: 3px solid var(--subject-color, var(--accent-blue)); }
 .sdm-card-subject { color: var(--subject-color, var(--accent-blue)); }
-#gcStatsIcon { background: var(--subject-color-soft, rgba(68, 138, 255, 0.15)); }
-#gcStatsIcon i { color: var(--subject-color, #64b5f6); }
-.group-course-stats-bar-label i { margin-right: 4px; }
 .sdm-label { color: var(--text-white); }
 .gcs-summary-card:nth-child(2) .gcs-summary-num { color: var(--accent-green); }
 .gcs-summary-card:nth-child(3) .gcs-summary-num { color: var(--accent-yellow); }
 
 /* Loading indicator while we sync data on first load */
 .fb-load { text-align: center; padding: 20px; color: var(--text-secondary); }
+
+/* JADVAL QATORLARI HOVER EFFEKTI */
+.clickable-row {
+  cursor: pointer;
+  transition: all 0.2s var(--transition-base);
+  position: relative;
+}
+
+.clickable-row:hover {
+  background: rgba(68, 138, 255, 0.08) !important;
+  transform: translateX(4px);
+  box-shadow: inset 4px 0 0 var(--accent-blue);
+}
+
+.clickable-row:hover td {
+  color: var(--text-white) !important;
+}
+
+.clickable-row:active {
+  transform: translateX(2px);
+  background: rgba(68, 138, 255, 0.12) !important;
+}
+
+/* O'quvchi ismi hover bo'lganda ajralib turishi */
+.clickable-row:hover td:nth-child(2) {
+  font-weight: 700;
+  color: var(--accent-blue) !important;
+}
 
 @media (max-width: 650px) {
   .search-wrapper { width: 100%; margin-right: 0; }
