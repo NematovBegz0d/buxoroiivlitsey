@@ -56,7 +56,7 @@ a { text-decoration: none; }
 
 /* ===== 3. TEST REJIMI BANNERI ===== */
 .test-mode-banner {
-  background: #e53e3e;
+  background: #ff0000;
   color: var(--white);
   padding: 12px 20px;
   text-align: center;
