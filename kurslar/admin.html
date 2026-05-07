@@ -1817,12 +1817,12 @@
       async function doForceRecreate() {
         const email = _resetEmail;
         const newPass = $("resetNewPassword").value.trim();
+        const manualOld = $("resetOldPassword").value.trim();
         if (!newPass || newPass.length < 6) {
           $("resetModalError").textContent = "Yangi parol kamida 6 ta belgi bo'lsin.";
           $("resetModalError").style.display = "";
           return;
         }
-        if (!confirm(`DIQQAT: "${email}" akkauntining eski Firebase Auth yozuvi o'chiriladi va yangi parol bilan qayta yaratiladi.\n\nDavom etilsinmi?`)) return;
 
         $("resetModalError").style.display = "none";
         $("resetModalResult").style.display = "none";
@@ -1836,52 +1836,104 @@
         const resetAuth = app.auth();
 
         try {
-          // 1) Userprofiles'dan eski ma'lumotlarni olish
+          // Firestore'dan shu email bo'yicha foydalanuvchi ma'lumotlarini topish
           const snap = await db.collection("userProfiles").where("email", "==", email).limit(1).get();
-          let oldProfile = null;
-          let oldDocId = null;
-          if (!snap.empty) {
-            oldDocId = snap.docs[0].id;
-            oldProfile = snap.docs[0].data();
+          const oldProfile = snap.empty ? null : snap.docs[0].data();
+          const oldDocId   = snap.empty ? null : snap.docs[0].id;
+
+          // Tegishli foydalanuvchini teachers/classMentors'dan topish
+          const isMentor = email.startsWith("mentor");
+          const matchedItem = isMentor
+            ? state.classMentors.find(m => bulkEmail(m, "sinf_rahbari") === email)
+            : state.teachers.find(t => bulkEmail(t, "oqituvchi") === email);
+          const role = isMentor ? "sinf_rahbari" : "oqituvchi";
+
+          // Eski parollarni sinab ko'rish (email band bo'lgan holat uchun)
+          const pad = email.match(/\d+/)?.[0]?.padStart(3, "0") || "001";
+          const prefix = isMentor ? "Mentor" : "Teacher";
+          const year = new Date().getFullYear();
+          const candidates = manualOld
+            ? [manualOld]
+            : [`${prefix}${pad}@${year}`, `${prefix}${pad}@${year-1}`,
+               `${prefix}${pad}@${year-2}`, `${prefix}${pad}@${year+1}`];
+
+          let uid = null;
+          let usedPass = newPass;
+
+          // Avval eski akkauntga kirib UID olishga harakat
+          for (const oldPass of candidates) {
+            try {
+              const c = await resetAuth.signInWithEmailAndPassword(email, oldPass);
+              uid = c.user.uid;
+              // Parolni yangilaymiz
+              await c.user.updatePassword(newPass);
+              usedPass = newPass;
+              await resetAuth.signOut();
+              break;
+            } catch (err) {
+              try { await resetAuth.signOut(); } catch (_) {}
+              if (err.code !== "auth/wrong-password" && err.code !== "auth/invalid-credential") throw err;
+            }
           }
 
-          // 2) Yangi Firebase Auth akkaunt yaratish
-          const cred = await resetAuth.createUserWithEmailAndPassword(email, newPass);
-          const newUid = cred.user.uid;
+          if (!uid) {
+            // Eski akkauntga kirib bo'lmadi — yangi yaratamiz (email band emas yoki o'chirilgan)
+            try {
+              const c = await resetAuth.createUserWithEmailAndPassword(email, newPass);
+              uid = c.user.uid;
+              await resetAuth.signOut();
+            } catch (err2) {
+              if (err2.code === "auth/email-already-in-use") {
+                $("resetModalError").textContent =
+                  "Eski parol noto'g'ri va yangi akkaunt ham yaratib bo'lmadi. " +
+                  "Joriy parolni yuqoridagi maydonga kiriting yoki Firebase Console'dan o'chirib keling.";
+                $("resetModalError").style.display = "";
+                btn.disabled = false; btn2.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Qayta yaratish';
+                return;
+              }
+              throw err2;
+            }
+          }
 
-          // 3) Yangi userProfiles yozuvi (eski ma'lumotlar bilan)
-          const profileData = oldProfile
-            ? { ...oldProfile, email, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: state.currentUser.uid }
-            : { active: true, email, role: email.startsWith("mentor") ? "sinf_rahbari" : "oqituvchi", createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: state.currentUser.uid };
-          delete profileData.createdAt;
-          await db.collection("userProfiles").doc(newUid).set({
-            ...profileData,
+          // userProfiles yaratish / yangilash
+          const base = oldProfile || {};
+          const profileData = {
+            active: true,
+            fullName: base.fullName || matchedItem?.fullName || "",
+            email,
+            login: base.login || bulkLogin(matchedItem || {}, role),
+            role,
+            id: String(base.id || matchedItem?.id || matchedItem?.docId || ""),
+            subjectIds: Array.isArray(base.subjectIds) ? base.subjectIds
+                      : Array.isArray(matchedItem?.subjectIds) ? matchedItem.subjectIds : [],
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          });
+            createdBy: state.currentUser.uid,
+          };
+          if (role === "sinf_rahbari" && (base.groupCode || matchedItem?.groupCode))
+            profileData.groupCode = String(base.groupCode || matchedItem.groupCode);
 
-          // 4) Eski userProfiles o'chirish
-          if (oldDocId && oldDocId !== newUid) {
+          await db.collection("userProfiles").doc(uid).set(profileData);
+
+          // Eski orphan yozuvni tozalash
+          if (oldDocId && oldDocId !== uid)
             await db.collection("userProfiles").doc(oldDocId).delete();
-          }
-
-          await resetAuth.signOut();
 
           $("resetModalResult").innerHTML =
-            `Akkaunt qayta yaratildi!<br>` +
-            `<b>Email:</b> ${email}<br><b>Yangi parol:</b> ${newPass}`;
+            `✅ Muvaffaqiyatli!<br>` +
+            `<b>Email&nbsp;&nbsp;:</b> ${email}<br>` +
+            `<b>Yangi parol:</b> ${usedPass}`;
           $("resetModalResult").style.display = "";
-          toast(`${email} qayta yaratildi.`, "success");
+          toast(`${email} uchun userProfiles yaratildi.`, "success");
           btn.innerHTML = '<i class="fa-solid fa-check"></i> Tayyor';
           setTimeout(() => {
             btn.disabled = false; btn2.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Qayta yaratish';
-          }, 3000);
+          }, 4000);
+          await bulkCheckStatus();
         } catch (e) {
           try { await resetAuth.signOut(); } catch (_) {}
-          let msg = e.message;
-          if (e.code === "auth/email-already-in-use")
-            msg = "Bu email allaqachon ishlatilmoqda. Avval Firebase Console'dan o'chirib keling.";
-          $("resetModalError").textContent = "Xatolik: " + msg;
+          $("resetModalError").textContent = "Xatolik: " + e.message;
           $("resetModalError").style.display = "";
           btn.disabled = false; btn2.disabled = false;
           btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Qayta yaratish';
