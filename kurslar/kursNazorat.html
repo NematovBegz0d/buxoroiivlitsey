@@ -799,9 +799,27 @@
         let courses = Object.values(courseMap);
 
         if (currentUser.role === "oqituvchi") {
-          courses = courses.filter(
-            (c) => String(c.teacherId) === String(currentUser.id),
-          );
+          const myId    = String(currentUser.id ?? "");
+          const myLogin = String(currentUser.login ?? "");
+          courses = courses.filter((c) => {
+            const tid = String(c.teacherId ?? "");
+            return (myId && tid === myId) ||
+                   (myLogin && tid === myLogin);
+          });
+        }
+
+        // Sinf rahbari ham fan o'qitsa — o'z kurslarini ham ko'rsin
+        if (currentUser.role === "sinf_rahbari") {
+          const myId    = String(currentUser.id ?? "");
+          const myLogin = String(currentUser.login ?? "");
+          if (myId || myLogin) {
+            const myCourses = courses.filter((c) => {
+              const tid = String(c.teacherId ?? "");
+              return (myId && tid === myId) || (myLogin && tid === myLogin);
+            });
+            // O'z kurslarini boshqa kurslardan oldinga chiqarish uchun belgilash
+            myCourses.forEach(c => { c._isMyTeaching = true; });
+          }
         }
 
         courses.sort((a, b) => a.subjectName.localeCompare(b.subjectName));
@@ -889,10 +907,14 @@
         );
         let attendanceBtnHtml = "";
 
-        if (
-          currentUser.role === "oqituvchi" &&
-          String(currentUser.id) === String(course.teacherId)
-        ) {
+        // O'qituvchi yoki mentor shu kursning o'qituvchisi ekanligi tekshiruvi
+        const myId    = String(currentUser.id ?? "");
+        const myLogin = String(currentUser.login ?? "");
+        const tid     = String(course.teacherId ?? "");
+        const isMyTeachingCourse =
+          (myId && tid === myId) || (myLogin && tid === myLogin);
+
+        if (isMyTeachingCourse) {
           if (!isTodayClass) {
             attendanceBtnHtml = `<button class="btn-attendance" disabled title="Bugun bu fandan dars yo'q">📅 Bugun dars yo'q</button>`;
           } else if (todayAttendance) {
@@ -1329,10 +1351,10 @@
 
         groupStudents.forEach((s) => {
           html += `
-          <div class="student-select-item">
+          <label class="student-select-item">
             <input type="checkbox" class="student-checkbox" value="${esc(s.id)}" data-name="${esc(s.fullName)}" onchange="updateSelectedCount()" />
             <div class="student-info"><div class="s-name">${esc(s.fullName)}</div></div>
-          </div>`;
+          </label>`;
         });
         listEl.innerHTML = html;
       }

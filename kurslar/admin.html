@@ -391,6 +391,32 @@
               </div>
             </div>
           </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Sinf rahbarlari</h2>
+                <p>classMentors collection — guruh va fan ma'lumotlari.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>F.I.Sh</th>
+                      <th>Login</th>
+                      <th>Guruh</th>
+                      <th>Fan(lar)</th>
+                      <th>Harakat</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mentorsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section class="view" id="ratingUploadView">
@@ -649,6 +675,29 @@
         </section>
       </section>
     </main>
+
+    <!-- Mentor → O'qituvchi modali -->
+    <div id="mentorTeacherModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:var(--card,#1e2435);border:1px solid var(--border,#2d3450);border-radius:12px;padding:2rem;width:min(520px,95vw);box-shadow:0 8px 40px #0008;">
+        <h3 style="margin:0 0 .3rem">Mentorni o'qituvchi sifatida qo'shish</h3>
+        <p id="mtmMentorName" style="margin:0 0 1.2rem;opacity:.6;font-size:.85rem"></p>
+
+        <div class="fg" style="margin-bottom:1rem">
+          <label>Fanlar * <span style="opacity:.5;font-size:.78rem">(bitta yoki bir nechta tanlang)</span></label>
+          <div id="mtmSubjectsList" class="subject-check-list" style="max-height:220px;overflow-y:auto"></div>
+        </div>
+
+        <div id="mtmError" style="display:none;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.85rem"></div>
+        <div id="mtmSuccess" style="display:none;background:#d1fae5;color:#065f46;border-radius:8px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.85rem"></div>
+
+        <div style="display:flex;gap:.6rem;justify-content:flex-end">
+          <button class="btn" onclick="closeMentorTeacherModal()">Bekor qilish</button>
+          <button class="btn primary" id="btnMtmSave" onclick="saveMentorAsTeacher()">
+            <i class="fa-solid fa-floppy-disk"></i> Saqlash
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Parol yangilash modali -->
     <div id="resetPasswordModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
@@ -1069,12 +1118,56 @@
               `<tr><td><code>${esc(subId(s))}</code></td><td>${esc(s.name || "")}</td><td>${esc(s.shortName || "")}</td><td>${s.active === false ? '<span class="pill red">nofaol</span>' : '<span class="pill green">faol</span>'}</td></tr>`,
           )
           .join("");
+
+        // O'qituvchilar jadvali — subjectIds ustun, fallback: subject
         teachersTableBody.innerHTML = state.teachers
-          .map(
-            (t) =>
-              `<tr><td>${esc(teacherId(t))}</td><td><strong>${esc(t.fullName || "")}</strong></td><td><code>${esc(t.login || "")}</code></td><td>${esc(t.subject || (Array.isArray(t.subjectIds) ? t.subjectIds.join(", ") : ""))}</td><td>${esc(t.type || t.badgeLabel || "")}</td></tr>`,
-          )
+          .map((t) => {
+            const ids = Array.isArray(t.subjectIds) && t.subjectIds.length
+              ? t.subjectIds : [];
+            const subDisplay = ids.length
+              ? ids.map(id => `<span class="pill green" style="margin:.1rem">${esc(subName(id) !== id ? subName(id) : id)}</span>`).join("")
+              : `<span class="pill">${esc(t.subject || "—")}</span>`;
+            return `<tr>
+              <td>${esc(teacherId(t))}</td>
+              <td><strong>${esc(t.fullName || "")}</strong></td>
+              <td><code>${esc(t.login || "")}</code></td>
+              <td>${subDisplay}</td>
+              <td>${esc(t.type || t.badgeLabel || "")}</td>
+            </tr>`;
+          })
           .join("");
+
+        // Sinf rahbarlari jadvali
+        const mentorsBody = document.getElementById("mentorsTableBody");
+        if (mentorsBody) {
+          mentorsBody.innerHTML = state.classMentors.length
+            ? state.classMentors.map((m) => {
+                const ids = Array.isArray(m.subjectIds) && m.subjectIds.length ? m.subjectIds : [];
+                const subDisplay = ids.length
+                  ? ids.map(id => `<span class="pill green" style="margin:.1rem">${esc(subName(id) !== id ? subName(id) : id)}</span>`).join("")
+                  : (m.subject ? `<span class="pill">${esc(m.subject)}</span>` : '<span style="opacity:.4">—</span>');
+                const mLogin = (m.login || "").trim();
+                const mId    = String(m.id || m.docId || "").trim();
+                const alreadyTeacher = mLogin
+                  ? state.teachers.some(t => (t.login || "").trim() === mLogin)
+                  : false;
+                return `<tr>
+                  <td>${esc(String(m.id || m.docId || ""))}</td>
+                  <td><strong>${esc(m.fullName || "")}</strong></td>
+                  <td><code>${esc(m.login || "")}</code></td>
+                  <td><span class="pill blue">${esc(String(m.groupCode || m.group || "—"))}</span></td>
+                  <td>${subDisplay}</td>
+                  <td>
+                    ${alreadyTeacher
+                      ? '<span class="pill green"><i class="fa-solid fa-check"></i> O\'qituvchi</span>'
+                      : `<button class="btn small blue" onclick="openMentorAsTeacherModal('${esc(m.docId || m.id || "")}')">
+                           <i class="fa-solid fa-user-plus"></i> O'qituvchi qo'shish
+                         </button>`}
+                  </td>
+                </tr>`;
+              }).join("")
+            : `<tr><td colspan="5"><div class="empty">Sinf rahbarlari topilmadi.</div></td></tr>`;
+        }
       }
       function groupSummary() {
         groupSummaryBody.innerHTML = state.groups
@@ -1488,6 +1581,107 @@
       /* ═══════════════════════════════════════════
          TOPLU LOGIN — mentor va o'qituvchilar uchun
       ═══════════════════════════════════════════ */
+      /* ═══════════════════════════════════════════════════
+         MENTOR → O'QITUVCHI sifatida qo'shish
+      ═══════════════════════════════════════════════════ */
+      let _mtmDocId = "";
+
+      function openMentorAsTeacherModal(mentorDocId) {
+        _mtmDocId = mentorDocId;
+        const m = state.classMentors.find(x => (x.docId || x.id) === mentorDocId || String(x.id) === mentorDocId);
+        if (!m) return toast("Mentor topilmadi.", "error");
+
+        $("mtmMentorName").textContent = `${m.fullName || ""} — ${m.groupCode || ""}-guruh`;
+        $("mtmError").style.display = "none";
+        $("mtmSuccess").style.display = "none";
+
+        const existingIds = Array.isArray(m.subjectIds) ? m.subjectIds.map(String) : [];
+        $("mtmSubjectsList").innerHTML = state.subjects.map(s => {
+          const id = subId(s);
+          const checked = existingIds.includes(id) ? "checked" : "";
+          return `<label class="subject-check-row">
+            <input type="checkbox" class="mtm-subj-check" value="${esc(id)}" ${checked}>
+            <div><div class="student-name">${esc(s.name || id)}</div><div class="student-meta">${esc(id)}</div></div>
+          </label>`;
+        }).join("");
+
+        $("mentorTeacherModal").style.display = "flex";
+      }
+
+      function closeMentorTeacherModal() {
+        $("mentorTeacherModal").style.display = "none";
+      }
+
+      async function saveMentorAsTeacher() {
+        const m = state.classMentors.find(x => (x.docId || x.id) === _mtmDocId || String(x.id) === _mtmDocId);
+        if (!m) return;
+
+        const selectedIds = Array.from(document.querySelectorAll(".mtm-subj-check:checked")).map(x => x.value);
+        if (!selectedIds.length) {
+          $("mtmError").textContent = "Kamida bitta fan tanlang.";
+          $("mtmError").style.display = "";
+          return;
+        }
+
+        $("mtmError").style.display = "none";
+        const btn = $("btnMtmSave");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
+
+        try {
+          const mentorId  = String(m.id || m.docId || "");
+          const login     = m.login || `mentor${mentorId.padStart(3,"0")}`;
+          const subNames  = selectedIds.map(id => subName(id)).join(", ");
+          const batch     = db.batch();
+
+          // 1) teachers kolleksiyasiga qo'shish
+          batch.set(db.collection("teachers").doc(login), {
+            id: mentorId,
+            fullName: m.fullName || "",
+            login,
+            role: "sinf_rahbari",
+            subjectIds: selectedIds,
+            subject: subNames,
+            groupCode: String(m.groupCode || m.group || ""),
+            badgeLabel: "Sinf rahbari",
+            active: true,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: state.currentUser.uid,
+          }, { merge: true });
+
+          // 2) classMentors hujjatini yangilash
+          batch.update(db.collection("classMentors").doc(m.docId || mentorId), {
+            subjectIds: selectedIds,
+            subject: subNames,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+
+          // 3) userProfiles ni yangilash (email orqali topish)
+          const email = `${login}@litsey.uz`;
+          const profSnap = await db.collection("userProfiles").where("email", "==", email).limit(1).get();
+          if (!profSnap.empty) {
+            batch.update(profSnap.docs[0].ref, { subjectIds: selectedIds });
+          }
+
+          await batch.commit();
+
+          $("mtmSuccess").textContent = `${m.fullName} "${subNames}" fanlaridan o'qituvchi sifatida qo'shildi. Endi "Kursga yozish"da bu mentor tanlanishi mumkin.`;
+          $("mtmSuccess").style.display = "";
+          toast(`${m.fullName} teachers kolleksiyasiga qo'shildi.`, "success");
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Saqlandi';
+          await loadAll();
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Saqlash';
+          }, 3000);
+        } catch (e) {
+          $("mtmError").textContent = "Xatolik: " + e.message;
+          $("mtmError").style.display = "";
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Saqlash';
+        }
+      }
+
       const bulkState = { items: [], checked: false };
 
       function buildBulkProfile(r) {
@@ -2212,6 +2406,8 @@
       window.switchView = switchView;
       window.openEnrollForGroup = openEnrollForGroup;
       window.deleteAssignment = deleteAssignment;
+      window.openMentorAsTeacherModal = openMentorAsTeacherModal;
+      window.closeMentorTeacherModal = closeMentorTeacherModal;
       window.openResetModal = openResetModal;
       window.closeResetModal = closeResetModal;
       window.doResetPassword = doResetPassword;
