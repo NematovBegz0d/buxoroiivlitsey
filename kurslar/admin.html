@@ -668,8 +668,11 @@
         <div id="resetModalResult" style="display:none;background:#0f2;color:#000;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-family:monospace;font-size:.9rem;"></div>
         <div id="resetModalError" style="display:none;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-size:.85rem;"></div>
 
-        <div style="display:flex;gap:.6rem;justify-content:flex-end;">
+        <div style="display:flex;gap:.6rem;justify-content:flex-end;flex-wrap:wrap;">
           <button class="btn" onclick="closeResetModal()">Bekor qilish</button>
+          <button class="btn red" id="btnDoForceRecreate" onclick="doForceRecreate()" title="Eski akkauntni o'chirib yangisini yaratish">
+            <i class="fa-solid fa-rotate"></i> Qayta yaratish
+          </button>
           <button class="btn primary" id="btnDoReset" onclick="doResetPassword()">
             <i class="fa-solid fa-key"></i> Parolni yangilash
           </button>
@@ -1763,6 +1766,80 @@
         }
       }
 
+      async function doForceRecreate() {
+        const email = _resetEmail;
+        const newPass = $("resetNewPassword").value.trim();
+        if (!newPass || newPass.length < 6) {
+          $("resetModalError").textContent = "Yangi parol kamida 6 ta belgi bo'lsin.";
+          $("resetModalError").style.display = "";
+          return;
+        }
+        if (!confirm(`DIQQAT: "${email}" akkauntining eski Firebase Auth yozuvi o'chiriladi va yangi parol bilan qayta yaratiladi.\n\nDavom etilsinmi?`)) return;
+
+        $("resetModalError").style.display = "none";
+        $("resetModalResult").style.display = "none";
+        const btn = $("btnDoForceRecreate");
+        const btn2 = $("btnDoReset");
+        btn.disabled = true; btn2.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ishlanmoqda...';
+
+        let app = firebase.apps.find(a => a.name === "resetApp");
+        if (!app) app = firebase.initializeApp(firebase.app().options, "resetApp");
+        const resetAuth = app.auth();
+
+        try {
+          // 1) Userprofiles'dan eski ma'lumotlarni olish
+          const snap = await db.collection("userProfiles").where("email", "==", email).limit(1).get();
+          let oldProfile = null;
+          let oldDocId = null;
+          if (!snap.empty) {
+            oldDocId = snap.docs[0].id;
+            oldProfile = snap.docs[0].data();
+          }
+
+          // 2) Yangi Firebase Auth akkaunt yaratish
+          const cred = await resetAuth.createUserWithEmailAndPassword(email, newPass);
+          const newUid = cred.user.uid;
+
+          // 3) Yangi userProfiles yozuvi (eski ma'lumotlar bilan)
+          const profileData = oldProfile
+            ? { ...oldProfile, email, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: state.currentUser.uid }
+            : { active: true, email, role: email.startsWith("mentor") ? "sinf_rahbari" : "oqituvchi", createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: state.currentUser.uid };
+          delete profileData.createdAt;
+          await db.collection("userProfiles").doc(newUid).set({
+            ...profileData,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+
+          // 4) Eski userProfiles o'chirish
+          if (oldDocId && oldDocId !== newUid) {
+            await db.collection("userProfiles").doc(oldDocId).delete();
+          }
+
+          await resetAuth.signOut();
+
+          $("resetModalResult").innerHTML =
+            `Akkaunt qayta yaratildi!<br>` +
+            `<b>Email:</b> ${email}<br><b>Yangi parol:</b> ${newPass}`;
+          $("resetModalResult").style.display = "";
+          toast(`${email} qayta yaratildi.`, "success");
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Tayyor';
+          setTimeout(() => {
+            btn.disabled = false; btn2.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Qayta yaratish';
+          }, 3000);
+        } catch (e) {
+          try { await resetAuth.signOut(); } catch (_) {}
+          let msg = e.message;
+          if (e.code === "auth/email-already-in-use")
+            msg = "Bu email allaqachon ishlatilmoqda. Avval Firebase Console'dan o'chirib keling.";
+          $("resetModalError").textContent = "Xatolik: " + msg;
+          $("resetModalError").style.display = "";
+          btn.disabled = false; btn2.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Qayta yaratish';
+        }
+      }
+
       async function createTeacherAccount() {
         const fullName = newTeacherFullName.value.trim();
         const id = String(newTeacherIdAdmin.value || "").trim();
@@ -2038,6 +2115,7 @@
       window.openResetModal = openResetModal;
       window.closeResetModal = closeResetModal;
       window.doResetPassword = doResetPassword;
+      window.doForceRecreate = doForceRecreate;
       window.logout = logout;
       document.addEventListener("DOMContentLoaded", init);
     </script>
