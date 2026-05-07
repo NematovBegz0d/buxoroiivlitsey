@@ -619,7 +619,7 @@
                       <th>Turi</th>
                       <th>Email</th>
                       <th>Vaqtinchalik parol</th>
-                      <th>Holat</th>
+                      <th>Holat / Harakat</th>
                     </tr>
                   </thead>
                   <tbody id="bulkStatusBody"></tbody>
@@ -649,6 +649,33 @@
         </section>
       </section>
     </main>
+
+    <!-- Parol yangilash modali -->
+    <div id="resetPasswordModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:var(--card,#1e2435);border:1px solid var(--border,#2d3450);border-radius:12px;padding:2rem;width:min(480px,95vw);box-shadow:0 8px 40px #0008;">
+        <h3 style="margin:0 0 .4rem;font-size:1.1rem;">Parolni yangilash</h3>
+        <p id="resetModalEmail" style="margin:0 0 1.2rem;font-size:.85rem;opacity:.6;font-family:monospace;"></p>
+
+        <div class="fg" style="margin-bottom:.8rem;">
+          <label>Joriy parol <span style="opacity:.5;font-size:.78rem;">(eski parol — avto-sinab ko'rish uchun bo'sh qoldiring)</span></label>
+          <input class="input" id="resetOldPassword" type="password" placeholder="Bo'sh qoldirsangiz avto-sinab ko'riladi" autocomplete="off"/>
+        </div>
+        <div class="fg" style="margin-bottom:1.2rem;">
+          <label>Yangi parol</label>
+          <input class="input" id="resetNewPassword" type="text" autocomplete="new-password"/>
+        </div>
+
+        <div id="resetModalResult" style="display:none;background:#0f2;color:#000;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-family:monospace;font-size:.9rem;"></div>
+        <div id="resetModalError" style="display:none;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-size:.85rem;"></div>
+
+        <div style="display:flex;gap:.6rem;justify-content:flex-end;">
+          <button class="btn" onclick="closeResetModal()">Bekor qilish</button>
+          <button class="btn primary" id="btnDoReset" onclick="doResetPassword()">
+            <i class="fa-solid fa-key"></i> Parolni yangilash
+          </button>
+        </div>
+      </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
@@ -1532,9 +1559,14 @@
                 : '<span class="pill green">O\'qituvchi</span>'}</td>
               <td><code>${esc(r.email)}</code></td>
               <td><code>${r.hasAccount ? "—" : esc(r.password)}</code></td>
-              <td>${r.hasAccount
-                ? '<span class="pill green"><i class="fa-solid fa-check"></i> Mavjud</span>'
-                : '<span class="pill red"><i class="fa-solid fa-xmark"></i> Yo\'q</span>'}</td>
+              <td>
+                ${r.hasAccount
+                  ? `<span class="pill green"><i class="fa-solid fa-check"></i> Mavjud</span>
+                     <button class="btn small" onclick="openResetModal('${esc(r.email)}')" title="Parolni yangilash">
+                       <i class="fa-solid fa-key"></i> Parolni yangilash
+                     </button>`
+                  : '<span class="pill red"><i class="fa-solid fa-xmark"></i> Yo\'q</span>'}
+              </td>
             </tr>`).join("");
 
           $("bulkStatusTable").style.display = "";
@@ -1626,6 +1658,109 @@
         await bulkCheckStatus();
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Loginlar yaratish';
+      }
+
+      let _resetEmail = "";
+
+      function openResetModal(email) {
+        _resetEmail = email;
+        const year = new Date().getFullYear();
+        const pad = email.match(/\d+/)?.[0]?.padStart(3, "0") || "001";
+        const prefix = email.startsWith("mentor") ? "Mentor" : "Teacher";
+        $("resetModalEmail").textContent = email;
+        $("resetOldPassword").value = "";
+        $("resetNewPassword").value = `${prefix}${pad}@${year}New`;
+        $("resetModalResult").style.display = "none";
+        $("resetModalError").style.display = "none";
+        $("resetPasswordModal").style.display = "flex";
+      }
+      function closeResetModal() {
+        $("resetPasswordModal").style.display = "none";
+      }
+
+      async function doResetPassword() {
+        const email = _resetEmail;
+        const newPass = $("resetNewPassword").value.trim();
+        const manualOld = $("resetOldPassword").value.trim();
+        if (!newPass || newPass.length < 6) {
+          $("resetModalError").textContent = "Yangi parol kamida 6 ta belgi bo'lsin.";
+          $("resetModalError").style.display = "";
+          return;
+        }
+        $("resetModalError").style.display = "none";
+        $("resetModalResult").style.display = "none";
+
+        const btn = $("btnDoReset");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Tekshirilmoqda...';
+
+        let app = firebase.apps.find(a => a.name === "resetApp");
+        if (!app) app = firebase.initializeApp(firebase.app().options, "resetApp");
+        const resetAuth = app.auth();
+
+        // Sinab ko'rinadigan parollar ro'yxati
+        const year = new Date().getFullYear();
+        const pad = email.match(/\d+/)?.[0]?.padStart(3, "0") || "001";
+        const prefix = email.startsWith("mentor") ? "Mentor" : "Teacher";
+        const candidates = manualOld
+          ? [manualOld]
+          : [
+              `${prefix}${pad}@${year}`,
+              `${prefix}${pad}@${year - 1}`,
+              `${prefix}${pad}@${year - 2}`,
+              `${prefix}${pad}@${year + 1}`,
+            ];
+
+        let signedIn = false;
+        let triedPass = "";
+        for (const pass of candidates) {
+          try {
+            await resetAuth.signInWithEmailAndPassword(email, pass);
+            signedIn = true;
+            triedPass = pass;
+            break;
+          } catch (e) {
+            if (e.code !== "auth/wrong-password" && e.code !== "auth/invalid-credential") {
+              $("resetModalError").textContent = "Kirish xatosi: " + e.message;
+              $("resetModalError").style.display = "";
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fa-solid fa-key"></i> Parolni yangilash';
+              try { await resetAuth.signOut(); } catch (_) {}
+              return;
+            }
+          }
+        }
+
+        if (!signedIn) {
+          $("resetModalError").textContent = manualOld
+            ? "Kiritilgan parol noto'g'ri. Iltimos, to'g'ri joriy parolni kiriting."
+            : "Avtomat parollar ishlamadi. Joriy parolni qo'lda kiriting.";
+          $("resetModalError").style.display = "";
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-key"></i> Parolni yangilash';
+          return;
+        }
+
+        try {
+          await resetAuth.currentUser.updatePassword(newPass);
+          await resetAuth.signOut();
+          $("resetModalResult").innerHTML =
+            `Parol muvaffaqiyatli yangilandi!<br>` +
+            `<b>Email:</b> ${email}<br><b>Yangi parol:</b> ${newPass}`;
+          $("resetModalResult").style.display = "";
+          toast(`${email} uchun parol yangilandi.`, "success");
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Yangilandi';
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-key"></i> Parolni yangilash';
+          }, 3000);
+        } catch (e) {
+          try { await resetAuth.signOut(); } catch (_) {}
+          $("resetModalError").textContent = "Parol yangilashda xatolik: " + e.message;
+          $("resetModalError").style.display = "";
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-key"></i> Parolni yangilash';
+        }
       }
 
       async function createTeacherAccount() {
@@ -1900,6 +2035,9 @@
       window.switchView = switchView;
       window.openEnrollForGroup = openEnrollForGroup;
       window.deleteAssignment = deleteAssignment;
+      window.openResetModal = openResetModal;
+      window.closeResetModal = closeResetModal;
+      window.doResetPassword = doResetPassword;
       window.logout = logout;
       document.addEventListener("DOMContentLoaded", init);
     </script>
