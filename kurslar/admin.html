@@ -1585,7 +1585,10 @@
                      <button class="btn small" onclick="openResetModal('${esc(r.email)}')" title="Parolni yangilash">
                        <i class="fa-solid fa-key"></i> Parolni yangilash
                      </button>`
-                  : '<span class="pill red"><i class="fa-solid fa-xmark"></i> Yo\'q</span>'}
+                  : `<span class="pill red"><i class="fa-solid fa-xmark"></i> Yo'q</span>
+                     <button class="btn small red" onclick="openResetModal('${esc(r.email)}')" title="Qayta yaratish">
+                       <i class="fa-solid fa-rotate"></i> Qayta yaratish
+                     </button>`}
               </td>
             </tr>`).join("");
 
