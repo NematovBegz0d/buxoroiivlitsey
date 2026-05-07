@@ -1490,6 +1490,23 @@
       ═══════════════════════════════════════════ */
       const bulkState = { items: [], checked: false };
 
+      function buildBulkProfile(r) {
+        const p = {
+          active: true,
+          fullName: r.item.fullName || r.login,
+          email: r.email,
+          login: r.login,
+          role: r.role,
+          id: String(r.item.id || r.item.docId || ""),
+          subjectIds: Array.isArray(r.item.subjectIds) ? r.item.subjectIds : [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: state.currentUser.uid,
+        };
+        if (r.role === "sinf_rahbari" && r.item.groupCode)
+          p.groupCode = String(r.item.groupCode);
+        return p;
+      }
+
       function bulkEmail(item, role) {
         if (item.login) return `${item.login}@litsey.uz`;
         const id = String(item.id || item.docId || "0").padStart(3, "0");
@@ -1601,35 +1618,45 @@
         if (!app) app = firebase.initializeApp(firebase.app().options, "bulkCreatorApp");
         const secondaryAuth = app.auth();
 
-        const created = [], failed = [];
+        const created = [], fixed = [], failed = [];
 
         for (const r of pending) {
           try {
             const cred = await secondaryAuth.createUserWithEmailAndPassword(r.email, r.password);
             const uid = cred.user.uid;
-
-            const profileData = {
-              active: true,
-              fullName: r.item.fullName || r.login,
-              email: r.email,
-              login: r.login,
-              role: r.role,
-              id: String(r.item.id || r.item.docId || ""),
-              subjectIds: Array.isArray(r.item.subjectIds) ? r.item.subjectIds : [],
-              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-              createdBy: state.currentUser.uid,
-            };
-            if (r.role === "sinf_rahbari" && r.item.groupCode) {
-              profileData.groupCode = String(r.item.groupCode);
-            }
-            await db.collection("userProfiles").doc(uid).set(profileData);
+            await db.collection("userProfiles").doc(uid).set(buildBulkProfile(r));
             await secondaryAuth.signOut();
-
             created.push(r);
-            $("bulkLog").textContent = `Yaratildi: ${r.email} (${created.length}/${pending.length})`;
+            $("bulkLog").textContent = `Yaratildi: ${r.email} (${created.length + fixed.length}/${pending.length})`;
           } catch (e) {
             if (e.code === "auth/email-already-in-use") {
-              created.push({ ...r, alreadyExisted: true });
+              // Firebase Auth bor, lekin userProfiles yo'q — eski parol bilan kirib profil yaratamiz
+              $("bulkLog").textContent = `Auth bor, profil yo'q: ${r.email} — tuzatilmoqda...`;
+              const year = new Date().getFullYear();
+              const pad = String(r.item.id || r.item.docId || "0").padStart(3, "0");
+              const prefix = r.role === "sinf_rahbari" ? "Mentor" : "Teacher";
+              const candidates = [
+                `${prefix}${pad}@${year}`,
+                `${prefix}${pad}@${year - 1}`,
+                `${prefix}${pad}@${year - 2}`,
+                `${prefix}${pad}@${year + 1}`,
+              ];
+              let fixedOk = false;
+              for (const oldPass of candidates) {
+                try {
+                  const c2 = await secondaryAuth.signInWithEmailAndPassword(r.email, oldPass);
+                  await db.collection("userProfiles").doc(c2.user.uid).set(buildBulkProfile(r));
+                  await secondaryAuth.signOut();
+                  fixed.push({ ...r, fixedPassword: oldPass });
+                  fixedOk = true;
+                  break;
+                } catch (_) {
+                  try { await secondaryAuth.signOut(); } catch (__) {}
+                }
+              }
+              if (!fixedOk) {
+                failed.push({ r, msg: "Firebase Auth'da akkaunt bor, lekin parol noma'lum — 'Parolni yangilash → Qayta yaratish' dan foydalaning." });
+              }
             } else {
               failed.push({ r, msg: e.message });
             }
@@ -1638,16 +1665,29 @@
         }
 
         // Natijani chiqarish
-        const lines = ["=== YARATILGAN AKKAUNTLAR ===", ""];
-        created.filter(r => !r.alreadyExisted).forEach(r => {
-          lines.push(`${r.role === "sinf_rahbari" ? "Sinf rahbari" : "O'qituvchi"}: ${r.item.fullName || r.login}`);
-          lines.push(`  Email   : ${r.email}`);
-          lines.push(`  Parol   : ${r.password}`);
-          lines.push("");
-        });
+        const lines = [];
+        if (created.length) {
+          lines.push("=== YANGI AKKAUNTLAR ===", "");
+          created.forEach(r => {
+            lines.push(`${r.role === "sinf_rahbari" ? "Sinf rahbari" : "O'qituvchi"}: ${r.item.fullName || r.login}`);
+            lines.push(`  Email   : ${r.email}`);
+            lines.push(`  Parol   : ${r.password}`);
+            lines.push("");
+          });
+        }
+        if (fixed.length) {
+          lines.push("=== TUZATILDI (profil yo'q edi, tiklandi) ===", "");
+          fixed.forEach(r => {
+            lines.push(`${r.role === "sinf_rahbari" ? "Sinf rahbari" : "O'qituvchi"}: ${r.item.fullName || r.login}`);
+            lines.push(`  Email   : ${r.email}`);
+            lines.push(`  Parol   : ${r.fixedPassword}`);
+            lines.push("");
+          });
+        }
         if (failed.length) {
-          lines.push("=== XATOLAR ===", "");
-          failed.forEach(({ r, msg }) => lines.push(`${r.email} — ${msg}`));
+          lines.push("=== QO'LDA HAL QILISH KERAK ===", "");
+          failed.forEach(({ r, msg }) => lines.push(`${r.email}\n  Sabab: ${msg}`));
+          lines.push("");
         }
 
         $("bulkResultText").value = lines.join("\n");
@@ -1655,7 +1695,12 @@
         $("bulkLog").textContent = `Tayyor: ${created.filter(r => !r.alreadyExisted).length} ta yangi akkaunt yaratildi` +
           (failed.length ? `, ${failed.length} ta xato` : "") + ".";
 
-        toast(`${created.filter(r => !r.alreadyExisted).length} ta akkaunt yaratildi.`, "success");
+        const newCount = created.length, fixCount = fixed.length, failCount = failed.length;
+        const parts = [];
+        if (newCount) parts.push(`${newCount} ta yangi`);
+        if (fixCount) parts.push(`${fixCount} ta tuzatildi`);
+        if (failCount) parts.push(`${failCount} ta qo'lda hal qilish kerak`);
+        toast(parts.join(", ") || "Hech narsa o'zgarmadi.", newCount + fixCount > 0 ? "success" : "warning");
 
         // Holatni yangilash
         await bulkCheckStatus();
