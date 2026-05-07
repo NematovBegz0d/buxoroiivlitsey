@@ -80,7 +80,10 @@
             <i class="fa-solid fa-ranking-star"></i> Reyting yangilash
           </button>
           <button class="tab" data-view="createTeacherView">
-            <i class="fa-solid fa-user-plus"></i> Yangi o‘qituvchi
+            <i class="fa-solid fa-user-plus"></i> Yangi o’qituvchi
+          </button>
+          <button class="tab" data-view="bulkLoginView">
+            <i class="fa-solid fa-key"></i> Toplu login
           </button>
         </nav>
 
@@ -564,6 +567,83 @@
                   <i class="fa-solid fa-user-plus"></i> O‘qituvchi yaratish
                 </button>
               </div>
+            </div>
+          </div>
+        </section>
+        <section class="view" id="bulkLoginView">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Toplu login yaratish</h2>
+                <p>Firestore'dagi barcha o'qituvchi va sinf rahbarlariga avtomatik Firebase Auth akkaunt va login/parol beriladi.</p>
+              </div>
+              <div class="toolbar">
+                <button class="btn blue" id="btnBulkCheck">
+                  <i class="fa-solid fa-magnifying-glass"></i> Holatni tekshirish
+                </button>
+                <button class="btn primary" id="btnBulkCreate" disabled>
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Loginlar yaratish
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="grid" style="margin-bottom:1rem">
+                <div class="stat">
+                  <div class="stat-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                  <div class="stat-num" id="bulkTeacherTotal">—</div>
+                  <div class="stat-label">O'qituvchilar</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-icon"><i class="fa-solid fa-user-tie"></i></div>
+                  <div class="stat-num" id="bulkMentorTotal">—</div>
+                  <div class="stat-label">Sinf rahbarlari</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-icon"><i class="fa-solid fa-circle-check" style="color:#22c55e"></i></div>
+                  <div class="stat-num" id="bulkHasAccount">—</div>
+                  <div class="stat-label">Akkaunt bor</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-icon"><i class="fa-solid fa-circle-xmark" style="color:#ef4444"></i></div>
+                  <div class="stat-num" id="bulkNoAccount">—</div>
+                  <div class="stat-label">Akkaunt yo'q</div>
+                </div>
+              </div>
+
+              <div class="table-wrap" id="bulkStatusTable" style="display:none">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>F.I.Sh</th>
+                      <th>Turi</th>
+                      <th>Email</th>
+                      <th>Vaqtinchalik parol</th>
+                      <th>Holat</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bulkStatusBody"></tbody>
+                </table>
+              </div>
+
+              <div class="card embedded-card rating-preview-card" id="bulkResultCard" style="display:none">
+                <div class="card-header">
+                  <div>
+                    <h2>Yaratilgan akkauntlar</h2>
+                    <p>Quyidagi login ma'lumotlarini foydalanuvchilarga yuboring.</p>
+                  </div>
+                  <button class="btn small blue" id="btnCopyBulkResult">
+                    <i class="fa-solid fa-copy"></i> Nusxa olish
+                  </button>
+                </div>
+                <div class="card-body">
+                  <textarea id="bulkResultText" class="input" rows="10"
+                    style="width:100%;font-family:monospace;font-size:0.85rem;resize:vertical"
+                    readonly></textarea>
+                </div>
+              </div>
+
+              <div class="log" id="bulkLog" style="margin-top:1rem">Tekshirish tugmasini bosing...</div>
             </div>
           </div>
         </section>
@@ -1375,6 +1455,179 @@
         teacherCredentialBox.style.display = "none";
         generateTeacherLoginPassword();
       }
+      /* ═══════════════════════════════════════════
+         TOPLU LOGIN — mentor va o'qituvchilar uchun
+      ═══════════════════════════════════════════ */
+      const bulkState = { items: [], checked: false };
+
+      function bulkEmail(item, role) {
+        if (item.login) return `${item.login}@litsey.uz`;
+        const id = String(item.id || item.docId || "0").padStart(3, "0");
+        return role === "sinf_rahbari" ? `mentor${id}@litsey.uz` : `teacher${id}@litsey.uz`;
+      }
+      function bulkPassword(item, role) {
+        const id = String(item.id || item.docId || "0").padStart(3, "0");
+        const year = new Date().getFullYear();
+        return role === "sinf_rahbari" ? `Mentor${id}@${year}` : `Teacher${id}@${year}`;
+      }
+      function bulkLogin(item, role) {
+        if (item.login) return item.login;
+        const id = String(item.id || item.docId || "0").padStart(3, "0");
+        return role === "sinf_rahbari" ? `mentor${id}` : `teacher${id}`;
+      }
+
+      async function checkProfileByEmail(email) {
+        const snap = await db.collection("userProfiles")
+          .where("email", "==", email).limit(1).get();
+        return !snap.empty;
+      }
+
+      async function bulkCheckStatus() {
+        const btn = $("btnBulkCheck");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Tekshirilmoqda...';
+        $("bulkLog").textContent = "Tekshirilmoqda...";
+        $("bulkStatusTable").style.display = "none";
+        $("bulkResultCard").style.display = "none";
+
+        try {
+          const allItems = [
+            ...state.teachers.map(t => ({ ...t, _role: "oqituvchi" })),
+            ...state.classMentors.map(m => ({ ...m, _role: "sinf_rahbari" })),
+          ];
+
+          // Parallel ravishda har birining akkaunt statusini tekshirish
+          const results = await Promise.all(allItems.map(async item => {
+            const email = bulkEmail(item, item._role);
+            const hasProfile = await checkProfileByEmail(email);
+            return {
+              item,
+              role: item._role,
+              email,
+              password: bulkPassword(item, item._role),
+              login: bulkLogin(item, item._role),
+              hasAccount: hasProfile,
+            };
+          }));
+
+          bulkState.items = results;
+          bulkState.checked = true;
+
+          const teachers = results.filter(r => r.role === "oqituvchi");
+          const mentors = results.filter(r => r.role === "sinf_rahbari");
+          const hasAcc = results.filter(r => r.hasAccount).length;
+          const noAcc = results.filter(r => !r.hasAccount).length;
+
+          $("bulkTeacherTotal").textContent = teachers.length;
+          $("bulkMentorTotal").textContent = mentors.length;
+          $("bulkHasAccount").textContent = hasAcc;
+          $("bulkNoAccount").textContent = noAcc;
+
+          $("bulkStatusBody").innerHTML = results.map((r, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td><strong>${esc(r.item.fullName || r.item.login || r.email)}</strong></td>
+              <td>${r.role === "sinf_rahbari"
+                ? '<span class="pill">Sinf rahbari</span>'
+                : '<span class="pill green">O\'qituvchi</span>'}</td>
+              <td><code>${esc(r.email)}</code></td>
+              <td><code>${r.hasAccount ? "—" : esc(r.password)}</code></td>
+              <td>${r.hasAccount
+                ? '<span class="pill green"><i class="fa-solid fa-check"></i> Mavjud</span>'
+                : '<span class="pill red"><i class="fa-solid fa-xmark"></i> Yo\'q</span>'}</td>
+            </tr>`).join("");
+
+          $("bulkStatusTable").style.display = "";
+          $("btnBulkCreate").disabled = noAcc === 0;
+          $("bulkLog").textContent = `Tekshiruv tugadi: ${results.length} ta foydalanuvchi — ${hasAcc} ta akkaunt bor, ${noAcc} ta akkaunt yo'q.`;
+          if (noAcc === 0) toast("Barcha foydalanuvchilarda akkaunt mavjud.", "success");
+          else toast(`${noAcc} ta foydalanuvchida akkaunt yo'q — yaratish tugmasini bosing.`, "warning");
+        } catch (e) {
+          $("bulkLog").textContent = "Xatolik: " + e.message;
+          toast("Tekshirishda xatolik: " + e.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Holatni tekshirish';
+        }
+      }
+
+      async function bulkCreateAccounts() {
+        if (!bulkState.checked) return toast("Avval tekshiring.", "warning");
+        const pending = bulkState.items.filter(r => !r.hasAccount);
+        if (!pending.length) return toast("Yaratish kerak bo'lgan akkaunt yo'q.", "warning");
+        if (!confirm(`${pending.length} ta foydalanuvchi uchun Firebase Auth akkaunt va userProfiles yaratilsinmi?`)) return;
+
+        const btn = $("btnBulkCreate");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yaratilmoqda...';
+        $("bulkLog").textContent = "Yaratilmoqda...";
+
+        let app = firebase.apps.find(a => a.name === "bulkCreatorApp");
+        if (!app) app = firebase.initializeApp(firebase.app().options, "bulkCreatorApp");
+        const secondaryAuth = app.auth();
+
+        const created = [], failed = [];
+
+        for (const r of pending) {
+          try {
+            const cred = await secondaryAuth.createUserWithEmailAndPassword(r.email, r.password);
+            const uid = cred.user.uid;
+
+            const profileData = {
+              active: true,
+              fullName: r.item.fullName || r.login,
+              email: r.email,
+              login: r.login,
+              role: r.role,
+              id: String(r.item.id || r.item.docId || ""),
+              subjectIds: Array.isArray(r.item.subjectIds) ? r.item.subjectIds : [],
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: state.currentUser.uid,
+            };
+            if (r.role === "sinf_rahbari" && r.item.groupCode) {
+              profileData.groupCode = String(r.item.groupCode);
+            }
+            await db.collection("userProfiles").doc(uid).set(profileData);
+            await secondaryAuth.signOut();
+
+            created.push(r);
+            $("bulkLog").textContent = `Yaratildi: ${r.email} (${created.length}/${pending.length})`;
+          } catch (e) {
+            if (e.code === "auth/email-already-in-use") {
+              created.push({ ...r, alreadyExisted: true });
+            } else {
+              failed.push({ r, msg: e.message });
+            }
+            try { await secondaryAuth.signOut(); } catch (_) {}
+          }
+        }
+
+        // Natijani chiqarish
+        const lines = ["=== YARATILGAN AKKAUNTLAR ===", ""];
+        created.filter(r => !r.alreadyExisted).forEach(r => {
+          lines.push(`${r.role === "sinf_rahbari" ? "Sinf rahbari" : "O'qituvchi"}: ${r.item.fullName || r.login}`);
+          lines.push(`  Email   : ${r.email}`);
+          lines.push(`  Parol   : ${r.password}`);
+          lines.push("");
+        });
+        if (failed.length) {
+          lines.push("=== XATOLAR ===", "");
+          failed.forEach(({ r, msg }) => lines.push(`${r.email} — ${msg}`));
+        }
+
+        $("bulkResultText").value = lines.join("\n");
+        $("bulkResultCard").style.display = "";
+        $("bulkLog").textContent = `Tayyor: ${created.filter(r => !r.alreadyExisted).length} ta yangi akkaunt yaratildi` +
+          (failed.length ? `, ${failed.length} ta xato` : "") + ".";
+
+        toast(`${created.filter(r => !r.alreadyExisted).length} ta akkaunt yaratildi.`, "success");
+
+        // Holatni yangilash
+        await bulkCheckStatus();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Loginlar yaratish';
+      }
+
       async function createTeacherAccount() {
         const fullName = newTeacherFullName.value.trim();
         const id = String(newTeacherIdAdmin.value || "").trim();
@@ -1592,6 +1845,18 @@
             state.parsedRating = [];
             btnUploadRating.disabled = true;
             ratingPreviewStats.textContent = "Fayl tanlandi. Endi tekshirish tugmasini bosing.";
+          });
+        if ($("btnBulkCheck"))
+          $("btnBulkCheck").addEventListener("click", bulkCheckStatus);
+        if ($("btnBulkCreate"))
+          $("btnBulkCreate").addEventListener("click", bulkCreateAccounts);
+        if ($("btnCopyBulkResult"))
+          $("btnCopyBulkResult").addEventListener("click", () => {
+            const ta = $("bulkResultText");
+            ta.select();
+            navigator.clipboard.writeText(ta.value)
+              .then(() => toast("Nusxa olindi."))
+              .catch(() => toast("Nusxa olishda xatolik.", "error"));
           });
       }
       function accessError(m) {
