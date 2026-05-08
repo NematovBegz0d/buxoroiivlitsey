@@ -1933,6 +1933,12 @@ a { text-decoration: none; }
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
   }
+
+  /* Quick links: 2 ustun */
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* About: gap kamaytirish */
+  .about-flex { gap: 36px; margin: 2rem; }
 }
 
 /* — 992px — */
@@ -1955,10 +1961,16 @@ a { text-decoration: none; }
   .test-mode-banner { font-size: 12px; padding: 10px; }
   .test-mode-badge  { display: none; }
 
+  /* Top bar compact */
+  .top-bar { padding: 8px 16px; font-size: 12px; }
+  .top-bar-location { display: none; }
+
   /* Hero */
+  .hero-section { height: 480px; }
   .slide-title { font-size: 2.2rem; }
   .slide-subtitle { font-size: 14px; }
-  .slide-buttons { flex-direction: column; align-items: center; }
+  .slide-buttons { flex-direction: column; align-items: center; gap: 10px; }
+  .btn-primary, .btn-secondary { width: 100%; text-align: center; justify-content: center; }
 
   /* Nav */
   .nav-links, .header-actions .btn-apply { display: none; }
@@ -1971,9 +1983,16 @@ a { text-decoration: none; }
   /* About */
   .about-flex {
     flex-direction: column;
-    gap: 30px;
+    gap: 24px;
     margin: 1.5rem;
   }
+  .about-image img { height: 280px; }
+
+  /* News image: fixed height'ni kamaytirish */
+  .news-img-wrapper { height: 220px; }
+
+  /* Stats: iOS Safari parallax bug fix */
+  .stats-section { background-attachment: scroll; }
 
   /* Footer */
   .footer-grid    { grid-template-columns: 1fr; gap: 30px; }
@@ -1981,14 +2000,14 @@ a { text-decoration: none; }
   .bottom-links a { margin-left: 0; margin: 0 10px; }
 
   /* Gallery */
-  .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 250px; }
+  .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
   .span-2-row, .gallery-item:first-child {
     grid-row: span 1;
     grid-column: span 1;
   }
 
   /* News static */
-  .news-header-flex { flex-direction: column; align-items: flex-start; }
+  .news-header-flex { flex-direction: column; align-items: flex-start; gap: 12px; }
   .news-grid        { grid-template-columns: 1fr; gap: 20px; }
   .desktop-only     { display: none; }
   .mobile-only      { display: flex; justify-content: center; margin-top: 30px; }
@@ -2000,6 +2019,9 @@ a { text-decoration: none; }
   /* FAQ */
   .faq-question { font-size: 1rem; padding: 16px 20px; }
   .faq-answer p { padding: 0 20px 16px; font-size: 0.95rem; }
+
+  /* Lightbox */
+  .lightbox-close { top: 16px; right: 20px; font-size: 36px; }
 }
 
 /* — 640px — */
@@ -2025,14 +2047,51 @@ a { text-decoration: none; }
   .news-card__tg-btn { justify-content: center; }
 }
 
+/* — 640px — already defined above */
+
 /* — 576px — */
 @media (max-width: 576px) {
   /* Stats */
-  .stats-section { padding: 70px 0; }
-  .stats-grid    { grid-template-columns: 1fr; gap: 40px; }
-  .stat-number   { font-size: 3rem; }
+  .stats-section { padding: 60px 0; }
+  .stats-grid    { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .stat-number   { font-size: 2.6rem; }
 
   /* Hero */
-  .hero-section { height: 450px; }
-  .slide-title  { font-size: 1.8rem; }
+  .hero-section { height: 400px; }
+  .slide-title  { font-size: 1.7rem; }
+  .slide-subtitle { font-size: 12px; letter-spacing: 1px; }
+  .slider-btn   { width: 40px; height: 40px; font-size: 16px; }
+}
+
+/* — 480px — */
+@media (max-width: 480px) {
+  /* Container */
+  .container { padding: 0 14px; }
+
+  /* Top bar */
+  .top-bar { flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px 14px; }
+  .top-bar-contact { gap: 12px; }
+
+  /* Hero */
+  .hero-section { height: 360px; }
+  .slide-title  { font-size: 1.5rem; }
+  .slide-buttons { width: 100%; padding: 0 16px; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns: 1fr; gap: 24px; }
+
+  /* Reyting va galareya */
+  .gallery-grid { grid-auto-rows: 180px; }
+
+  /* News card */
+  .news-img-wrapper { height: 180px; }
+  .news-content { padding: 16px; }
+  .news-title { font-size: 1.1rem; }
+
+  /* Footer */
+  .footer-logo { font-size: 1.4rem; }
+  .social-links { justify-content: center; }
+
+  /* Scroll to top */
+  .topToScrollBtn { bottom: 20px; right: 16px; width: 44px; height: 44px; }
 }

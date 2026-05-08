@@ -172,7 +172,24 @@
 .stats-summary-cards-4 { grid-template-columns: repeat(4, minmax(120px, 1fr)); }
 @media (max-width: 760px) {
   .stats-summary-cards-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats-summary-cards   { grid-template-columns: repeat(2, 1fr); }
+  .stats-tabs { gap: 6px; }
+  .stats-tab  { padding: 8px 10px; font-size: 0.8rem; }
+}
+@media (max-width: 560px) {
+  /* Enroll modali mobil uchun */
+  #enrollModal .modal-container { width: 100vw; max-width: 100vw; border-radius: var(--radius-lg) var(--radius-lg) 0 0; margin: auto 0 0; max-height: 96vh; }
+  /* Statistika modali */
+  .stats-summary-cards   { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stats-summary-num     { font-size: 1.4rem; }
 }
 @media (max-width: 480px) {
+  .stats-summary-cards-4 { grid-template-columns: 1fr 1fr; }
+  .stats-summary-cards   { grid-template-columns: 1fr 1fr; }
+  .course-card-actions   { flex-wrap: wrap; }
+  .btn-stats             { font-size: 0.72rem; padding: 6px 10px; }
+}
+@media (max-width: 360px) {
   .stats-summary-cards-4 { grid-template-columns: 1fr; }
+  .stats-summary-cards   { grid-template-columns: 1fr; }
 }

@@ -1774,18 +1774,29 @@ img {
   .header-content {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
+  }
+
+  .header-left {
+    width: 100%;
   }
 
   .header-right {
     width: 100%;
     justify-content: flex-start;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+    /* oxirgi element qirqilmasligi uchun */
+    padding-right: 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
+  /* Qidiruv maydonchasi to'liq kenglikda */
   .search-section {
     padding: 0 16px;
+  }
+  .search-wrapper {
+    max-width: 100%;
   }
 
   .courses-container,
@@ -1797,9 +1808,24 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* Modal */
+  .modal-overlay {
+    padding: 12px;
+  }
   .modal-container {
-    max-height: 92vh;
+    max-height: 94vh;
     border-radius: var(--radius-lg);
+  }
+  .modal-header {
+    padding: 16px 18px;
+  }
+  .modal-body {
+    padding: 16px 18px;
+  }
+  .modal-footer {
+    padding: 12px 18px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .modal-form-row {
@@ -1813,6 +1839,19 @@ img {
   .enrolled-table {
     display: block;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Toast container */
+  .toast-container {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+  }
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -1823,8 +1862,12 @@ img {
   }
 
   .header-right {
-    flex-wrap: wrap;
     gap: 6px;
+  }
+
+  /* Date badge yashirish - kichik ekranda joy tejash */
+  .date-badge {
+    display: none;
   }
 
   .weekday-selector {
@@ -1834,6 +1877,54 @@ img {
   .weekday-btn {
     padding: 6px 10px;
     font-size: 0.75rem;
+  }
+
+  /* Kurs kartasi */
+  .course-card {
+    padding: 14px;
+  }
+  .course-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .course-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Modal footer tugmalari */
+  .btn-modal-save,
+  .btn-modal-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Login karta */
+  .login-card {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  html { font-size: 12px; }
+
+  .groups-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    padding: 10px 12px;
+  }
+
+  .header-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .group-card-code {
+    font-size: 1.3rem;
   }
 }
 
