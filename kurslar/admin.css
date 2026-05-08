@@ -1,5 +1,24 @@
 /* Extracted from admin.html. Kept external to avoid inline style blocks. */
 
+/* Tab badge (yangi arizalar soni) */
+.tab { position: relative; }
+.tab-badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  min-width: 18px; height: 18px;
+  background: var(--accent-red, #ff5252);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  border-radius: 50px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
 :root {
         --bg: #0b0f17;
         --card: #121a27;

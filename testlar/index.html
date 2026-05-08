@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testlar — IIV Buxoro Akademik Litseyi</title>
+    <meta name="description" content="Fanlar bo'yicha test sinash va bilimingizni tekshirish" />
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="../kurslar/style.css" />
+    <link rel="stylesheet" href="testlar.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body class="tl-page">
+
+    <!-- YUKLANISH -->
+    <div class="tl-loading" id="tlLoading">
+      <i class="fa-solid fa-spinner"></i>
+      <p>Yuklanmoqda...</p>
+    </div>
+
+    <!-- XATO EKRANI -->
+    <div class="tl-error-screen" id="tlError">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <h3>Xatolik yuz berdi</h3>
+      <p id="tlErrorMsg">Noma'lum xatolik.</p>
+      <button class="btn-tl-logout" style="margin-top:14px" onclick="auth.signOut().then(()=>location.href='login.html')">
+        <i class="fa-solid fa-right-from-bracket"></i> Chiqish
+      </button>
+    </div>
+
+    <!-- QULFLANGAN MODAL -->
+    <div class="tl-modal-bg" id="lockModalBg" onclick="if(event.target===this)closeLockModal()">
+      <div class="tl-modal">
+        <i class="fa-solid fa-lock big"></i>
+        <h3>Obuna kerak</h3>
+        <p>Bu testdan foydalanish uchun faol obuna talab qilinadi. Obuna haqida ma'lumot olish uchun administrator bilan bog'laning.</p>
+        <button class="btn-tl-modal-close" onclick="closeLockModal()">
+          <i class="fa-solid fa-xmark"></i> Yopish
+        </button>
+      </div>
+    </div>
+
+    <!-- SAHIFA -->
+    <div id="tlContent" style="display:none">
+
+      <!-- HEADER -->
+      <header class="tl-header">
+        <a class="tl-logo" href="index.html">
+          <div class="tl-logo-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+          <span class="tl-logo-text">Testlar</span>
+        </a>
+        <a href="../index.html"
+           style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#8b96a8;font-size:.74rem;font-weight:600;text-decoration:none;transition:all .15s;"
+           onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#e2e8f0'"
+           onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='#8b96a8'">
+          <i class="fa-solid fa-house"></i> <span class="hide-xs">Asosiy sayt</span>
+        </a>
+        <div class="tl-header-right">
+          <span class="tl-sub-pill" id="subPill" style="display:none"></span>
+          <div class="tl-user-chip">
+            <div class="tl-user-avatar" id="userAvatar">?</div>
+            <span class="tl-user-name" id="userName">—</span>
+          </div>
+          <button class="btn-tl-logout" onclick="doLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="hide-xs">Chiqish</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ASOSIY KONTENT -->
+      <main class="tl-main">
+
+        <!-- OBUNA BANNER -->
+        <div class="tl-sub-banner" id="subBanner" style="display:none">
+          <i class="fa-solid fa-crown"></i>
+          <div>
+            <div class="tl-sub-banner-title" id="subBannerTitle"></div>
+            <div class="tl-sub-banner-desc" id="subBannerDesc"></div>
+          </div>
+        </div>
+
+        <!-- BO'LIM SARLAVHASI -->
+        <div class="tl-section-head">
+          <h2 class="tl-section-title">Mavjud testlar</h2>
+          <span class="tl-section-count" id="testCount">0 ta</span>
+        </div>
+
+        <!-- FILTR QATORI -->
+        <div class="tl-filters" id="filterRow">
+          <button class="tl-filter-btn active" data-subject="all">
+            <i class="fa-solid fa-list-check"></i> Barcha
+          </button>
+        </div>
+
+        <!-- TEST TORI -->
+        <div class="tl-grid" id="testGrid">
+          <div class="tl-empty" style="display:none" id="emptyState">
+            <i class="fa-solid fa-inbox"></i>
+            <div class="tl-empty-title">Testlar hali qo'shilmagan</div>
+            <p>Administrator testlarni qo'shgandan so'ng bu yerda ko'rinadi.</p>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      /* ─── FAN MA'LUMOTLARI ─── */
+      const SUBJECTS = {
+        matematika:   { label: "Matematika",   color: "#448aff", icon: "fa-square-root-variable" },
+        fizika:       { label: "Fizika",        color: "#00bcd4", icon: "fa-atom" },
+        kimyo:        { label: "Kimyo",         color: "#ff9800", icon: "fa-flask" },
+        biologiya:    { label: "Biologiya",     color: "#00e676", icon: "fa-dna" },
+        psixologiya:  { label: "Psixologiya",   color: "#7c4dff", icon: "fa-brain" },
+        ingliz:       { label: "Ingliz tili",   color: "#10b981", icon: "fa-language" },
+        tarix:        { label: "Tarix",         color: "#ffc107", icon: "fa-landmark" },
+        geografiya:   { label: "Geografiya",    color: "#06b6d4", icon: "fa-globe" },
+        informatika:  { label: "Informatika",   color: "#3b82f6", icon: "fa-laptop-code" },
+        umumiy:       { label: "Umumiy",        color: "#9ca3af", icon: "fa-list-check" },
+      };
+
+      const state = {
+        user: null,
+        profile: null,
+        sub: null,
+        subscribed: false,
+        tests: [],
+        myResults: {},
+        filter: "all",
+      };
+
+      /* ─── YORDAMCHILAR ─── */
+      const $ = id => document.getElementById(id);
+
+      function esc(s) {
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      }
+
+      function initials(name) {
+        const parts = (name || "?").trim().split(" ");
+        return (parts[0]?.[0] || "") + (parts[1]?.[0] || "");
+      }
+
+      function isSubActive(profile) {
+        const adminRoles = ["admin", "sinf_rahbari", "oqituvchi", "observer"];
+        if (adminRoles.includes(profile?.role)) return true;
+        return profile?.subscribed === true;
+      }
+
+      function daysLeft(profile) {
+        if (!profile?.subEndDate) return null;
+        const diff = profile.subEndDate.toDate() - new Date();
+        return Math.max(0, Math.ceil(diff / 86400000));
+      }
+
+      function fmtDate(ts) {
+        if (!ts) return "—";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString("uz-UZ", { day: "2-digit", month: "2-digit", year: "numeric" });
+      }
+
+      function scoreColor(pct) {
+        if (pct >= 85) return "var(--accent-green)";
+        if (pct >= 70) return "var(--accent-blue)";
+        if (pct >= 50) return "var(--accent-yellow)";
+        return "var(--accent-red)";
+      }
+
+      /* ─── AUTH + MA'LUMOTLARNI YUKLASH ─── */
+      async function loadUserProfile(uid) {
+        const doc = await db.collection("userProfiles").doc(uid).get();
+        if (!doc.exists) throw new Error("Profil topilmadi. Administrator bilan bog'laning.");
+        const p = doc.data();
+        if (!p.active) throw new Error("Akkaunt bloklangan. Administrator bilan bog'laning.");
+        return p;
+      }
+
+      async function loadSubscription(profile) {
+        /* profile.subscribed field'i doApproveRegistration tomonidan to'ldiriladi */
+        return profile;
+      }
+
+      async function loadTests() {
+        const snap = await db.collection("tests")
+          .where("active", "==", true)
+          .get();
+        return snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (a.subject || "").localeCompare(b.subject || ""));
+      }
+
+      async function loadMyResults(uid) {
+        if (!uid) return {};
+        const snap = await db.collection("testResults")
+          .where("studentUid", "==", uid)
+          .limit(200)
+          .get();
+        const docs = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => {
+            const ta = a.completedAt?.toMillis?.() || 0;
+            const tb = b.completedAt?.toMillis?.() || 0;
+            return tb - ta;
+          });
+        const map = {};
+        docs.forEach(data => {
+          if (!map[data.testId]) map[data.testId] = data;
+        });
+        return map;
+      }
+
+      /* ─── RENDER ─── */
+      function renderSubBanner() {
+        const banner  = $("subBanner");
+        const pill    = $("subPill");
+        const profile = state.profile;
+        const adminRoles = ["admin", "sinf_rahbari", "oqituvchi", "observer"];
+        const isAdmin = adminRoles.includes(profile?.role);
+
+        if (isAdmin) {
+          banner.className = "tl-sub-banner admin";
+          $("subBannerTitle").textContent = "Admin / O'qituvchi";
+          $("subBannerDesc").textContent  = "Siz tizim xodimi sifatida barcha testlarga to'liq kirishingiz mumkin.";
+          banner.style.display = "flex";
+          pill.className = "tl-sub-pill active";
+          pill.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin';
+          pill.style.display = "inline-flex";
+          return;
+        }
+
+        if (state.subscribed) {
+          const dl = daysLeft(profile);
+          banner.className = "tl-sub-banner active";
+          $("subBannerTitle").textContent = "Faol obuna";
+          $("subBannerDesc").textContent  = dl !== null
+            ? `${dl} kun qolgan · ${profile.planLabel || profile.plan || ""}`
+            : "Muddatsiz obuna · Barcha testlar ochiq.";
+          banner.style.display = "flex";
+          pill.className = "tl-sub-pill active";
+          pill.innerHTML = '<i class="fa-solid fa-crown"></i> Obuna faol';
+          pill.style.display = "inline-flex";
+        } else {
+          banner.className = "tl-sub-banner none";
+          $("subBannerTitle").textContent = "Obuna faol emas";
+          $("subBannerDesc").textContent  = "Testlardan foydalanish uchun administrator tasdiqlashini kuting.";
+          banner.style.display = "flex";
+          pill.className = "tl-sub-pill inactive";
+          pill.innerHTML = '<i class="fa-solid fa-lock"></i> Faol emas';
+          pill.style.display = "inline-flex";
+        }
+      }
+
+      function buildSubjectFilters() {
+        const filterRow = $("filterRow");
+        const used = new Set(state.tests.map(t => t.subject).filter(Boolean));
+        used.forEach(subj => {
+          const info = SUBJECTS[subj] || { label: subj, color: "#9ca3af", icon: "fa-circle" };
+          const btn = document.createElement("button");
+          btn.className = "tl-filter-btn";
+          btn.dataset.subject = subj;
+          btn.innerHTML = `<i class="fa-solid ${esc(info.icon)}" style="color:${esc(info.color)}"></i> ${esc(info.label)}`;
+          btn.addEventListener("click", () => setFilter(subj));
+          filterRow.appendChild(btn);
+        });
+      }
+
+      function setFilter(subject) {
+        state.filter = subject;
+        document.querySelectorAll(".tl-filter-btn").forEach(b => {
+          b.classList.toggle("active", b.dataset.subject === subject);
+        });
+        renderTestCards();
+      }
+
+      function renderTestCards() {
+        const grid = $("testGrid");
+        const filtered = state.filter === "all"
+          ? state.tests
+          : state.tests.filter(t => t.subject === state.filter);
+
+        $("testCount").textContent = `${filtered.length} ta`;
+
+        const empty = $("emptyState");
+        if (filtered.length === 0) {
+          grid.innerHTML = "";
+          empty.style.display = "block";
+          empty.querySelector(".tl-empty-title").textContent =
+            state.filter === "all" ? "Testlar hali qo'shilmagan" : "Bu fanda test yo'q";
+          grid.appendChild(empty);
+          return;
+        }
+
+        empty.style.display = "none";
+
+        const cards = filtered.map(t => {
+          const info = SUBJECTS[t.subject] || { label: t.subject || "Umumiy", color: "#9ca3af", icon: "fa-list-check" };
+          const color = t.color || info.color;
+          const icon  = t.icon  || info.icon;
+          const label = t.subjectLabel || info.label;
+          const lastResult = state.myResults[t.id];
+          const locked = !state.subscribed;
+
+          const timeLbl = t.timeLimit
+            ? `${t.timeLimit} daqiqa`
+            : "Cheksiz";
+
+          const scoreHtml = lastResult
+            ? `<div class="tl-card-last">
+                <span class="tl-card-last-label">Oxirgi natija</span>
+                <span class="tl-card-last-val" style="color:${scoreColor(lastResult.percent)}">${lastResult.score}/${lastResult.total} (${lastResult.percent}%)</span>
+               </div>`
+            : "";
+
+          const btnHtml = locked
+            ? `<button class="btn-tl-start locked" onclick="openLockModal()">
+                 <i class="fa-solid fa-lock"></i> Qulflangan
+               </button>`
+            : `<a class="btn-tl-start unlocked" href="test.html?id=${esc(t.id)}">
+                 <i class="fa-solid fa-play"></i> Boshlash
+               </a>`;
+
+          return `
+            <div class="tl-card${locked ? " locked" : ""}">
+              <div class="tl-card-header">
+                <div class="tl-card-icon" style="background:${color}22; color:${color}">
+                  <i class="fa-solid ${esc(icon)}"></i>
+                </div>
+                <div>
+                  <div class="tl-card-title">${esc(t.title)}</div>
+                  <div class="tl-card-subject" style="color:${color}">${esc(label)}</div>
+                </div>
+              </div>
+              <div class="tl-card-meta">
+                <span class="tl-meta-chip"><i class="fa-solid fa-question"></i> ${t.questionCount || "?"} savol</span>
+                <span class="tl-meta-chip"><i class="fa-regular fa-clock"></i> ${esc(timeLbl)}</span>
+              </div>
+              ${scoreHtml}
+              ${btnHtml}
+            </div>`;
+        });
+
+        grid.innerHTML = cards.join("");
+      }
+
+      /* ─── MODAL ─── */
+      function openLockModal()  { $("lockModalBg").classList.add("open"); }
+      function closeLockModal() { $("lockModalBg").classList.remove("open"); }
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") closeLockModal();
+      });
+
+      /* ─── CHIQISH ─── */
+      function doLogout() {
+        auth.signOut().then(() => { location.href = "login.html"; });
+      }
+
+      /* ─── INIT ─── */
+      auth.onAuthStateChanged(async u => {
+        if (!u) {
+          location.href = "login.html";
+          return;
+        }
+        state.user = u;
+        try {
+          state.profile    = await loadUserProfile(u.uid);
+          state.sub        = state.profile;
+          state.subscribed = isSubActive(state.profile);
+
+          const [tests, results] = await Promise.all([
+            loadTests(),
+            loadMyResults(u.uid),
+          ]);
+          state.tests     = tests;
+          state.myResults = results;
+
+          const name = state.profile.fullName || state.profile.email || "O'quvchi";
+          $("userName").textContent = name;
+          $("userAvatar").textContent = initials(name).toUpperCase();
+
+          renderSubBanner();
+          buildSubjectFilters();
+          renderTestCards();
+
+          $("tlLoading").style.display  = "none";
+          $("tlContent").style.display  = "block";
+        } catch (e) {
+          $("tlLoading").style.display  = "none";
+          $("tlErrorMsg").textContent   = e.message;
+          $("tlError").classList.add("show");
+        }
+      });
+
+      window.openLockModal  = openLockModal;
+      window.closeLockModal = closeLockModal;
+      window.doLogout       = doLogout;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ro'yxatdan o'tish — IIV Buxoro Akademik Litseyi Testlar</title>
+    <meta name="description" content="Testlar tizimidan foydalanish uchun ro'yxatdan o'ting" />
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+      :root {
+        --bg:#080b10; --bg-card:#0f1520; --bg-card2:#141d2b;
+        --border:rgba(255,255,255,0.07); --border-h:rgba(255,255,255,0.13);
+        --txt:#e2e8f0; --txt-2:#8b96a8; --txt-3:#4b5563;
+        --blue:#448aff; --blue-g:rgba(68,138,255,0.12);
+        --green:#00e676; --green-g:rgba(0,230,118,0.1);
+        --red:#ff5252; --red-g:rgba(255,82,82,0.1);
+        --yellow:#ffc107; --yellow-g:rgba(255,193,7,0.1);
+        --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:20px; --r-full:50px;
+        --font:"Inter",system-ui,sans-serif;
+      }
+      *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+      html{font-size:14px;scroll-behavior:smooth;}
+      body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:100vh;display:flex;flex-direction:column;}
+      a{text-decoration:none;color:inherit;}
+
+      .nav{
+        position:sticky;top:0;z-index:100;
+        background:rgba(8,11,16,0.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+        border-bottom:1px solid var(--border);
+        padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+      }
+      .nav-logo{display:flex;align-items:center;gap:10px;}
+      .nav-logo-icon{
+        width:32px;height:32px;border-radius:8px;
+        background:var(--blue-g);border:1px solid rgba(68,138,255,0.2);
+        display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:0.85rem;
+      }
+      .nav-logo-text{font-size:0.9rem;font-weight:800;color:#fff;}
+      .nav-back{
+        display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--r-md);
+        border:1px solid var(--border-h);background:rgba(255,255,255,0.05);
+        color:var(--txt-2);font-size:0.8rem;font-weight:600;transition:all .15s;
+      }
+      .nav-back:hover{background:rgba(255,255,255,.09);color:var(--txt);}
+
+      .page-main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px 60px;}
+      .reg-card{
+        background:var(--bg-card);border:1px solid var(--border);
+        border-radius:var(--r-xl);padding:36px 32px;
+        max-width:520px;width:100%;
+      }
+
+      .reg-head{text-align:center;margin-bottom:28px;}
+      .reg-icon{
+        width:56px;height:56px;border-radius:14px;
+        background:var(--blue-g);border:1px solid rgba(68,138,255,0.25);
+        display:flex;align-items:center;justify-content:center;
+        color:var(--blue);font-size:1.4rem;margin:0 auto 16px;
+      }
+      .reg-title{font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:6px;}
+      .reg-sub{font-size:0.82rem;color:var(--txt-2);line-height:1.5;}
+
+      .steps-bar{display:flex;gap:0;margin-bottom:28px;}
+      .step-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;}
+      .step-item:not(:last-child)::after{
+        content:'';position:absolute;top:12px;left:50%;width:100%;height:1px;
+        background:var(--border);z-index:0;
+      }
+      .step-item.done::after,.step-item.active::after{background:var(--blue);opacity:.4;}
+      .step-dot{
+        width:24px;height:24px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-size:0.68rem;font-weight:700;z-index:1;
+        background:var(--bg-card2);border:2px solid var(--border-h);color:var(--txt-2);transition:all .2s;
+      }
+      .step-item.active .step-dot{background:var(--blue);border-color:var(--blue);color:#fff;}
+      .step-item.done   .step-dot{background:var(--green);border-color:var(--green);color:#fff;}
+      .step-lbl{font-size:0.68rem;color:var(--txt-3);white-space:nowrap;}
+      .step-item.active .step-lbl{color:var(--blue);}
+      .step-item.done   .step-lbl{color:var(--green);}
+
+      .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+      .form-group{margin-bottom:14px;}
+      .form-label{font-size:0.78rem;font-weight:600;color:var(--txt-2);margin-bottom:6px;display:block;}
+      .form-label span{color:var(--red);margin-left:2px;}
+      .form-input{
+        width:100%;padding:10px 14px;
+        background:rgba(255,255,255,0.04);border:1.5px solid var(--border-h);border-radius:var(--r-md);
+        color:var(--txt);font-size:0.88rem;font-family:var(--font);
+        transition:border-color .15s,box-shadow .15s;outline:none;
+      }
+      .form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(68,138,255,0.15);}
+      .form-input.error{border-color:var(--red);box-shadow:0 0 0 3px var(--red-g);}
+      .form-input::placeholder{color:var(--txt-3);}
+      .form-hint{font-size:0.72rem;color:var(--txt-2);margin-top:5px;}
+      .form-error{font-size:0.72rem;color:var(--red);margin-top:4px;display:none;}
+      .form-error.show{display:block;}
+
+      .phone-wrap{display:flex;gap:0;}
+      .phone-prefix{
+        padding:10px 12px;background:rgba(255,255,255,0.06);
+        border:1.5px solid var(--border-h);border-right:none;
+        border-radius:var(--r-md) 0 0 var(--r-md);
+        color:var(--txt-2);font-size:0.85rem;font-weight:600;white-space:nowrap;
+      }
+      .phone-wrap .form-input{border-radius:0 var(--r-md) var(--r-md) 0;flex:1;}
+
+      .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+      .plan-opt{
+        border:2px solid var(--border-h);border-radius:var(--r-lg);
+        padding:12px 14px;cursor:pointer;transition:all .15s;position:relative;
+      }
+      .plan-opt:hover{border-color:rgba(68,138,255,.4);}
+      .plan-opt.selected{border-color:var(--blue);background:var(--blue-g);}
+      .plan-opt input{position:absolute;opacity:0;pointer-events:none;}
+      .plan-opt-name{font-size:0.82rem;font-weight:700;color:#fff;margin-bottom:2px;}
+      .plan-opt-price{font-size:0.88rem;font-weight:800;color:var(--blue);}
+      .plan-opt-save{font-size:0.68rem;color:var(--green);margin-top:2px;}
+      .plan-opt.popular-plan{border-color:rgba(68,138,255,.5);background:rgba(68,138,255,.04);}
+      .plan-badge{
+        position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+        background:var(--blue);color:#fff;font-size:0.62rem;font-weight:800;
+        padding:2px 8px;border-radius:var(--r-full);white-space:nowrap;letter-spacing:.04em;
+      }
+
+      .consent-wrap{
+        display:flex;align-items:flex-start;gap:10px;
+        padding:12px 14px;border-radius:var(--r-md);
+        background:rgba(255,255,255,.03);border:1px solid var(--border);
+        margin-bottom:18px;cursor:pointer;
+      }
+      .consent-wrap input{margin-top:2px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;}
+      .consent-text{font-size:0.78rem;color:var(--txt-2);line-height:1.5;}
+
+      .btn-submit{
+        width:100%;padding:13px;border-radius:var(--r-lg);border:none;
+        background:linear-gradient(135deg,var(--blue) 0%,#2066e8 100%);
+        color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;
+        transition:all .15s;box-shadow:0 4px 20px rgba(68,138,255,.3);
+        display:flex;align-items:center;justify-content:center;gap:9px;
+      }
+      .btn-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 28px rgba(68,138,255,.45);}
+      .btn-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+
+      .alert{
+        padding:12px 16px;border-radius:var(--r-md);
+        margin-bottom:16px;font-size:0.82rem;display:none;border:1px solid;line-height:1.5;
+      }
+      .alert.error{background:var(--red-g);border-color:rgba(255,82,82,.3);color:#fca5a5;}
+      .alert.show{display:block;}
+
+      /* MAVJUD ARIZA HOLATI */
+      .existing-box{
+        text-align:center;padding:8px 0 4px;display:none;
+      }
+      .existing-box.show{display:block;}
+      .existing-icon{
+        width:58px;height:58px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.5rem;margin:0 auto 16px;
+      }
+      .existing-icon.yellow{background:var(--yellow-g);border:2px solid rgba(255,193,7,.3);color:var(--yellow);}
+      .existing-icon.green{background:var(--green-g);border:2px solid rgba(0,230,118,.3);color:var(--green);}
+      .existing-title{font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:8px;}
+      .existing-sub{font-size:.82rem;color:var(--txt-2);line-height:1.6;margin-bottom:22px;}
+      .btn-existing{
+        display:inline-flex;align-items:center;gap:8px;
+        padding:12px 24px;border-radius:var(--r-lg);
+        background:linear-gradient(135deg,var(--blue),#2066e8);
+        color:#fff;font-weight:700;font-size:.88rem;border:none;cursor:pointer;
+      }
+
+      .reg-footer{text-align:center;margin-top:18px;font-size:0.78rem;color:var(--txt-2);}
+      .reg-footer a{color:var(--blue);}
+      .reg-footer a:hover{text-decoration:underline;}
+
+      @media(max-width:540px){
+        .reg-card{padding:24px 18px;}
+        .form-row{grid-template-columns:1fr;}
+        .plans-grid{grid-template-columns:1fr 1fr;}
+        .nav{padding:0 16px;}
+      }
+      @media(max-width:400px){
+        .plans-grid{grid-template-columns:1fr;}
+        .steps-bar .step-lbl{display:none;}
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav class="nav">
+      <a class="nav-logo" href="landing.html">
+        <div class="nav-logo-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+        <span class="nav-logo-text">Testlar</span>
+      </a>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a class="nav-back" href="landing.html">
+          <i class="fa-solid fa-arrow-left"></i> Orqaga
+        </a>
+        <a class="nav-back" href="../index.html" style="gap:6px;">
+          <i class="fa-solid fa-house"></i> Asosiy sayt
+        </a>
+      </div>
+    </nav>
+
+    <main class="page-main">
+      <div class="reg-card">
+
+        <div class="reg-head">
+          <div class="reg-icon"><i class="fa-solid fa-user-plus"></i></div>
+          <h1 class="reg-title">Ro'yxatdan o'tish</h1>
+          <p class="reg-sub">Ma'lumotlaringizni kiriting. To'lovdan so'ng administrator<br>akkauntingizni faollashtiradi.</p>
+        </div>
+
+        <div class="steps-bar">
+          <div class="step-item active">
+            <div class="step-dot">1</div>
+            <span class="step-lbl">Ma'lumotlar</span>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">2</div>
+            <span class="step-lbl">To'lov</span>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">3</div>
+            <span class="step-lbl">Faollashtirish</span>
+          </div>
+        </div>
+
+        <!-- XATO -->
+        <div class="alert error" id="alertBox"></div>
+
+        <!-- FORMA -->
+        <form id="regForm" novalidate>
+
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="fieldIsm">Ism <span>*</span></label>
+              <input class="form-input" id="fieldIsm" type="text" placeholder="Sardor" autocomplete="given-name" />
+              <div class="form-error" id="errIsm">Ism kiritilishi shart</div>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="fieldFamiliya">Familiya <span>*</span></label>
+              <input class="form-input" id="fieldFamiliya" type="text" placeholder="Toshmatov" autocomplete="family-name" />
+              <div class="form-error" id="errFamiliya">Familiya kiritilishi shart</div>
+            </div>
+          </div>
+          <div style="height:14px"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="fieldPhone">Telefon raqami <span>*</span></label>
+            <div class="phone-wrap">
+              <span class="phone-prefix">+998</span>
+              <input class="form-input" id="fieldPhone" type="tel"
+                     placeholder="90 123 45 67" maxlength="9"
+                     autocomplete="tel-national" inputmode="numeric" />
+            </div>
+            <div class="form-hint">Telegram bor raqamni kiriting — admin shu raqamga bog'lanadi</div>
+            <div class="form-error" id="errPhone">To'g'ri telefon raqami kiriting (9 ta raqam)</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Obuna turi <span>*</span></label>
+            <div class="plans-grid">
+              <label class="plan-opt" data-plan="1oy">
+                <input type="radio" name="plan" value="1oy" />
+                <div class="plan-opt-name">1 oy</div>
+                <div class="plan-opt-price">50 000 so'm</div>
+              </label>
+              <label class="plan-opt" data-plan="3oy">
+                <input type="radio" name="plan" value="3oy" />
+                <div class="plan-opt-name">3 oy</div>
+                <div class="plan-opt-price">130 000 so'm</div>
+                <div class="plan-opt-save">13% tejaysiz</div>
+              </label>
+              <label class="plan-opt popular-plan" data-plan="1yil">
+                <div class="plan-badge">⭐ Mashhur</div>
+                <input type="radio" name="plan" value="1yil" />
+                <div class="plan-opt-name">1 yil</div>
+                <div class="plan-opt-price">450 000 so'm</div>
+                <div class="plan-opt-save">25% tejaysiz</div>
+              </label>
+              <label class="plan-opt" data-plan="lifetime">
+                <input type="radio" name="plan" value="lifetime" />
+                <div class="plan-opt-name">Muddatsiz</div>
+                <div class="plan-opt-price" style="font-size:.8rem;color:#9ca3af">Kelishiladi</div>
+              </label>
+            </div>
+            <div class="form-error" id="errPlan">Obuna turini tanlang</div>
+          </div>
+
+          <label class="consent-wrap">
+            <input type="checkbox" id="fieldConsent" />
+            <span class="consent-text">
+              Ro'yxatdan o'tish orqali shaxsiy ma'lumotlarimni (ism, telefon raqam) IIV Buxoro Akademik Litseyi ma'muriyatiga berishga roziman.
+            </span>
+          </label>
+          <div class="form-error" id="errConsent" style="margin-top:-12px;margin-bottom:12px">
+            Davom etish uchun rozilik berilishi shart
+          </div>
+
+          <button class="btn-submit" type="submit" id="btnSubmit">
+            <i class="fa-solid fa-arrow-right"></i> Davom etish — To'lov
+          </button>
+
+        </form>
+
+        <div class="reg-footer">
+          Akkauntingiz bor mi? <a href="login.html">Tizimga kiring</a>
+        </div>
+
+      </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      const PLANS = {
+        "1oy":      { label: "1 oy",      price: "50 000 so'm",  days: 30 },
+        "3oy":      { label: "3 oy",      price: "130 000 so'm", days: 90 },
+        "1yil":     { label: "1 yil",     price: "450 000 so'm", days: 365 },
+        "lifetime": { label: "Muddatsiz", price: "Kelishiladi",  days: null },
+      };
+
+      let selectedPlan = "";
+
+      /* ── Plan tanlash ── */
+      document.querySelectorAll(".plan-opt").forEach(el => {
+        el.addEventListener("click", () => {
+          document.querySelectorAll(".plan-opt").forEach(e => e.classList.remove("selected"));
+          el.classList.add("selected");
+          el.querySelector("input").checked = true;
+          selectedPlan = el.dataset.plan;
+          document.getElementById("errPlan").classList.remove("show");
+        });
+      });
+
+      /* ── Telefon faqat raqam ── */
+      const phoneInput = document.getElementById("fieldPhone");
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 9);
+      });
+
+      /* ── Validatsiya ── */
+      function validateForm() {
+        let ok = true;
+        const ism      = document.getElementById("fieldIsm").value.trim();
+        const familiya = document.getElementById("fieldFamiliya").value.trim();
+        const phone    = phoneInput.value.trim();
+        const consent  = document.getElementById("fieldConsent").checked;
+
+        function setErr(id, inputId, show) {
+          document.getElementById(id).classList.toggle("show", show);
+          if (inputId) document.getElementById(inputId).classList.toggle("error", show);
+        }
+
+        setErr("errIsm",      "fieldIsm",      !ism);
+        setErr("errFamiliya", "fieldFamiliya", !familiya);
+        setErr("errPhone",    "fieldPhone",    !/^\d{9}$/.test(phone));
+        setErr("errPlan",     null,            !selectedPlan);
+        setErr("errConsent",  null,            !consent);
+
+        if (!ism || !familiya || !/^\d{9}$/.test(phone) || !selectedPlan || !consent) ok = false;
+        return ok;
+      }
+
+      /* ── Submit ── */
+      document.getElementById("regForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        document.getElementById("alertBox").classList.remove("show");
+
+        if (!validateForm()) return;
+
+        const btn = document.getElementById("btnSubmit");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Tekshirilmoqda...';
+
+        const ism      = document.getElementById("fieldIsm").value.trim();
+        const familiya = document.getElementById("fieldFamiliya").value.trim();
+        const phone    = "+998" + phoneInput.value.trim();
+        const plan     = selectedPlan;
+        const planInfo = PLANS[plan];
+
+        try {
+          /* Anonim auth token olish */
+          if (!auth.currentUser) await auth.signInAnonymously();
+
+          /* Yangi ariza saqlash */
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
+          const doc = await db.collection("studentsTest").add({
+            fullName:    `${ism} ${familiya}`,
+            firstName:   ism,
+            lastName:    familiya,
+            phone,
+            plan,
+            planLabel:   planInfo.label,
+            planPrice:   planInfo.price,
+            status:      "pending",
+            subscribed:  false,
+            anonUid:     auth.currentUser?.uid || null,
+            createdAt:   firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt:   firebase.firestore.FieldValue.serverTimestamp(),
+            approvedAt:  null,
+            approvedBy:  null,
+            studentUid:  null,
+            studentLogin: null,
+            notes:       "",
+          });
+
+          window.location.href = `tolov.html?id=${doc.id}`;
+
+        } catch (err) {
+          document.getElementById("alertBox").textContent = "Xatolik: " + err.message;
+          document.getElementById("alertBox").classList.add("show");
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Davom etish — To\'lov';
+        }
+      });
+
+    </script>
+  </body>
+</html>

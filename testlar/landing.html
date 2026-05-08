@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testlar — IIV Buxoro Akademik Litseyi</title>
+    <meta name="description" content="Fanlar bo'yicha testlar, psixologik sinovlar va reyting tizimi. Obuna oling — bilimingizni sinab ko'ring." />
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      /* ── TOKENS ── */
+      :root {
+        --bg:        #080b10;
+        --bg-card:   #0f1520;
+        --bg-card2:  #141d2b;
+        --border:    rgba(255,255,255,0.07);
+        --border-h:  rgba(255,255,255,0.13);
+        --txt:       #e2e8f0;
+        --txt-2:     #8b96a8;
+        --txt-3:     #4b5563;
+        --blue:      #448aff;
+        --blue-g:    rgba(68,138,255,0.15);
+        --green:     #00e676;
+        --green-g:   rgba(0,230,118,0.12);
+        --purple:    #7c4dff;
+        --purple-g:  rgba(124,77,255,0.12);
+        --yellow:    #ffc107;
+        --yellow-g:  rgba(255,193,7,0.1);
+        --red:       #ff5252;
+        --cyan:      #00bcd4;
+        --orange:    #ff9800;
+        --r-sm:  6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-full: 50px;
+        --font: "Inter", system-ui, -apple-system, sans-serif;
+      }
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+      *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+      html { font-size:14px; scroll-behavior:smooth; }
+      body { background:var(--bg); color:var(--txt); font-family:var(--font); line-height:1.6; overflow-x:hidden; }
+      a { text-decoration:none; color:inherit; }
+      button { font-family:var(--font); }
+
+      /* ── NAVBAR ── */
+      .nav {
+        position:sticky; top:0; z-index:100;
+        background:rgba(8,11,16,0.85);
+        backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+        border-bottom:1px solid var(--border);
+        padding:0 32px; height:60px;
+        display:flex; align-items:center; justify-content:space-between; gap:16px;
+      }
+      .nav-logo {
+        display:flex; align-items:center; gap:10px;
+      }
+      .nav-logo-icon {
+        width:34px; height:34px; border-radius:9px;
+        background:var(--purple-g);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--purple); font-size:0.9rem;
+        border:1px solid rgba(124,77,255,0.25);
+      }
+      .nav-logo-text { font-size:0.95rem; font-weight:800; color:#fff; }
+      .nav-logo-sub  { font-size:0.68rem; color:var(--txt-2); margin-top:-2px; }
+      .nav-right { display:flex; align-items:center; gap:10px; }
+      .nav-link { font-size:0.82rem; color:var(--txt-2); padding:6px 12px; border-radius:var(--r-md); transition:all .15s; }
+      .nav-link:hover { color:var(--txt); background:rgba(255,255,255,0.05); }
+      .btn-nav-login {
+        display:flex; align-items:center; gap:7px;
+        padding:8px 18px; border-radius:var(--r-md);
+        background:var(--blue); color:#fff;
+        font-size:0.82rem; font-weight:700; border:none; cursor:pointer;
+        transition:all .15s;
+      }
+      .btn-nav-login:hover { background:#5c9dff; transform:translateY(-1px); box-shadow:0 4px 14px rgba(68,138,255,.35); }
+
+      /* ── HERO ── */
+      .hero {
+        min-height:92vh;
+        display:flex; align-items:center; justify-content:center;
+        text-align:center;
+        padding:80px 24px 60px;
+        position:relative;
+        overflow:hidden;
+      }
+      /* Grid pattern */
+      .hero::before {
+        content:'';
+        position:absolute; inset:0;
+        background-image:
+          linear-gradient(rgba(68,138,255,.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(68,138,255,.04) 1px, transparent 1px);
+        background-size:48px 48px;
+        pointer-events:none;
+      }
+      /* Glow blobs */
+      .hero-blob1 {
+        position:absolute; top:-100px; left:50%; transform:translateX(-50%);
+        width:700px; height:400px;
+        background:radial-gradient(ellipse, rgba(68,138,255,.18) 0%, transparent 65%);
+        pointer-events:none;
+      }
+      .hero-blob2 {
+        position:absolute; bottom:0; right:-150px;
+        width:500px; height:400px;
+        background:radial-gradient(ellipse, rgba(124,77,255,.12) 0%, transparent 60%);
+        pointer-events:none;
+      }
+      .hero-inner { position:relative; max-width:760px; }
+      .hero-badge {
+        display:inline-flex; align-items:center; gap:7px;
+        padding:5px 14px; border-radius:var(--r-full);
+        background:var(--purple-g);
+        border:1px solid rgba(124,77,255,.3);
+        color:var(--purple); font-size:0.78rem; font-weight:700;
+        margin-bottom:24px; letter-spacing:.03em;
+      }
+      .hero-h1 {
+        font-size:clamp(2rem, 5vw, 3.5rem);
+        font-weight:900; color:#fff; line-height:1.1;
+        margin-bottom:20px; letter-spacing:-.02em;
+      }
+      .hero-h1 span {
+        background:linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      }
+      .hero-sub {
+        font-size:1.05rem; color:var(--txt-2); line-height:1.65;
+        max-width:580px; margin:0 auto 36px;
+      }
+      .hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+      .btn-hero-primary {
+        display:flex; align-items:center; gap:9px;
+        padding:14px 28px; border-radius:var(--r-lg);
+        background:linear-gradient(135deg, var(--blue) 0%, #2066e8 100%);
+        color:#fff; font-size:0.95rem; font-weight:700; border:none; cursor:pointer;
+        transition:all .18s; box-shadow:0 4px 24px rgba(68,138,255,.35);
+      }
+      .btn-hero-primary:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(68,138,255,.45); }
+      .btn-hero-secondary {
+        display:flex; align-items:center; gap:9px;
+        padding:14px 28px; border-radius:var(--r-lg);
+        background:rgba(255,255,255,0.06);
+        border:1.5px solid var(--border-h);
+        color:var(--txt); font-size:0.95rem; font-weight:600; cursor:pointer;
+        transition:all .18s;
+      }
+      .btn-hero-secondary:hover { background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.2); }
+
+      /* Hero floating cards */
+      .hero-cards {
+        display:flex; justify-content:center; gap:12px;
+        margin-top:52px; flex-wrap:wrap;
+      }
+      .hero-card {
+        display:flex; align-items:center; gap:10px;
+        background:var(--bg-card);
+        border:1px solid var(--border);
+        border-radius:var(--r-lg);
+        padding:10px 16px;
+        font-size:0.8rem; color:var(--txt-2);
+        transition:all .2s;
+        animation:float 3s ease-in-out infinite;
+      }
+      .hero-card:nth-child(2) { animation-delay:.6s; }
+      .hero-card:nth-child(3) { animation-delay:1.2s; }
+      .hero-card:hover { border-color:var(--border-h); color:var(--txt); transform:translateY(-3px); }
+      @keyframes float {
+        0%,100% { transform:translateY(0); }
+        50%      { transform:translateY(-6px); }
+      }
+      .hero-card i { font-size:1rem; }
+      .hero-card strong { color:var(--txt); font-weight:700; }
+
+      /* ── STATS STRIP ── */
+      .stats-strip {
+        border-top:1px solid var(--border);
+        border-bottom:1px solid var(--border);
+        background:var(--bg-card);
+        padding:0;
+      }
+      .stats-strip-inner {
+        max-width:1100px; margin:0 auto;
+        display:grid; grid-template-columns:repeat(4,1fr);
+        divide-x:1px;
+      }
+      .stat-item {
+        padding:28px 20px; text-align:center;
+        border-right:1px solid var(--border);
+        transition:background .2s;
+      }
+      .stat-item:last-child { border-right:none; }
+      .stat-item:hover { background:rgba(255,255,255,.02); }
+      .stat-num {
+        font-size:2rem; font-weight:900; color:#fff;
+        line-height:1; margin-bottom:5px;
+      }
+      .stat-label { font-size:0.78rem; color:var(--txt-2); text-transform:uppercase; letter-spacing:.05em; }
+
+      /* ── SECTION GENERIC ── */
+      section { padding:80px 24px; }
+      .sec-inner { max-width:1100px; margin:0 auto; }
+      .sec-badge {
+        display:inline-flex; align-items:center; gap:7px;
+        padding:4px 12px; border-radius:var(--r-full);
+        font-size:0.72rem; font-weight:700; letter-spacing:.05em;
+        text-transform:uppercase; margin-bottom:14px;
+      }
+      .sec-badge.blue   { background:var(--blue-g); color:var(--blue); border:1px solid rgba(68,138,255,.25); }
+      .sec-badge.purple { background:var(--purple-g); color:var(--purple); border:1px solid rgba(124,77,255,.25); }
+      .sec-badge.green  { background:var(--green-g); color:var(--green); border:1px solid rgba(0,230,118,.25); }
+      .sec-title {
+        font-size:clamp(1.4rem, 3vw, 2.1rem);
+        font-weight:800; color:#fff; line-height:1.15;
+        margin-bottom:10px; letter-spacing:-.01em;
+      }
+      .sec-sub { font-size:0.92rem; color:var(--txt-2); max-width:520px; line-height:1.65; }
+
+      /* ── FANLAR ── */
+      #fanlar { background:var(--bg-card); }
+      .fanlar-header { margin-bottom:36px; }
+      .fanlar-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+        gap:14px;
+      }
+      .fan-card {
+        background:var(--bg); border:1px solid var(--border);
+        border-radius:var(--r-lg); padding:20px 16px;
+        display:flex; flex-direction:column; align-items:center; gap:12px;
+        text-align:center; transition:all .2s; cursor:default;
+      }
+      .fan-card:hover {
+        border-color:var(--border-h);
+        transform:translateY(-3px);
+        box-shadow:0 8px 24px rgba(0,0,0,.4);
+      }
+      .fan-icon {
+        width:48px; height:48px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.2rem;
+      }
+      .fan-name { font-size:0.85rem; font-weight:700; color:#fff; }
+      .fan-count { font-size:0.72rem; color:var(--txt-2); }
+
+      /* Psixologik testlar qismi */
+      .psix-row {
+        display:grid; grid-template-columns:1fr 1fr; gap:14px;
+        margin-top:14px;
+      }
+      .psix-card {
+        background:var(--bg); border:1px solid var(--border);
+        border-radius:var(--r-lg); padding:20px;
+        display:flex; gap:14px; align-items:flex-start;
+        transition:all .2s;
+      }
+      .psix-card:hover { border-color:var(--border-h); transform:translateY(-2px); }
+      .psix-icon {
+        width:42px; height:42px; border-radius:10px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.1rem; flex-shrink:0;
+      }
+      .psix-title { font-size:0.88rem; font-weight:700; color:#fff; margin-bottom:4px; }
+      .psix-desc  { font-size:0.78rem; color:var(--txt-2); line-height:1.5; }
+
+      /* ── QANDAY ISHLAYDI ── */
+      .steps-grid {
+        display:grid; grid-template-columns:repeat(3,1fr);
+        gap:20px; margin-top:36px; position:relative;
+      }
+      .steps-grid::before {
+        content:'';
+        position:absolute; top:28px; left:calc(16.6% + 24px); right:calc(16.6% + 24px);
+        height:1px;
+        background:linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+        opacity:.3;
+      }
+      .step-card {
+        background:var(--bg-card); border:1px solid var(--border);
+        border-radius:var(--r-xl); padding:28px 24px; text-align:center;
+        position:relative; transition:all .2s;
+      }
+      .step-card:hover { border-color:var(--border-h); transform:translateY(-3px); }
+      .step-num {
+        width:48px; height:48px; border-radius:50%;
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:1.1rem; font-weight:800; margin:0 auto 16px;
+        border:2px solid;
+      }
+      .step-num.s1 { background:var(--blue-g);   color:var(--blue);   border-color:rgba(68,138,255,.4); }
+      .step-num.s2 { background:var(--purple-g); color:var(--purple); border-color:rgba(124,77,255,.4); }
+      .step-num.s3 { background:var(--green-g);  color:var(--green);  border-color:rgba(0,230,118,.4); }
+      .step-icon { font-size:1.3rem; margin-bottom:10px; }
+      .step-title { font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:8px; }
+      .step-desc { font-size:0.8rem; color:var(--txt-2); line-height:1.6; }
+
+      /* ── NARXLAR ── */
+      #narxlar { background:var(--bg-card); }
+      .plans-grid {
+        display:grid; grid-template-columns:repeat(4,1fr);
+        gap:16px; margin-top:36px;
+      }
+      .plan-card {
+        background:var(--bg); border:1px solid var(--border);
+        border-radius:var(--r-xl); padding:28px 22px;
+        display:flex; flex-direction:column; gap:0;
+        position:relative; transition:all .22s;
+      }
+      .plan-card:hover { border-color:var(--border-h); transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.5); }
+      .plan-card.popular {
+        border-color:rgba(68,138,255,.5);
+        background:linear-gradient(160deg, rgba(68,138,255,.07) 0%, var(--bg-card2) 100%);
+      }
+      .plan-popular-badge {
+        position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+        background:var(--blue); color:#fff;
+        font-size:0.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+        padding:3px 12px; border-radius:var(--r-full);
+        white-space:nowrap;
+      }
+      .plan-icon {
+        width:44px; height:44px; border-radius:11px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.1rem; margin-bottom:16px;
+      }
+      .plan-name  { font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+      .plan-price {
+        font-size:2rem; font-weight:900; color:#fff; line-height:1;
+        margin-bottom:4px;
+      }
+      .plan-price small { font-size:0.78rem; font-weight:500; color:var(--txt-2); }
+      .plan-per { font-size:0.75rem; color:var(--txt-2); margin-bottom:20px; }
+      .plan-divider {
+        height:1px; background:var(--border);
+        margin-bottom:18px;
+      }
+      .plan-features { display:flex; flex-direction:column; gap:10px; flex:1; margin-bottom:22px; }
+      .plan-feat {
+        display:flex; align-items:center; gap:9px;
+        font-size:0.8rem; color:var(--txt-2);
+      }
+      .plan-feat i { font-size:0.75rem; color:var(--green); flex-shrink:0; }
+      .plan-feat.dim i { color:var(--txt-3); }
+      .plan-feat.dim { opacity:.55; }
+      .btn-plan {
+        width:100%; padding:11px; border-radius:var(--r-lg);
+        font-size:0.85rem; font-weight:700; cursor:pointer; transition:all .15s;
+        border:1.5px solid; text-align:center; display:block;
+      }
+      .btn-plan.primary {
+        background:var(--blue); color:#fff; border-color:var(--blue);
+      }
+      .btn-plan.primary:hover { background:#5c9dff; box-shadow:0 4px 18px rgba(68,138,255,.4); }
+      .btn-plan.ghost {
+        background:transparent; color:var(--txt-2); border-color:var(--border-h);
+      }
+      .btn-plan.ghost:hover { background:rgba(255,255,255,.06); color:var(--txt); }
+      .plan-note { font-size:0.72rem; color:var(--txt-2); text-align:center; margin-top:10px; }
+
+      /* ── FAQ ── */
+      .faq-list { display:flex; flex-direction:column; gap:10px; margin-top:32px; }
+      .faq-item {
+        background:var(--bg-card); border:1px solid var(--border);
+        border-radius:var(--r-lg); overflow:hidden; transition:border-color .15s;
+      }
+      .faq-item.open { border-color:var(--border-h); }
+      .faq-head {
+        display:flex; align-items:center; justify-content:space-between;
+        gap:14px; padding:16px 20px; cursor:pointer; user-select:none;
+        transition:background .12s;
+      }
+      .faq-head:hover { background:rgba(255,255,255,.02); }
+      .faq-q { font-size:0.88rem; font-weight:600; color:#fff; }
+      .faq-arrow { color:var(--txt-2); transition:transform .2s; font-size:0.75rem; flex-shrink:0; }
+      .faq-item.open .faq-arrow { transform:rotate(180deg); color:var(--blue); }
+      .faq-body {
+        display:none; padding:0 20px 16px;
+        font-size:0.82rem; color:var(--txt-2); line-height:1.65;
+      }
+      .faq-item.open .faq-body { display:block; }
+
+      /* ── CTA BANNER ── */
+      .cta-section {
+        padding:80px 24px;
+        text-align:center;
+        position:relative;
+        overflow:hidden;
+      }
+      .cta-section::before {
+        content:'';
+        position:absolute; inset:0;
+        background:
+          radial-gradient(ellipse 80% 60% at 50% 0%, rgba(68,138,255,.18) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 40% at 80% 100%, rgba(124,77,255,.12) 0%, transparent 60%);
+        pointer-events:none;
+      }
+      .cta-inner { position:relative; max-width:680px; margin:0 auto; }
+      .cta-h2 { font-size:clamp(1.6rem, 3.5vw, 2.4rem); font-weight:900; color:#fff; margin-bottom:14px; letter-spacing:-.01em; }
+      .cta-sub { font-size:0.92rem; color:var(--txt-2); margin-bottom:32px; line-height:1.6; }
+      .cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+
+      /* ── FOOTER ── */
+      footer {
+        border-top:1px solid var(--border);
+        background:var(--bg-card);
+        padding:32px 24px;
+        text-align:center;
+      }
+      .footer-inner {
+        max-width:1100px; margin:0 auto;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:14px;
+      }
+      .footer-logo { display:flex; align-items:center; gap:8px; }
+      .footer-logo-icon {
+        width:28px; height:28px; border-radius:7px;
+        background:var(--purple-g); color:var(--purple);
+        display:flex; align-items:center; justify-content:center; font-size:0.8rem;
+      }
+      .footer-logo-text { font-size:0.85rem; font-weight:700; color:#fff; }
+      .footer-copy { font-size:0.75rem; color:var(--txt-2); }
+      .footer-link { color:var(--blue); text-decoration:underline; }
+
+      /* ── UTILITY ── */
+      .reveal {
+        opacity:0; transform:translateY(24px);
+        transition:opacity .6s ease, transform .6s ease;
+      }
+      .reveal.visible { opacity:1; transform:none; }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width:900px) {
+        .plans-grid { grid-template-columns:repeat(2,1fr); }
+        .fanlar-grid { grid-template-columns:repeat(3,1fr); }
+        .stats-strip-inner { grid-template-columns:repeat(2,1fr); }
+        .stat-item:nth-child(2) { border-right:none; }
+        .psix-row { grid-template-columns:1fr; }
+      }
+      @media (max-width:720px) {
+        .steps-grid { grid-template-columns:1fr; }
+        .steps-grid::before { display:none; }
+        .plans-grid { grid-template-columns:1fr; max-width:400px; margin-left:auto; margin-right:auto; }
+        section { padding:60px 18px; }
+        .nav { padding:0 18px; }
+        .nav-link { display:none; }
+      }
+      @media (max-width:560px) {
+        .fanlar-grid { grid-template-columns:repeat(2,1fr); }
+        .stats-strip-inner { grid-template-columns:1fr 1fr; }
+        .hero { min-height:auto; padding:70px 18px 50px; }
+        .hero-cards { gap:8px; }
+        .hero-card span { display:none; }
+      }
+      @media (max-width:400px) {
+        .fanlar-grid { grid-template-columns:1fr 1fr; }
+        .footer-inner { flex-direction:column; text-align:center; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="nav">
+      <a class="nav-logo" href="#">
+        <div class="nav-logo-icon"><i class="fa-solid fa-crown"></i></div>
+        <div>
+          <div class="nav-logo-text">Testlar</div>
+          <div class="nav-logo-sub">IIV Buxoro Akademik Litseyi</div>
+        </div>
+      </a>
+      <div class="nav-right">
+        <a class="nav-link" href="../index.html" style="display:flex;align-items:center;gap:5px;color:var(--txt-2);font-size:.78rem;">
+          <i class="fa-solid fa-house"></i> Asosiy sayt
+        </a>
+        <a class="nav-link" href="#fanlar">Fanlar</a>
+        <a class="nav-link" href="#narxlar">Narxlar</a>
+        <a class="nav-link" href="#faq">Savollar</a>
+        <a class="btn-nav-login" href="login.html">
+          <i class="fa-solid fa-right-to-bracket"></i> Kirish
+        </a>
+      </div>
+    </nav>
+
+    <!-- ══ HERO ══ -->
+    <section class="hero">
+      <div class="hero-blob1"></div>
+      <div class="hero-blob2"></div>
+      <div class="hero-inner">
+        <div class="hero-badge">
+          <i class="fa-solid fa-crown"></i> IIV Buxoro Akademik Litseyi
+        </div>
+        <h1 class="hero-h1">
+          Bilimingizni<br>
+          <span>sinab ko'ring</span>
+        </h1>
+        <p class="hero-sub">
+          10 dan ortiq fan bo'yicha testlar, psixologik sinovlar va reyting tizimi.
+          Obuna oling — istalgan vaqt, istalgan qurilmadan testlaring.
+        </p>
+        <div class="hero-btns">
+          <a class="btn-hero-primary" href="register.html">
+            <i class="fa-solid fa-user-plus"></i> Ro'yxatdan o'tish
+          </a>
+          <a class="btn-hero-secondary" href="#narxlar">
+            <i class="fa-solid fa-tag"></i> Narxlarni ko'rish
+          </a>
+          <a class="btn-hero-secondary" href="login.html" style="padding:14px 20px;">
+            <i class="fa-solid fa-right-to-bracket"></i> Kirish
+          </a>
+        </div>
+
+        <!-- Floating mini-cards -->
+        <div class="hero-cards">
+          <div class="hero-card">
+            <i class="fa-solid fa-square-root-variable" style="color:#448aff"></i>
+            <span><strong>Matematika</strong> · 40 savol</span>
+          </div>
+          <div class="hero-card">
+            <i class="fa-solid fa-brain" style="color:#7c4dff"></i>
+            <span><strong>Psixologiya</strong> · Likert testi</span>
+          </div>
+          <div class="hero-card">
+            <i class="fa-solid fa-atom" style="color:#00bcd4"></i>
+            <span><strong>Fizika</strong> · 30 savol</span>
+          </div>
+          <div class="hero-card">
+            <i class="fa-solid fa-certificate" style="color:#ffc107"></i>
+            <span><strong>Sertifikat</strong> oling</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ STATS STRIP ══ -->
+    <div class="stats-strip">
+      <div class="stats-strip-inner">
+        <div class="stat-item reveal">
+          <div class="stat-num" style="color:var(--blue)">10+</div>
+          <div class="stat-label">Fan yo'nalishi</div>
+        </div>
+        <div class="stat-item reveal">
+          <div class="stat-num" style="color:var(--green)">500+</div>
+          <div class="stat-label">Test savoli</div>
+        </div>
+        <div class="stat-item reveal">
+          <div class="stat-num" style="color:var(--purple)">2</div>
+          <div class="stat-label">Test turi</div>
+        </div>
+        <div class="stat-item reveal">
+          <div class="stat-num" style="color:var(--yellow)">4</div>
+          <div class="stat-label">Obuna varianti</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FANLAR ══ -->
+    <section id="fanlar">
+      <div class="sec-inner">
+        <div class="fanlar-header reveal">
+          <div class="sec-badge blue"><i class="fa-solid fa-list-check"></i> Fanlar</div>
+          <h2 class="sec-title">Qaysi fanlardan test berasiz?</h2>
+          <p class="sec-sub">Har bir fan bo'yicha turli darajadagi savollar: oson, o'rta va qiyin. Shuningdek, maxsus psixologik testlar.</p>
+        </div>
+
+        <!-- Akademik fanlar -->
+        <div class="fanlar-grid">
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(68,138,255,.12);color:#448aff">
+              <i class="fa-solid fa-square-root-variable"></i>
+            </div>
+            <div class="fan-name">Matematika</div>
+            <div class="fan-count">Algebra, geometriya</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(0,188,212,.12);color:#00bcd4">
+              <i class="fa-solid fa-atom"></i>
+            </div>
+            <div class="fan-name">Fizika</div>
+            <div class="fan-count">Mexanika, optika</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(255,152,0,.12);color:#ff9800">
+              <i class="fa-solid fa-flask"></i>
+            </div>
+            <div class="fan-name">Kimyo</div>
+            <div class="fan-count">Organik, anorganik</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(0,230,118,.12);color:#00e676">
+              <i class="fa-solid fa-dna"></i>
+            </div>
+            <div class="fan-name">Biologiya</div>
+            <div class="fan-count">Botanika, zoologiya</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(16,185,129,.12);color:#10b981">
+              <i class="fa-solid fa-language"></i>
+            </div>
+            <div class="fan-name">Ingliz tili</div>
+            <div class="fan-count">Grammar, vocabulary</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(255,193,7,.12);color:#ffc107">
+              <i class="fa-solid fa-landmark"></i>
+            </div>
+            <div class="fan-name">Tarix</div>
+            <div class="fan-count">O'zbekiston, jahon</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(6,182,212,.12);color:#06b6d4">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="fan-name">Geografiya</div>
+            <div class="fan-count">Fizik, iqtisodiy</div>
+          </div>
+          <div class="fan-card reveal">
+            <div class="fan-icon" style="background:rgba(59,130,246,.12);color:#3b82f6">
+              <i class="fa-solid fa-laptop-code"></i>
+            </div>
+            <div class="fan-name">Informatika</div>
+            <div class="fan-count">Dasturlash asoslari</div>
+          </div>
+        </div>
+
+        <!-- Psixologik testlar -->
+        <div style="margin-top:40px" class="reveal">
+          <div class="sec-badge purple" style="margin-bottom:18px"><i class="fa-solid fa-brain"></i> Psixologik testlar</div>
+          <div class="psix-row">
+            <div class="psix-card">
+              <div class="psix-icon" style="background:rgba(124,77,255,.12);color:#7c4dff">
+                <i class="fa-solid fa-user-gear"></i>
+              </div>
+              <div>
+                <div class="psix-title">Kasbiy yo'nalish testi</div>
+                <div class="psix-desc">Kelajakdagi kasbingizni aniqlashga yordam beradigan Holland testi. 42 savol, 5 daqiqa.</div>
+              </div>
+            </div>
+            <div class="psix-card">
+              <div class="psix-icon" style="background:rgba(124,77,255,.12);color:#7c4dff">
+                <i class="fa-solid fa-puzzle-piece"></i>
+              </div>
+              <div>
+                <div class="psix-title">Shaxsiyat testi</div>
+                <div class="psix-desc">Kuchli va zaif tomonlaringizni aniqlang. 30 savol, Likert shkala asosida natija.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ QANDAY ISHLAYDI ══ -->
+    <section id="qanday">
+      <div class="sec-inner">
+        <div class="reveal" style="margin-bottom:0">
+          <div class="sec-badge green"><i class="fa-solid fa-circle-info"></i> Jarayon</div>
+          <h2 class="sec-title">Qanday ishlaydi?</h2>
+          <p class="sec-sub">Atigi uch qadam — obunadan testgacha.</p>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card reveal">
+            <div class="step-num s1">1</div>
+            <div class="step-icon"><i class="fa-solid fa-crown" style="color:#448aff"></i></div>
+            <div class="step-title">Obuna aktivlash</div>
+            <div class="step-desc">Sinf rahbari yoki administrator orqali ismingizga obuna ochladi. To'lov tasdiqlangach akkauntingiz faollashadi.</div>
+          </div>
+          <div class="step-card reveal">
+            <div class="step-num s2">2</div>
+            <div class="step-icon"><i class="fa-solid fa-right-to-bracket" style="color:#7c4dff"></i></div>
+            <div class="step-title">Tizimga kiring</div>
+            <div class="step-desc">Berilgan login va parol bilan tizimga kiring. "O'quvchi" akkauntingiz testlar sahifasiga avtomatik yo'naltiradi.</div>
+          </div>
+          <div class="step-card reveal">
+            <div class="step-num s3">3</div>
+            <div class="step-icon"><i class="fa-solid fa-flag-checkered" style="color:#00e676"></i></div>
+            <div class="step-title">Test bering</div>
+            <div class="step-desc">Kerakli fanni tanlang, testni boshlang. Tugatgach natija, savollar tahlili va sertifikat tayyor bo'ladi.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ NARXLAR ══ -->
+    <section id="narxlar">
+      <div class="sec-inner">
+        <div class="reveal">
+          <div class="sec-badge blue"><i class="fa-solid fa-tag"></i> Narxlar</div>
+          <h2 class="sec-title">Qulay narxlar</h2>
+          <p class="sec-sub">Obuna administrator tomonidan qo'lda aktivlanadi. To'lovni tasdiqlab, sinf rahbari yoki admin bilan bog'laning.</p>
+        </div>
+        <div class="plans-grid">
+
+          <!-- 1 oy -->
+          <div class="plan-card reveal">
+            <div class="plan-icon" style="background:rgba(255,255,255,.05);color:#9ca3af">
+              <i class="fa-regular fa-calendar"></i>
+            </div>
+            <div class="plan-name" style="color:#9ca3af">1 oy</div>
+            <div class="plan-price">50 000 <small>so'm</small></div>
+            <div class="plan-per">30 kun · bir martalik</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Barcha akademik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Psixologik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Natijalar tarixi</div>
+              <div class="plan-feat dim"><i class="fa-solid fa-xmark"></i> Sertifikat</div>
+            </div>
+            <a class="btn-plan ghost" href="#qanday">Qanday olish →</a>
+            <div class="plan-note">Sinf rahbariga murojaat qiling</div>
+          </div>
+
+          <!-- 3 oy -->
+          <div class="plan-card reveal">
+            <div class="plan-icon" style="background:rgba(0,188,212,.1);color:#00bcd4">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div class="plan-name" style="color:#00bcd4">3 oy</div>
+            <div class="plan-price">130 000 <small>so'm</small></div>
+            <div class="plan-per">90 kun · 13% tejaladi</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Barcha akademik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Psixologik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Natijalar tarixi</div>
+              <div class="plan-feat dim"><i class="fa-solid fa-xmark"></i> Sertifikat</div>
+            </div>
+            <a class="btn-plan ghost" href="#qanday">Qanday olish →</a>
+            <div class="plan-note">Sinf rahbariga murojaat qiling</div>
+          </div>
+
+          <!-- 1 yil — POPULAR -->
+          <div class="plan-card popular reveal">
+            <div class="plan-popular-badge">⭐ Mashhur</div>
+            <div class="plan-icon" style="background:var(--blue-g);color:var(--blue)">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="plan-name" style="color:var(--blue)">1 yil</div>
+            <div class="plan-price">450 000 <small>so'm</small></div>
+            <div class="plan-per">365 kun · 25% tejaladi</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Barcha akademik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Psixologik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Natijalar tarixi</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> <strong style="color:#fff">Sertifikat</strong></div>
+            </div>
+            <a class="btn-plan primary" href="#qanday">Qanday olish →</a>
+            <div class="plan-note">Sinf rahbariga murojaat qiling</div>
+          </div>
+
+          <!-- Muddatsiz -->
+          <div class="plan-card reveal">
+            <div class="plan-icon" style="background:var(--purple-g);color:var(--purple)">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div class="plan-name" style="color:var(--purple)">Muddatsiz</div>
+            <div class="plan-price" style="font-size:1.5rem;padding-top:4px">Alohida<br><small style="font-size:.8rem">kelishiladi</small></div>
+            <div class="plan-per">Cheksiz muddat</div>
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Barcha akademik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Psixologik testlar</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> Natijalar tarixi</div>
+              <div class="plan-feat"><i class="fa-solid fa-check"></i> <strong style="color:#fff">Sertifikat</strong></div>
+            </div>
+            <a class="btn-plan ghost" href="#qanday">Qanday olish →</a>
+            <div class="plan-note">Adminstratsiyaga murojaat qiling</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ FAQ ══ -->
+    <section id="faq" style="background:var(--bg-card)">
+      <div class="sec-inner" style="max-width:720px">
+        <div class="reveal">
+          <div class="sec-badge purple"><i class="fa-solid fa-circle-question"></i> Savollar</div>
+          <h2 class="sec-title">Ko'p so'raladigan savollar</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <div class="faq-head" onclick="toggleFaq(this)">
+              <span class="faq-q">Testlarga qanday kirish mumkin?</span>
+              <i class="fa-solid fa-chevron-down faq-arrow"></i>
+            </div>
+            <div class="faq-body">
+              Sinf rahbari yoki administrator sizga login va parol beradi. Berilgan ma'lumotlar bilan <a href="login.html" style="color:var(--blue)">login sahifasiga</a> kirib, "O'quvchi" akkauntingizdan foydalanasiz.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="faq-head" onclick="toggleFaq(this)">
+              <span class="faq-q">Obuna tugagandan keyin nima bo'ladi?</span>
+              <i class="fa-solid fa-chevron-down faq-arrow"></i>
+            </div>
+            <div class="faq-body">
+              Obuna muddati tugagach testlar qulflangadi, lekin avvalgi natijalaringiz saqlanib qoladi. Yangi obuna olish uchun sinf rahbari yoki administratorga murojaat qiling.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="faq-head" onclick="toggleFaq(this)">
+              <span class="faq-q">Bir testni necha marta bersa bo'ladi?</span>
+              <i class="fa-solid fa-chevron-down faq-arrow"></i>
+            </div>
+            <div class="faq-body">
+              Har bir testni cheklanmagan marta berishingiz mumkin. Har safar yangi natija saqlanadi va oxirgi natijangiz ko'rsatiladi.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="faq-head" onclick="toggleFaq(this)">
+              <span class="faq-q">Sertifikat qanday olinadi?</span>
+              <i class="fa-solid fa-chevron-down faq-arrow"></i>
+            </div>
+            <div class="faq-body">
+              1 yillik yoki muddatsiz obuna egalari testni muvaffaqiyatli topshirgandan keyin sertifikat yuklab olishlari mumkin bo'ladi. Bu funksiya tez orada qo'shiladi.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="faq-head" onclick="toggleFaq(this)">
+              <span class="faq-q">Telefonda ham ishlaydi?</span>
+              <i class="fa-solid fa-chevron-down faq-arrow"></i>
+            </div>
+            <div class="faq-body">
+              Ha, platforma to'liq mobil qurilmalarga moslashtirilgan. Telefon, planshet va kompyuterda bir xil qulay ko'rinadi.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CTA ══ -->
+    <section class="cta-section">
+      <div class="cta-inner reveal">
+        <h2 class="cta-h2">Boshlashga tayyor bo'ldingizmi?</h2>
+        <p class="cta-sub">Obuna oling va 500 dan ortiq savol bilan bilimingizni sinab ko'ring. Har bir to'g'ri javob sizni maqsadingizga bir qadam yaqinlashtiradi.</p>
+        <div class="cta-btns">
+          <a class="btn-hero-primary" href="register.html">
+            <i class="fa-solid fa-user-plus"></i> Ro'yxatdan o'tish
+          </a>
+          <a class="btn-hero-secondary" href="login.html">
+            <i class="fa-solid fa-right-to-bracket"></i> Tizimga kirish
+          </a>
+          <a class="btn-hero-secondary" href="#narxlar">
+            <i class="fa-solid fa-tag"></i> Narxlarni ko'rish
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <div class="footer-logo-icon"><i class="fa-solid fa-crown"></i></div>
+          <span class="footer-logo-text">IIV Buxoro Akademik Litseyi — Testlar</span>
+        </div>
+        <div class="footer-copy">
+          © 2025 · <a class="footer-link" href="../index.html">Asosiy sayt</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      /* FAQ accordion */
+      function toggleFaq(head) {
+        const item = head.parentElement;
+        const wasOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+        if (!wasOpen) item.classList.add("open");
+      }
+
+      /* Scroll reveal */
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll(".reveal").forEach((el, i) => {
+        el.style.transitionDelay = `${(i % 4) * 80}ms`;
+        observer.observe(el);
+      });
+    </script>
+  </body>
+</html>

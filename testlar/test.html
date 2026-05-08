@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test — IIV Buxoro Akademik Litseyi</title>
+    <link rel="icon" type="image/png" href="../imgs/logo.png" />
+    <link rel="stylesheet" href="../kurslar/style.css" />
+    <link rel="stylesheet" href="testlar.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body class="tl-test-page">
+
+    <!-- YUKLANISH -->
+    <div class="tl-loading" id="tlLoading">
+      <i class="fa-solid fa-spinner"></i>
+      <p>Test yuklanmoqda...</p>
+    </div>
+
+    <!-- XATO EKRANI -->
+    <div class="tl-error-screen" id="tlError">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <h3 id="tlErrorTitle">Xatolik</h3>
+      <p id="tlErrorMsg">Noma'lum xatolik.</p>
+      <a href="index.html" class="btn-tl-back" style="margin-top:14px">
+        <i class="fa-solid fa-arrow-left"></i> Testlarga qaytish
+      </a>
+    </div>
+
+    <!-- TEST HEADER (sticky) -->
+    <header class="tl-test-header" id="testHeader" style="display:none">
+      <div class="tl-test-title-wrap">
+        <div class="tl-test-title"  id="testTitle">Test</div>
+        <div class="tl-test-subtitle" id="testSubtitle"></div>
+      </div>
+      <div class="tl-timer" id="timerBox" style="display:none">
+        <i class="fa-regular fa-clock"></i>
+        <span id="timerDisplay">--:--</span>
+      </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="tl-progress-wrap" id="progressWrap" style="display:none">
+      <div class="tl-progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- KIRISH EKRANI -->
+    <div class="tl-intro" id="introScreen" style="display:none">
+      <div class="tl-intro-card">
+        <div class="tl-intro-icon" id="introIcon"></div>
+        <h1 class="tl-intro-title" id="introTitle"></h1>
+        <div class="tl-intro-subject" id="introSubject"></div>
+        <div class="tl-intro-meta">
+          <div class="tl-intro-meta-item">
+            <span class="tl-intro-meta-num" id="introQCount">—</span>
+            <span class="tl-intro-meta-label">Savol</span>
+          </div>
+          <div class="tl-intro-meta-item" id="introTimeWrap">
+            <span class="tl-intro-meta-num" id="introTime">—</span>
+            <span class="tl-intro-meta-label">Daqiqa</span>
+          </div>
+        </div>
+        <p class="tl-intro-desc" id="introDesc"></p>
+        <button class="btn-tl-begin" id="btnBegin">
+          <i class="fa-solid fa-play"></i> Testni boshlash
+        </button>
+      </div>
+    </div>
+
+    <!-- SAVOL EKRANI -->
+    <div class="tl-question-main" id="questionScreen" style="display:none">
+      <div class="tl-question-wrap">
+
+        <!-- Nuqtalar navigatsiyasi -->
+        <div class="tl-q-nav-row">
+          <span class="tl-q-counter" id="qCounter">1 / 1</span>
+          <div class="tl-q-dots" id="qDots"></div>
+        </div>
+
+        <!-- Savol karta -->
+        <div class="tl-q-card">
+          <div class="tl-q-num"  id="qNum">Savol 1</div>
+          <div class="tl-q-text" id="qText"></div>
+        </div>
+
+        <!-- Variantlar -->
+        <div class="tl-options" id="optionsWrap"></div>
+
+        <!-- Navigatsiya -->
+        <div class="tl-nav">
+          <button class="btn-tl-nav" id="btnPrev">
+            <i class="fa-solid fa-arrow-left"></i> Oldingi
+          </button>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-tl-nav" id="btnNext">
+              Keyingi <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn-tl-submit" id="btnSubmit" style="display:none">
+              <i class="fa-solid fa-flag-checkered"></i> Tugatish
+            </button>
+          </div>
+        </div>
+
+        <!-- Tasdiqlash paneli -->
+        <div class="tl-confirm-bar" id="confirmBar">
+          <span class="tl-confirm-text" id="confirmText"></span>
+          <div class="tl-confirm-actions">
+            <button class="btn-tl-yes" id="btnConfirmYes">
+              <i class="fa-solid fa-check"></i> Ha, tugatish
+            </button>
+            <button class="btn-tl-no" onclick="cancelSubmit()">Bekor qilish</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+      const SUBJECTS = {
+        matematika:   { label: "Matematika",   color: "#448aff", icon: "fa-square-root-variable" },
+        fizika:       { label: "Fizika",        color: "#00bcd4", icon: "fa-atom" },
+        kimyo:        { label: "Kimyo",         color: "#ff9800", icon: "fa-flask" },
+        biologiya:    { label: "Biologiya",     color: "#00e676", icon: "fa-dna" },
+        psixologiya:  { label: "Psixologiya",   color: "#7c4dff", icon: "fa-brain" },
+        ingliz:       { label: "Ingliz tili",   color: "#10b981", icon: "fa-language" },
+        tarix:        { label: "Tarix",         color: "#ffc107", icon: "fa-landmark" },
+        geografiya:   { label: "Geografiya",    color: "#06b6d4", icon: "fa-globe" },
+        informatika:  { label: "Informatika",   color: "#3b82f6", icon: "fa-laptop-code" },
+        umumiy:       { label: "Umumiy",        color: "#9ca3af", icon: "fa-list-check" },
+      };
+
+      const $ = id => document.getElementById(id);
+
+      function esc(s) {
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      }
+
+      const state = {
+        user: null, profile: null,
+        testId: null, testData: null,
+        questions: [],
+        answers: [],    // per-question selected index (-1 = skipped)
+        current: 0,
+        timerSec: 0,
+        timerInterval: null,
+        startedAt: null,
+        submitting: false,
+      };
+
+      /* ─── AUTH + MA'LUMOTLAR ─── */
+      function showError(title, msg) {
+        $("tlLoading").style.display = "none";
+        $("tlErrorTitle").textContent = title || "Xatolik";
+        $("tlErrorMsg").textContent   = msg   || "Noma'lum xatolik.";
+        $("tlError").classList.add("show");
+      }
+
+      function checkAccess(profile) {
+        const adminRoles = ["admin", "sinf_rahbari", "oqituvchi", "observer"];
+        if (adminRoles.includes(profile?.role)) return true;
+        return profile?.subscribed === true;
+      }
+
+      auth.onAuthStateChanged(async u => {
+        if (!u) { location.href = "login.html"; return; }
+        state.user = u;
+
+        const params = new URLSearchParams(location.search);
+        state.testId = params.get("id");
+        if (!state.testId) { showError("Test topilmadi", "URL da test ID ko'rsatilmagan."); return; }
+
+        try {
+          const profDoc = await db.collection("userProfiles").doc(u.uid).get();
+          if (!profDoc.exists) throw new Error("Profil topilmadi.");
+          state.profile = profDoc.data();
+          if (!state.profile.active) throw new Error("Akkaunt bloklangan.");
+
+          const hasAccess = checkAccess(state.profile);
+          if (!hasAccess) {
+            showError("Kirish taqiqlandi", "Bu testdan foydalanish uchun faol obuna kerak.");
+            return;
+          }
+
+          const testDoc = await db.collection("tests").doc(state.testId).get();
+          if (!testDoc.exists) throw new Error("Test topilmadi yoki o'chirilgan.");
+          state.testData = { id: testDoc.id, ...testDoc.data() };
+          if (!state.testData.active) throw new Error("Bu test hozircha faol emas.");
+
+          const qSnap = await db.collection("tests")
+            .doc(state.testId)
+            .collection("questions")
+            .orderBy("order")
+            .get();
+
+          if (qSnap.empty) throw new Error("Bu testda hali savollar yo'q.");
+          state.questions = qSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          state.answers   = new Array(state.questions.length).fill(-1);
+
+          renderIntro();
+
+          $("tlLoading").style.display = "none";
+          $("testHeader").style.display = "flex";
+          $("introScreen").style.display = "flex";
+        } catch(e) {
+          showError("Xatolik", e.message);
+        }
+      });
+
+      /* ─── KIRISH EKRANI ─── */
+      function renderIntro() {
+        const t    = state.testData;
+        const info = SUBJECTS[t.subject] || { label: t.subject || "Umumiy", color: "#9ca3af", icon: "fa-list-check" };
+        const color = t.color || info.color;
+        const icon  = t.icon  || info.icon;
+
+        $("testTitle").textContent    = t.title;
+        $("testSubtitle").textContent = (t.subjectLabel || info.label);
+        $("introIcon").innerHTML      = `<i class="fa-solid ${esc(icon)}" style="color:${color}"></i>`;
+        $("introTitle").textContent   = t.title;
+        $("introSubject").textContent = t.subjectLabel || info.label;
+        $("introSubject").style.color = color;
+        $("introQCount").textContent  = state.questions.length;
+        $("introDesc").textContent    = t.description || "Har bir savolni diqqat bilan o'qing va eng to'g'ri javobni tanlang.";
+
+        if (t.timeLimit) {
+          $("introTime").textContent = t.timeLimit;
+        } else {
+          $("introTimeWrap").style.display = "none";
+        }
+
+        $("btnBegin").addEventListener("click", startTest);
+      }
+
+      /* ─── TEST BOSHLASH ─── */
+      function startTest() {
+        state.startedAt = new Date();
+        $("introScreen").style.display    = "none";
+        $("questionScreen").style.display = "flex";
+        $("progressWrap").style.display   = "block";
+
+        if (state.testData.timeLimit) {
+          state.timerSec = state.testData.timeLimit * 60;
+          $("timerBox").style.display = "flex";
+          updateTimerDisplay();
+          state.timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        buildDots();
+        goToQuestion(0);
+      }
+
+      /* ─── TAYMER ─── */
+      function tickTimer() {
+        state.timerSec--;
+        updateTimerDisplay();
+        if (state.timerSec <= 0) {
+          clearInterval(state.timerInterval);
+          autoSubmit();
+        }
+      }
+
+      function updateTimerDisplay() {
+        const m = Math.floor(state.timerSec / 60);
+        const s = state.timerSec % 60;
+        $("timerDisplay").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        const box = $("timerBox");
+        box.classList.toggle("warning", state.timerSec <= 120 && state.timerSec > 60);
+        box.classList.toggle("danger",  state.timerSec <= 60);
+      }
+
+      function autoSubmit() {
+        $("confirmBar").classList.remove("open");
+        submitTest();
+      }
+
+      /* ─── NUQTALAR ─── */
+      function buildDots() {
+        const wrap = $("qDots");
+        wrap.innerHTML = "";
+        state.questions.forEach((_, i) => {
+          const dot = document.createElement("span");
+          dot.className = "tl-q-dot";
+          dot.title = `Savol ${i + 1}`;
+          dot.addEventListener("click", () => goToQuestion(i));
+          wrap.appendChild(dot);
+        });
+      }
+
+      function updateDots() {
+        const dots = $("qDots").querySelectorAll(".tl-q-dot");
+        dots.forEach((dot, i) => {
+          dot.className = "tl-q-dot";
+          if (i === state.current)           dot.classList.add("current");
+          else if (state.answers[i] !== -1)  dot.classList.add("answered");
+        });
+      }
+
+      /* ─── SAVOLLARGA O'TISH ─── */
+      function goToQuestion(idx) {
+        state.current = idx;
+        const q   = state.questions[idx];
+        const n   = state.questions.length;
+        const sel = state.answers[idx];
+        const LETTERS = ["A", "B", "C", "D", "E"];
+
+        $("qNum").textContent    = `Savol ${idx + 1}`;
+        $("qText").textContent   = q.text || q.question || "";
+        $("qCounter").textContent = `${idx + 1} / ${n}`;
+
+        const opts = $("optionsWrap");
+        opts.innerHTML = (q.options || []).map((opt, oi) => `
+          <div class="tl-option${sel === oi ? " selected" : ""}" onclick="selectOption(${oi})">
+            <div class="tl-option-letter">${LETTERS[oi] || oi + 1}</div>
+            <div class="tl-option-text">${esc(opt)}</div>
+          </div>`).join("");
+
+        const pct = ((idx + 1) / n) * 100;
+        $("progressFill").style.width = `${pct}%`;
+
+        $("btnPrev").disabled = idx === 0;
+        $("btnNext").style.display   = idx < n - 1 ? "flex"  : "none";
+        $("btnSubmit").style.display = idx === n - 1 ? "flex" : "none";
+
+        updateDots();
+      }
+
+      function selectOption(oi) {
+        state.answers[state.current] = oi;
+        goToQuestion(state.current);
+      }
+
+      /* ─── NAVIGATSIYA ─── */
+      $("btnPrev").addEventListener("click", () => {
+        if (state.current > 0) goToQuestion(state.current - 1);
+      });
+      $("btnNext").addEventListener("click", () => {
+        if (state.current < state.questions.length - 1) goToQuestion(state.current + 1);
+      });
+      $("btnSubmit").addEventListener("click", askSubmit);
+
+      function askSubmit() {
+        if (state.submitting) return;
+        const unanswered = state.answers.filter(a => a === -1).length;
+        const bar  = $("confirmBar");
+        const text = $("confirmText");
+        if (unanswered > 0) {
+          text.textContent = `Hali ${unanswered} ta savolga javob berilmagan. Shunga qaramay testni tugatmoqchimisiz?`;
+        } else {
+          text.textContent = `Barcha ${state.questions.length} ta savolga javob berildi. Testni tugatmoqchimisiz?`;
+        }
+        bar.classList.add("open");
+        $("btnConfirmYes").onclick = submitTest;
+      }
+
+      function cancelSubmit() {
+        $("confirmBar").classList.remove("open");
+      }
+
+      /* ─── SAQLASH VA TUGATISH ─── */
+      async function submitTest() {
+        if (state.submitting) return;
+        state.submitting = true;
+        clearInterval(state.timerInterval);
+        $("confirmBar").classList.remove("open");
+
+        const submitBtn = $("btnSubmit");
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
+        submitBtn.disabled = true;
+
+        const qs = state.questions;
+        let score = 0;
+        const answers = qs.map((q, i) => {
+          const selected  = state.answers[i];
+          const correct   = q.correct ?? -1;
+          const isCorrect = selected !== -1 && selected === correct;
+          if (isCorrect) score++;
+          return { qId: q.id, selected, correct, isCorrect };
+        });
+
+        const total   = qs.length;
+        const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+        const now     = new Date();
+        const durSec  = Math.round((now - state.startedAt) / 1000);
+        const sid     = String(state.profile.id || state.user.uid);
+
+        const resultData = {
+          studentId:   sid,
+          studentUid:  state.user.uid,
+          studentName: state.profile.fullName || state.profile.email || "—",
+          testId:      state.testId,
+          testTitle:   state.testData.title,
+          subject:     state.testData.subject || "",
+          score, total, percent, answers,
+          startedAt:   firebase.firestore.Timestamp.fromDate(state.startedAt),
+          completedAt: firebase.firestore.Timestamp.fromDate(now),
+          durationSec: durSec,
+        };
+
+        try {
+          const ref = await db.collection("testResults").add(resultData);
+
+          /* testRating — shaxsiy javoblarsiz, reyting uchun */
+          await db.collection("testRating").add({
+            studentName: resultData.studentName,
+            studentUid:  resultData.studentUid,
+            testId:      resultData.testId,
+            testTitle:   resultData.testTitle,
+            subject:     resultData.subject,
+            score:       resultData.score,
+            total:       resultData.total,
+            percent:     resultData.percent,
+            durationSec: resultData.durationSec,
+            completedAt: resultData.completedAt,
+            resultId:    ref.id,
+          });
+
+          sessionStorage.setItem("tl_last_result", JSON.stringify({ id: ref.id, ...resultData }));
+          location.href = `natija.html?rid=${ref.id}`;
+        } catch(e) {
+          state.submitting = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Tugatish';
+          submitBtn.disabled = false;
+          alert("Natijani saqlashda xatolik: " + e.message);
+        }
+      }
+
+      window.selectOption  = selectOption;
+      window.cancelSubmit  = cancelSubmit;
+    </script>
+  </body>
+</html>
