@@ -355,7 +355,7 @@
             showToast("Ma'lumotlar bazadan yuklanmoqda...", "info");
             const [studSnap, assignSnap, attSnap, gradesSnap, subjSnap, teachSnap, ratingSnap] =
               await Promise.all([
-                db.collection("students").get(),
+                db.collection("course_students").get(),
                 db.collection("courseAssignments").get(),
                 db.collection("attendance").get(),
                 db.collection("grades").get(),

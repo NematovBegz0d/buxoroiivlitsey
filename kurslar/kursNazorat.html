@@ -516,6 +516,19 @@
         );
       }
 
+      /**
+       * 2.3 — O'qituvchi shu kursning egasimi?
+       * Kurslar id YOKI login bo'yicha biriktirilishi mumkin (eski/yangi model).
+       * Avval faqat `id` tekshirilardi — login bilan biriktirilgan o'qituvchi
+       * o'z kursiga davomat/baho qo'ya olmasdi. Endi ikkalasi ham qabul qilinadi.
+       */
+      function isMyTeacherId(teacherId) {
+        const tid = String(teacherId ?? "");
+        const myId = String(currentUser?.id ?? "");
+        const myLogin = String(currentUser?.login ?? "");
+        return (!!myId && tid === myId) || (!!myLogin && tid === myLogin);
+      }
+
       function teacherMatchesSubject(teacher, subjectId, selectedSubject) {
         const sid = String(subjectId || "");
         const subjectName = selectedSubject?.name || "";
@@ -1594,7 +1607,7 @@
       function openAttendanceModal(subjectId, teacherId, classTime) {
         if (
           currentUser.role !== "oqituvchi" ||
-          String(currentUser.id) !== String(teacherId)
+          !isMyTeacherId(teacherId)
         ) {
           showToast("Sizda bu kursga davomat olish huquqi yo'q!", "error");
           return;
@@ -1692,7 +1705,7 @@
         if (
           !currentUser ||
           currentUser.role !== "oqituvchi" ||
-          String(currentUser.id) !== String(currentAttendanceCourse.teacherId)
+          !isMyTeacherId(currentAttendanceCourse.teacherId)
         ) {
           showToast("Sizda bu kursga davomat saqlash huquqi yo‘q!", "error");
           return;
@@ -1836,7 +1849,7 @@
       function openGradingModal(subjectId, teacherId, classTime) {
         if (
           currentUser.role !== "oqituvchi" ||
-          String(currentUser.id) !== String(teacherId)
+          !isMyTeacherId(teacherId)
         ) {
           showToast("Sizda bu kursni baholash huquqi yo'q!", "error");
           return;
@@ -2270,9 +2283,14 @@
             expectedSessions - st.attended - st.missed,
             0,
           );
+          // 2.1 — Foiz studentProfile.html bilan bir xil ta'rifda: faqat QAYD
+          // QILINGAN darslar asosida (kelgan / (kelgan + kelmagan)). Olinmagan
+          // (qayd qilinmagan) darslar foizni pasaytirmaydi — ular alohida
+          // "Olinmagan" ustunida ko'rsatiladi.
+          const recorded = st.attended + st.missed;
           const pct =
-            expectedSessions > 0
-              ? Math.round((st.attended / expectedSessions) * 100)
+            recorded > 0
+              ? Math.round((st.attended / recorded) * 100)
               : 0;
           const tone = toneClass(pct);
           rows += `
