@@ -1563,7 +1563,7 @@
         newTeacherIdAdmin.value = n;
         newTeacherLoginAdmin.value = login;
         newTeacherEmail.value = `${login}@litsey.uz`;
-        newTeacherPasswordAdmin.value = `Teacher${pad}@${new Date().getFullYear()}`;
+        newTeacherPasswordAdmin.value = genSecurePassword();
         teacherCredentialBox.style.display = "none";
       }
       function selectedTeacherSubjects() {
@@ -1707,10 +1707,21 @@
         const id = String(item.id || item.docId || "0").padStart(3, "0");
         return role === "sinf_rahbari" ? `mentor${id}@litsey.uz` : `teacher${id}@litsey.uz`;
       }
+      // XAVFSIZLIK: parollar bashorat qilinmaydigan, kriptografik tasodifiy bo'lsin.
+      // Eski `Teacher001@2026` naqshi har kimga ma'lum bo'lib qolardi.
+      function genSecurePassword(len = 14) {
+        const cs = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$%";
+        const arr = new Uint32Array(len);
+        (self.crypto || window.crypto).getRandomValues(arr);
+        let out = "";
+        for (let i = 0; i < len; i++) out += cs[arr[i] % cs.length];
+        return out;
+      }
       function bulkPassword(item, role) {
-        const id = String(item.id || item.docId || "0").padStart(3, "0");
-        const year = new Date().getFullYear();
-        return role === "sinf_rahbari" ? `Mentor${id}@${year}` : `Teacher${id}@${year}`;
+        // Har bir akkaunt uchun yangi tasodifiy parol. bulkCheckStatus uni bir
+        // marta yaratib bulkState'ga saqlaydi va jadvalda ko'rsatadi;
+        // bulkCreateAccounts aynan o'sha saqlangan qiymatdan foydalanadi.
+        return genSecurePassword();
       }
       function bulkLogin(item, role) {
         if (item.login) return item.login;
@@ -1910,12 +1921,10 @@
 
       function openResetModal(email) {
         _resetEmail = email;
-        const year = new Date().getFullYear();
-        const pad = email.match(/\d+/)?.[0]?.padStart(3, "0") || "001";
-        const prefix = email.startsWith("mentor") ? "Mentor" : "Teacher";
         $("resetModalEmail").textContent = email;
         $("resetOldPassword").value = "";
-        $("resetNewPassword").value = `${prefix}${pad}@${year}New`;
+        // Tasodifiy yangi parol taklif qilinadi (bashoratli emas).
+        $("resetNewPassword").value = genSecurePassword();
         $("resetModalResult").style.display = "none";
         $("resetModalError").style.display = "none";
         $("resetPasswordModal").style.display = "flex";
@@ -2223,7 +2232,7 @@
           newTeacherIdAdmin.value = nextN;
           newTeacherLoginAdmin.value = `teacher${nextPad}`;
           newTeacherEmail.value = `teacher${nextPad}@litsey.uz`;
-          newTeacherPasswordAdmin.value = `Teacher${nextPad}@${new Date().getFullYear()}`;
+          newTeacherPasswordAdmin.value = genSecurePassword();
         } catch (e) {
           // console.error(e);
           if (createdUser && secondaryAuth) {

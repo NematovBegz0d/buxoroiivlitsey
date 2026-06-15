@@ -322,21 +322,11 @@
       function checkAuth() {
         const userData = sessionStorage.getItem("currentUser");
 
-        // Bu sahifa ota-ona/kuzatuvchi uchun ham ochiq.
-        // Session bo'lmasa — avtomatik observer rejimida ishlaydi.
+        // XAVFSIZLIK: o'quvchilar PII si (ism, davomat, baho) ommaga ochiq emas.
+        // Bu sahifani ko'rish uchun tizimga kirgan faol akkaunt (xodim yoki
+        // admin tomonidan yaratilgan observer) talab qilinadi.
         if (!userData) {
-          currentUser = {
-            uid: "public_observer",
-            email: "",
-            role: "observer",
-            login: "observer",
-            fullName: "Kuzatuvchi",
-            groupCode: "",
-            subjectIds: [],
-            active: true,
-          };
-          sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
-          updateUIForRole();
+          window.location.replace("login.html");
           return;
         }
 
@@ -344,12 +334,14 @@
           currentUser = JSON.parse(userData);
         } catch (e) {
           sessionStorage.removeItem("currentUser");
-          currentUser = {
-            role: "observer",
-            fullName: "Kuzatuvchi",
-            active: true,
-          };
-          sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
+          window.location.replace("login.html");
+          return;
+        }
+
+        if (!currentUser || !currentUser.role) {
+          sessionStorage.removeItem("currentUser");
+          window.location.replace("login.html");
+          return;
         }
 
         updateUIForRole();
