@@ -180,7 +180,9 @@
         }
 
         if (currentUser.role === "student") {
-          window.location.href = "../testlar/index.html";
+          auth.signOut();
+          sessionStorage.removeItem("currentUser");
+          showError("Bu tizim faqat xodimlar uchun. O'quvchi akkaunti bu yerda ishlatilmaydi.");
           return;
         }
 
@@ -300,6 +302,5 @@
         checkExistingSession();
       });
     </script>
-    <script src="../js/testlar-banner.js"></script>
   </body>
 </html>
