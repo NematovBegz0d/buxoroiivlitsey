@@ -80,11 +80,6 @@
             </a>
           </div>
         </form>
-
-        <div class="observer-divider">yoki</div>
-        <button class="btn-observer" id="btnObserver" type="button">
-          <i class="fa-solid fa-eye"></i> O'quvchilarni kuzatish
-        </button>
       </div>
     </div>
 
@@ -99,7 +94,6 @@
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       const btnLogin = document.getElementById("btnLogin");
-      const btnObserver = document.getElementById("btnObserver");
 
       function showError(message) {
         loginError.textContent = message;
@@ -251,26 +245,9 @@
         return false;
       }
       async function loginAsObserver() {
-        hideError();
-        if (checkFirebaseReady()) {
-          try {
-            if (auth.currentUser) await auth.signOut();
-          } catch (error) {
-            // console.warn("Observer rejimga o’tishda auth signOut xatosi:", error);
-          }
-        }
-        const observerUser = {
-          uid: "observer_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9),
-          email: "",
-          role: "observer",
-          login: "observer",
-          fullName: "Kuzatuvchi",
-          groupCode: "",
-          subjectIds: [],
-          active: true,
-        };
-        sessionStorage.setItem("currentUser", JSON.stringify(observerUser));
-        window.location.href = "kursgaYozilganlar.html";
+        // Kuzatuv rejimi endi public emas — admin tomonidan yaratilgan
+        // haqiqiy "observer" akkaunt orqali oddiy login qilinadi.
+        showError("Kuzatuvchi sifatida kirish uchun admin bergan login/parol bilan tizimga kiring.");
       }
       function checkExistingSession() {
         if (!checkFirebaseReady()) return;
@@ -293,7 +270,6 @@
           }
         });
       }
-      btnObserver.addEventListener("click", loginAsObserver);
       loginForm.addEventListener("submit", handleLogin);
       loginInput.addEventListener("input", hideError);
       passwordInput.addEventListener("input", hideError);
