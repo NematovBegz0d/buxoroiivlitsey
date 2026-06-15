@@ -2373,7 +2373,12 @@
         };
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
-        toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${message}</span>`;
+        const _iconSpan = document.createElement("span");
+        _iconSpan.className = "toast-icon";
+        _iconSpan.innerHTML = icons[type] || icons.info; // ikonka — ichki, xavfsiz
+        const _msgSpan = document.createElement("span");
+        _msgSpan.textContent = message; // XSS himoyasi: foydalanuvchi matni textContent orqali
+        toast.append(_iconSpan, _msgSpan);
         container.appendChild(toast);
 
         setTimeout(() => {

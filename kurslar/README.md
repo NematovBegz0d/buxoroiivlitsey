@@ -33,37 +33,21 @@ Agar `pages/` ichiga ko'chirsangiz, `../js/` va `../imgs/` pathlarini moslang.
 
 ## Firestore Security Rules (Muhim!)
 
-`firestore.rules` fayli bu paketda **yo'q** — siz uni alohida boshqarasiz.
-Iltimos, quyidagi minimal qoidalar mavjudligini tekshiring:
+Haqiqiy qoidalar repo ildizidagi **`firestore.rules`** faylida joylashgan (bu README
+dagi eski namuna emas). U **Firebase Console → Firestore → Rules** ga **deploy
+qilinishi shart** — faqat repoda turishi himoyani kuchga kiritmaydi.
 
-```js
-// firestore.rules
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+Joriy siyosat qisqacha:
 
-    // Faqat autentifikatsiya qilingan foydalanuvchilar o'qiy oladi
-    match /{document=**} {
-      allow read: if request.auth != null;
-    }
-
-    // Faqat admin yozishi mumkin (userProfiles orqali rol tekshiriladi)
-    match /courseAssignments/{id} {
-      allow write: if request.auth != null;
-    }
-    match /attendance/{id} {
-      allow write: if request.auth != null;
-    }
-    match /grades/{id} {
-      allow write: if request.auth != null;
-    }
-    match /students_rating/{id} {
-      allow write: if request.auth != null
-        && get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data.role == "admin";
-    }
-  }
-}
-```
+- **O'quvchilar PII si** (`students`, `course_students`, `attendance`, `grades`,
+  `courseAssignments`, `teachers`, `classMentors`) — faqat tizimga kirgan **faol
+  foydalanuvchi** o'qiy oladi (`activeUser()`). Ommaga ochiq EMAS.
+- **Davomat/baho yozish** — o'qituvchi faqat O'ZIGA tegishli yozuvni
+  (`teacherId == o'z id`) yoza/yangilaydi; o'chirish faqat admin.
+- **`teachers` / `classMentors`** yozish — faqat admin.
+  **`courseAssignments` / `course_students` / `students`** — admin yoki sinf rahbari.
+- **Ommaviy (maxfiy emas):** `groups`, `subjects`, `students_rating`, `rating_meta`.
+- Qolgan barcha hujjatlar catch-all (`allow read, write: if false`) bilan taqiqlangan.
 
 ## Tuzatilgan asosiy xatolar (ushbu versiyada)
 

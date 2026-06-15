@@ -514,26 +514,22 @@
           localStorage.getItem("courseAssignments") || "[]",
         );
 
-        const groups1 = [
-          "101",
-          "102",
-          "103",
-          "104",
-          "105",
-          "106",
-          "107",
-          "108",
-        ];
-        const groups2 = [
-          "201",
-          "202",
-          "203",
-          "204",
-          "205",
-          "206",
-          "207",
-          "208",
-        ];
+        // 3.3 — Guruhlar dinamik aniqlanadi (qattiq yozilgan 101-108 / 201-208 o'rniga).
+        // O'quvchilar ro'yxati va kurs biriktiruvlaridagi barcha guruh kodlari
+        // yig'iladi — yangi guruhlar (109, 301, ...) avtomatik ko'rinadi.
+        const studentsForGroups = JSON.parse(
+          localStorage.getItem("students") || "[]",
+        );
+        const allGroupCodes = [
+          ...new Set(
+            [
+              ...studentsForGroups.map((s) => String(s.groupCode || "")),
+              ...assignments.map((a) => String(a.groupCode || "")),
+            ].filter(Boolean),
+          ),
+        ].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        const groups1 = allGroupCodes.filter((g) => g.startsWith("1"));
+        const groups2 = allGroupCodes.filter((g) => !g.startsWith("1"));
 
         const grid1 = document.getElementById("groups1Grid");
         const grid2 = document.getElementById("groups2Grid");
@@ -1383,7 +1379,12 @@
         };
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
-        toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${message}</span>`;
+        const _iconSpan = document.createElement("span");
+        _iconSpan.className = "toast-icon";
+        _iconSpan.innerHTML = icons[type] || icons.info; // ikonka — ichki, xavfsiz
+        const _msgSpan = document.createElement("span");
+        _msgSpan.textContent = message; // XSS himoyasi: foydalanuvchi matni textContent orqali
+        toast.append(_iconSpan, _msgSpan);
         container.appendChild(toast);
         setTimeout(() => {
           toast.style.opacity = "0";
